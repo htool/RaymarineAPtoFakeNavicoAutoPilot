@@ -15,7 +15,7 @@ const device = require('./canboatjs/lib/candevice').device
 const canbus = new (require('./canboatjs').canbus)({})
 const util = require('util')
 
-const Parser = require('canboatjs/index').FromPgn
+const Parser = require('canboatjs').FromPgn
 var parser = new Parser()
 
 debug('Using device id: %i', canbus.candevice.address)
