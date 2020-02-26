@@ -13,7 +13,6 @@ require('./canboatjs/lib/canbus')
 const canDevice = require('./canboatjs/lib/canbus').canDevice
 const device = require('./canboatjs/lib/candevice').device
 const canbus = new (require('./canboatjs').canbus)({})
-const { encodeCanId, parseCanId } = require('./canboatjs/lib/canId')
 const util = require('util')
 
 debug('Using device id: %i', canbus.candevice.address)
@@ -125,47 +124,46 @@ switch (emulate) {
 	    break;
 }
 
-
-function parsePNG (msg) {
-	if (canbus.candevice.cansend) {
-		while (canbus.readableLength > 0) {
-			//debug('canbus.readableLength: %i', canbus.readableLength)
-      var msg.pgn = parseCanId(msg.id)
-      // msg = canbus.read()
-			debug('Received packet msg: %j', msg)
-		  // debug('msg.pgn.src %i != canbus.candevice.address %i?', msg.pgn.src, canbus.candevice.address)
-      if ( msg.pgn.dst == canbus.candevice.address || msg.pgn.dst == 255) {
-        msg.pgn.fields = {}
-        if (msg.pgn.pgn == 59904) {
-          PGN1 = msg.data[1]
-          PGN2 = msg.data[0]
-          debug('ISO request. Data PGN1: %i  PGN2: %i', PGN1, PGN2)
-          switch (PGN1) {
-            case 238: // ISO Address claim
-              msg.pgn.fields.PGN = 60928
-              canbus.candevice.n2kMessage(msg.pgn)
-              break;
-            case 240: // Product info / ISO Group
-              if (PGN2 == 20) { msg.pgn.fields.PGN = 126996 }
-              if (PGN2 == 22) { msg.pgn.fields.PGN = 126998 }
-              canbus.candevice.n2kMessage(msg.pgn)
-              break;
-            case 255: // PGN1: 255  PGN2: 24
-              if (PGN2 == 24) { msg.pgn.fields.PGN = 65304}
-              canbus.candevice.n2kMessage(msg.pgn)
-              break;
-          }
-        //canbus.candevice.n2kMessage(msg.pgn)
+function mainLoop () {
+	while (canbus.readableLength > 0) {
+	//debug('canbus.readableLength: %i', canbus.readableLength)
+    msg = canbus.read()
+		// debug('Received packet msg: %j', msg)
+	  // debug('msg.pgn.src %i != canbus.candevice.address %i?', msg.pgn.src, canbus.candevice.address)
+    if ( msg.pgn.dst == canbus.candevice.address || msg.pgn.dst == 255) {
+      msg.pgn.fields = {}
+      if (msg.pgn.pgn == 59904) {
+        PGN1 = msg.data[1]
+        PGN2 = msg.data[0]
+        debug('ISO request. Data PGN1: %i  PGN2: %i', PGN1, PGN2)
+        switch (PGN1) {
+          case 238: // ISO Address claim
+            msg.pgn.fields.PGN = 60928
+            canbus.candevice.n2kMessage(msg.pgn)
+            break;
+          case 240: // Product info / ISO Group
+            if (PGN2 == 20) { msg.pgn.fields.PGN = 126996 }
+            if (PGN2 == 22) { msg.pgn.fields.PGN = 126998 }
+            canbus.candevice.n2kMessage(msg.pgn)
+            break;
+          case 255: // PGN1: 255  PGN2: 24
+            if (PGN2 == 24) { msg.pgn.fields.PGN = 65304}
+            canbus.candevice.n2kMessage(msg.pgn)
+            break;
         }
       }
 		}
-		// process.exit()
 	}
+  setTimeout(mainLoop, 50)
 }
 
-// Listen for incoming packets
-canbus.channel.addListener('onMessage', (msg) => { parsePNG(msg) } )
+// Wait for cansend
+function waitForSend () {
+  if (canbus.candevice.cansend) {
+    mainLoop()
+    return
+  }
+  setTimeout (waitForSend, 500)
+}
 
-
-// Check every 5 millisecnds
-// setInterval(mainLoop, 5);
+waitForSend()
