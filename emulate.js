@@ -1,7 +1,7 @@
 const debug = require('debug')('emulate')
 
 var myArgs = process.argv.slice(2);
-emulate = myArgs[0]
+emulate = myArgs[0] || 'AC12'
 emulate_init = './device/' + emulate + '.js'
 
 // Load device specific init info
@@ -167,6 +167,8 @@ function mainLoop () {
 parser.on('pgn', (pgn) => {
   console.log(JSON.stringify(pgn))
 })
+
+
 
 // Check every 5 millisecnds
 setInterval(mainLoop, 5);
