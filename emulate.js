@@ -15,6 +15,9 @@ const device = require('./canboatjs/lib/candevice').device
 const canbus = new (require('./canboatjs').canbus)({})
 const util = require('util')
 
+const Parser = require('canboatjs/index').FromPgn
+var parser = new Parser()
+
 debug('Using device id: %i', canbus.candevice.address)
 
 // Generic functions
@@ -160,6 +163,10 @@ function mainLoop () {
 		// process.exit()
 	}
 }
+
+parser.on('pgn', (pgn) => {
+  console.log(JSON.stringify(pgn))
+})
 
 // Check every 5 millisecnds
 setInterval(mainLoop, 5);
