@@ -15,8 +15,8 @@ const device = require('./canboatjs/lib/candevice').device
 const canbus = new (require('./canboatjs').canbus)({})
 const util = require('util')
 
-const Parser = require('./canboatjs').FromPgn
-var parser = new Parser()
+var canDevice = options.canDevice || 'can0'
+
 
 debug('Using device id: %i', canbus.candevice.address)
 
@@ -128,12 +128,13 @@ switch (emulate) {
 }
 
 
-function mainLoop () {
+function parsePNG () {
 	if (canbus.candevice.cansend) {
 		while (canbus.readableLength > 0) {
 			//debug('canbus.readableLength: %i', canbus.readableLength)
-			msg = canbus.read()
-			// debug('Received packet msg: %j', msg)
+      var msg.pgn = parseCanId(msg.id)
+      // msg = canbus.read()
+			debug('Received packet msg: %j', msg)
 		  // debug('msg.pgn.src %i != canbus.candevice.address %i?', msg.pgn.src, canbus.candevice.address)
       if ( msg.pgn.dst == canbus.candevice.address || msg.pgn.dst == 255) {
         msg.pgn.fields = {}
@@ -164,11 +165,9 @@ function mainLoop () {
 	}
 }
 
-parser.on('pgn', (pgn) => {
-  console.log(JSON.stringify(pgn))
-})
-
+// Listen for incoming packets
+canbus.channel.addListener('onMessage', (msg) => { parsePNG(msg) } )
 
 
 // Check every 5 millisecnds
-setInterval(mainLoop, 5);
+// setInterval(mainLoop, 5);
