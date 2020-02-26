@@ -82,7 +82,6 @@ async function AC12_pilotmode () {
     "%s,7,65302,%s,255,8,41,9f,0a,69,00,00,28,ff",
     "%s,3,65340,%s,255,8,41,9f,10,01,fe,fa,00,80",
     "%s,6,65341,%s,255,8,41,9f,ff,ff,0d,ff,ff,7f",
-    "%s,6,65341,%s,255,8,41,9f,ff,ff,0b,ff,00,00",
     "%s,6,65341,%s,255,8,41,9f,ff,ff,0c,ff,ff,ff",
     "%s,6,65341,%s,255,8,41,9f,ff,ff,03,ff,ff,ff",
     "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,ff,ff" ]
@@ -92,6 +91,12 @@ async function AC12_pilotmode () {
     canbus.sendPGN(msg)
     await sleep(25)
   }
+}
+
+function AC12_pilotmode_0b () {
+  const message = "%s,6,65341,%s,255,8,41,9f,ff,ff,0b,ff,00,00"
+  msg = util.format(message, (new Date()).toISOString(), canbus.candevice.address)
+  canbus.sendPGN(msg)
 }
 
 switch (emulate) {
@@ -113,6 +118,7 @@ switch (emulate) {
       setTimeout(PGN130822, 5000) // Once at startup
       setInterval(PGN130822, 300000) // Every 5 minutes
       setInterval(AC12_pilotmode, 1000) // Every second
+      setInterval(AC12_pilotmode_0b, 5000) // Every second
       setInterval(AC12_PGN130860, 1000) // Every second
       setInterval(heartbeat, 60000) // Heart beat PGN
 	    break;
@@ -157,4 +163,3 @@ function mainLoop () {
 
 // Check every 5 millisecnds
 setInterval(mainLoop, 5);
-
