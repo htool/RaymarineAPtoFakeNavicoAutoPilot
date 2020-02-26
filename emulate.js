@@ -13,10 +13,8 @@ require('./canboatjs/lib/canbus')
 const canDevice = require('./canboatjs/lib/canbus').canDevice
 const device = require('./canboatjs/lib/candevice').device
 const canbus = new (require('./canboatjs').canbus)({})
+const { encodeCanId, parseCanId } = require('./canboatjs/lib/canId')
 const util = require('util')
-
-var canDevice = options.canDevice || 'can0'
-
 
 debug('Using device id: %i', canbus.candevice.address)
 
@@ -128,7 +126,7 @@ switch (emulate) {
 }
 
 
-function parsePNG () {
+function parsePNG (msg) {
 	if (canbus.candevice.cansend) {
 		while (canbus.readableLength > 0) {
 			//debug('canbus.readableLength: %i', canbus.readableLength)
