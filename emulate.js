@@ -163,16 +163,15 @@ function mainLoop () {
         if (msg.pgn.pgn == 130850) { // Simnet Event, requires reply
           // Using 130850 and turning it into 130851
           debug ('Reply AP command: %j %j', msg.pgn, msg.data);
-          reply130851 = buf2hex(msg.data).slice(1);
-          //reply130851.push((msg.data.data).slice(1)); // Add multipart Data
+          reply130851.push(buf2hex(msg.data).slice(1)); // Add multipart Data
           debug('reply130851 %j', reply130851);
           if (reply130851.length > 8) { // We have 2 parts now
-              debug('Ready to send %j', reply130851);
+              msg = "%s,7,130851,%s,255,12," + reply130851.join(',');
+              debug('Ready to send %j', msg);
+              msg = util.format(msg, (new Date()).toISOString(), canbus.candevice.address)
+              canbus.sendPGN(msg)
               reply130851=[];
           }
-          // msg = util.format(messages[nr], (new Date()).toISOString(), canbus.candevice.address)
-          //canbus.sendPGN(reply)
-          // sendPGN(msg.pgn);
         }
         break;
       default:
