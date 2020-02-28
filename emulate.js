@@ -68,7 +68,7 @@ function AC12_PGN130860 () {
   canbus.sendPGN(msg)
 }
 
-function AC12_PGN127237 (state) {
+function AC12_PGN127237 () {
   const heading_track_pgn = {
       "auto":    "%s,2,127237,%s,%s,8,15,ff,3f,ff,ff,7f,%s,%s,00,00,ff,ff,ff,ff,ff,7f",
       "wind":    "",
@@ -149,7 +149,7 @@ switch (emulate) {
       setInterval(AC12_pilotmode_0b, 5000) // Every second
       setInterval(AC12_PGN130860, 1000) // Every second
       setInterval(heartbeat, 60000) // Heart beat PGN
-      setInterval(AC12_PGN127237(state), 1000) // Heading/track PGN
+      setInterval(AC12_PGN127237, 1000) // Heading/track PGN
  	    break;
 }
 
