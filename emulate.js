@@ -15,7 +15,7 @@ const device = require('./canboatjs/lib/candevice').device
 const canbus = new (require('./canboatjs').canbus)({})
 const util = require('util')
 
-var reply130851;
+var reply130851 = [];
 
 debug('Using device id: %i', canbus.candevice.address)
 
