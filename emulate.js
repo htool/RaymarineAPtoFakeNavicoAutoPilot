@@ -159,7 +159,7 @@ function mainLoop () {
           // Using 130850 and turning it into 130851
           debug ('Reply AP command: %j', msg.pgn)
           // msg = util.format(messages[nr], (new Date()).toISOString(), canbus.candevice.address)
-          canbus.sendPGN(reply)
+          //canbus.sendPGN(reply)
           // sendPGN(msg.pgn);
         }
         break;
