@@ -159,8 +159,9 @@ function mainLoop () {
       case 'AC12':
         if (msg.pgn.pgn == 130850) { // Simnet Event, requires reply
           // Using 130850 and turning it into 130851
-          debug ('Reply AP command: %j %j', msg.pgn, msg.data)
-          reply130851.push(msg.data[1].data.slice(1)); // Add multipart Data
+          debug ('Reply AP command: %j %j', msg.pgn, msg.data);
+          debug ('msg.data[1].data: %j', msg.data[1].data);
+          reply130851.push((msg.data[1].data).slice(1)); // Add multipart Data
           debug('reply130851 %j', reply130851);
           if (reply130851.length > 8) { // We have 2 parts now
               debug('Ready to send %j', reply130851);
