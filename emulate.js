@@ -17,6 +17,7 @@ const util = require('util')
 
 var reply130851 = [];
 var state = 'standby';
+var heading = 0;
 
 debug('Using device id: %i', canbus.candevice.address)
 
@@ -70,16 +71,16 @@ function AC12_PGN130860 () {
 
 function AC12_PGN127237 () {
   const heading_track_pgn = {
-      "auto":    "%s,2,127237,%s,%s,8,21,ff,3f,ff,ff,7f,%s,%s,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,ff",
+      "auto":    "%s,2,127237,%s,%s,21,ff,3f,ff,ff,7f,%s,%s,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,ff",
       "wind":    "",
       "route":   "",
-      "standby": "%s,2,127237,%s,%s,8,21,ff,7f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,ff" // Magnetic
+      "standby": "%s,2,127237,%s,%s,21,ff,7f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,ff" // Magnetic
       //"standbyTrue":     "%s,2,127237,%s,%s,8,15,ff,7f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f"
   }
 
   switch (state) {
     case 'auto':
-      var new_value = Math.trunc(degsToRad(value) * 10000)
+      var new_value = Math.trunc(degsToRad(heading) * 10000)
       var msg = util.format(heading_track_pgn[state], (new Date()).toISOString(), canbus.candevice.address,
                             autopilot_dst, padd((new_value & 0xff).toString(16), 2), padd(((new_value >> 8) & 0xff).toString(16), 2))
       debug('127237 (auto): %j', msg);
