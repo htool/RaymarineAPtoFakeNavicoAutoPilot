@@ -157,7 +157,7 @@ function mainLoop () {
       case 'AC12':
         if (msg.pgn.pgn == 130850) { // Simnet Event, requires reply
           // Using 130850 and turning it into 130851
-          debug ('Reply AP command: %j', msg.pgn)
+          debug ('Reply AP command: %j %j', msg.pgn, msg.data)
           // msg = util.format(messages[nr], (new Date()).toISOString(), canbus.candevice.address)
           //canbus.sendPGN(reply)
           // sendPGN(msg.pgn);
