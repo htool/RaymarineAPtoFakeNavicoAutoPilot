@@ -20,6 +20,9 @@ var reply130851 = [];
 debug('Using device id: %i', canbus.candevice.address)
 
 // Generic functions
+function buf2hex(buffer) { // buffer is an ArrayBuffer
+  return Array.prototype.map.call(new Uint8Array(buffer), x => ('00' + x.toString(16)).slice(-2)).join('');
+}
 
 // Sleep
 const sleep = (milliseconds) => {
@@ -160,7 +163,7 @@ function mainLoop () {
         if (msg.pgn.pgn == 130850) { // Simnet Event, requires reply
           // Using 130850 and turning it into 130851
           debug ('Reply AP command: %j %j', msg.pgn, msg.data);
-          debug ("msg.data['data']: %j", msg.data['data']);
+          reply130851 = buf2hex(msg.data);
           //reply130851.push((msg.data.data).slice(1)); // Add multipart Data
           debug('reply130851 %j', reply130851);
           if (reply130851.length > 8) { // We have 2 parts now
