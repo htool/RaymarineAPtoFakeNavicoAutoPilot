@@ -70,10 +70,10 @@ function AC12_PGN130860 () {
 
 function AC12_PGN127237 () {
   const heading_track_pgn = {
-      "auto":    "%s,2,127237,%s,%s,8,15,ff,3f,ff,ff,7f,%s,%s,00,00,ff,ff,ff,ff,ff,7f",
+      "auto":    "%s,2,127237,%s,%s,8,21,ff,3f,ff,ff,7f,%s,%s,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,ff",
       "wind":    "",
       "route":   "",
-      "standby": "%s,2,127237,%s,%s,8,15,ff,7f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f" // Magnetic
+      "standby": "%s,2,127237,%s,%s,8,21,ff,7f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,ff" // Magnetic
       //"standbyTrue":     "%s,2,127237,%s,%s,8,15,ff,7f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f"
   }
 
