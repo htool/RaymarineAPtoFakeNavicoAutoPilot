@@ -82,11 +82,13 @@ function AC12_PGN127237 () {
       var new_value = Math.trunc(degsToRad(value) * 10000)
       var msg = util.format(heading_track_pgn[state], (new Date()).toISOString(), canbus.candevice.address,
                             autopilot_dst, padd((new_value & 0xff).toString(16), 2), padd(((new_value >> 8) & 0xff).toString(16), 2))
-      canbus.sendPGN(msg)
+      debug('127237: %j', msg);
+      canbus.sendPGN(msg);
       break;
     default:
       var msg = util.format(heading_track_pgn[state], (new Date()).toISOString(), canbus.candevice.address, 255)
-      canbus.sendPGN(msg)
+      debug('127237: %j', msg);
+      canbus.sendPGN(msg);
   }
 }
 
