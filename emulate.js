@@ -15,6 +15,8 @@ const device = require('./canboatjs/lib/candevice').device
 const canbus = new (require('./canboatjs').canbus)({})
 const util = require('util')
 
+var reply130851;
+
 debug('Using device id: %i', canbus.candevice.address)
 
 // Generic functions
@@ -158,6 +160,10 @@ function mainLoop () {
         if (msg.pgn.pgn == 130850) { // Simnet Event, requires reply
           // Using 130850 and turning it into 130851
           debug ('Reply AP command: %j %j', msg.pgn, msg.data)
+          reply130851.push = msg.data.slice(1); // Add multipart Data
+          if reply130851.length > 8 {
+              debug('Ready to send %j', reply130851)
+          }
           // msg = util.format(messages[nr], (new Date()).toISOString(), canbus.candevice.address)
           //canbus.sendPGN(reply)
           // sendPGN(msg.pgn);
