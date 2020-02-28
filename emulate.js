@@ -161,7 +161,7 @@ function mainLoop () {
           // Using 130850 and turning it into 130851
           debug ('Reply AP command: %j %j', msg.pgn, msg.data)
           reply130851.push = msg.data.slice(1); // Add multipart Data
-          if reply130851.length > 8 {
+          if (reply130851.length > 8) { // We have 2 parts now
               debug('Ready to send %j', reply130851)
           }
           // msg = util.format(messages[nr], (new Date()).toISOString(), canbus.candevice.address)
