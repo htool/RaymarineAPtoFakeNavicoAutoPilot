@@ -16,6 +16,7 @@ const canbus = new (require('./canboatjs').canbus)({})
 const util = require('util')
 
 var reply130851 = [];
+var state = 'standby';
 
 debug('Using device id: %i', canbus.candevice.address)
 
@@ -65,6 +66,28 @@ function AC12_PGN130860 () {
   const message = "%s,7,130860,%s,255,21,13,99,ff,ff,ff,ff,7f,ff,ff,ff,7f,ff,ff,ff,ff,ff,ff,ff,7f,ff,ff,ff,7f"
   msg = util.format(message, (new Date()).toISOString(), canbus.candevice.address)
   canbus.sendPGN(msg)
+}
+
+function AC12_PGN127237 (state) {
+  const heading_track_pgn = {
+      "auto":    "%s,2,127237,%s,%s,8,15,ff,3f,ff,ff,7f,%s,%s,00,00,ff,ff,ff,ff,ff,7f",
+      "wind":    "",
+      "route":   "",
+      "standby": "%s,2,127237,%s,%s,8,15,ff,7f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f" // Magnetic
+      //"standbyTrue":     "%s,2,127237,%s,%s,8,15,ff,7f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f"
+  }
+
+  switch (state) {
+    case 'auto':
+      var new_value = Math.trunc(degsToRad(value) * 10000)
+      var msg = util.format(heading_track_pgn[state], (new Date()).toISOString(), default_src,
+                            autopilot_dst, padd((new_value & 0xff).toString(16), 2), padd(((new_value >> 8) & 0xff).toString(16), 2))
+      canbus.sendPGN(msg)
+      break;
+    default:
+      var msg = util.format(heading_track_pgn[state], (new Date()).toISOString(), default_src, 255)
+      canbus.sendPGN(msg)
+  }
 }
 
 async function AP44_PGN65305 () {
@@ -126,7 +149,8 @@ switch (emulate) {
       setInterval(AC12_pilotmode_0b, 5000) // Every second
       setInterval(AC12_PGN130860, 1000) // Every second
       setInterval(heartbeat, 60000) // Heart beat PGN
-	    break;
+      setInterval(AC12_PGN127237(state), 1000) // Heading/track PGN
+ 	    break;
 }
 
 function mainLoop () {
@@ -162,7 +186,7 @@ function mainLoop () {
       case 'AC12':
         if (msg.pgn.pgn == 130850) { // Simnet Event, requires reply
           // Using 130850 and turning it into 130851
-          debug ('Reply AP command: %j %j', msg.pgn, msg.data);
+          debug ('Event AP command: %j %j', msg.pgn, msg.data);
           if (reply130851.length == 0) {
             reply130851 = reply130851.concat(buf2hex(msg.data).slice(2)); // Skip multipart byte and length byte
           } else {
@@ -171,7 +195,7 @@ function mainLoop () {
           debug('reply130851 %j', reply130851);
           if (reply130851.length > 8) { // We have 2 parts now
               msg = "%s,7,130851,%s,255,12," + reply130851.join(',');
-              debug('Ready to send %j', msg);
+              debug('Sending %j', msg);
               msg = util.format(msg, (new Date()).toISOString(), canbus.candevice.address)
               canbus.sendPGN(msg)
               reply130851=[];
