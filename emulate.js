@@ -160,7 +160,7 @@ function mainLoop () {
         if (msg.pgn.pgn == 130850) { // Simnet Event, requires reply
           // Using 130850 and turning it into 130851
           debug ('Reply AP command: %j %j', msg.pgn, msg.data)
-          reply130851.push(msg.data.slice(1)); // Add multipart Data
+          reply130851.push(msg.data.data.slice(1)); // Add multipart Data
           debug('reply130851 %j', reply130851);
           if (reply130851.length > 8) { // We have 2 parts now
               debug('Ready to send %j', reply130851);
