@@ -166,7 +166,7 @@ function mainLoop () {
           if (reply130851.length == 0) {
             reply130851 = reply130851.concat(buf2hex(msg.data).slice(2)); // Skip multipart byte and length byte
           } else {
-            reply130851 = reply130851.concat(buf2hex(msg.data).slice(1)); // Skip only multipart byte
+            reply130851 = reply130851.concat(buf2hex(msg.data).slice(1,5)); // Skip multipart byte and 2 stuffing bytes
           }
           debug('reply130851 %j', reply130851);
           if (reply130851.length > 8) { // We have 2 parts now
