@@ -16,7 +16,7 @@ const canbus = new (require('./canboatjs').canbus)({})
 const util = require('util')
 
 var reply130851 = [];
-var state = 'standby';
+var pilot_state = 'standby';
 var heading = 199;
 
 debug('Using device id: %i', canbus.candevice.address)
@@ -93,16 +93,16 @@ function AC12_PGN127237 () {
       // True    "%s,2,127237,%s,%s,21,ff,7f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,ff"
   }
 
-  switch (state) {
+  switch (pilot_state) {
     case 'auto':
       var new_value = Math.trunc(degsToRad(heading) * 10000)
-      var msg = util.format(heading_track_pgn[state], (new Date()).toISOString(), canbus.candevice.address,
+      var msg = util.format(heading_track_pgn[pilot_state], (new Date()).toISOString(), canbus.candevice.address,
                             255, padd((new_value & 0xff).toString(16), 2), padd(((new_value >> 8) & 0xff).toString(16), 2))
       // debug('127237 (auto): %j', msg);
       canbus.sendPGN(msg);
       break;
     default:
-      var msg = util.format(heading_track_pgn[state], (new Date()).toISOString(), canbus.candevice.address, 255)
+      var msg = util.format(heading_track_pgn[pilot_state], (new Date()).toISOString(), canbus.candevice.address, 255)
       // debug('127237 (standby): %j', msg);
       canbus.sendPGN(msg);
   }
@@ -129,14 +129,24 @@ async function AC12_pilotmode () {
     "%s,3,65340,%s,255,8,41,9f,10,01,fe,fa,00,80",
     "%s,6,65341,%s,255,8,41,9f,ff,ff,0d,ff,ff,7f",
     "%s,6,65341,%s,255,8,41,9f,ff,ff,0c,ff,ff,ff",
-    "%s,6,65341,%s,255,8,41,9f,ff,ff,03,ff,ff,ff",
-    "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,ff,ff" ]
+    "%s,6,65341,%s,255,8,41,9f,ff,ff,03,ff,ff,ff" ]
 
   for (var nr in messages) {
     msg = util.format(messages[nr], (new Date()).toISOString(), canbus.candevice.address)
     canbus.sendPGN(msg)
     await sleep(25)
   }
+}
+
+function AC12_pilotmode_02 () {
+  const pilotmode = {
+      "auto":    "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,15,9a",
+      "wind":    "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,00,00",
+      "route":   "",
+      "standby": "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,ff,ff"
+  }
+  msg = util.format(message[pilot_state], (new Date()).toISOString(), canbus.candevice.address)
+  canbus.sendPGN(msg)
 }
 
 function AC12_pilotmode_0b () {
@@ -164,7 +174,8 @@ switch (emulate) {
       setTimeout(PGN130822, 5000) // Once at startup
       setInterval(PGN130822, 300000) // Every 5 minutes
       setInterval(AC12_pilotmode, 1000) // Every second
-      setInterval(AC12_pilotmode_0b, 5000) // Every second
+      setInterval(AC12_pilotmode_0b, 5000) // Every 5 second
+      setInterval(AC12_pilotmode_02, 5000) // Every 5 second
       setInterval(AC12_PGN130860, 1000) // Every second
       setInterval(heartbeat, 60000) // Heart beat PGN
       setInterval(AC12_PGN127237, 1000) // Heading/track PGN
@@ -213,10 +224,12 @@ function mainLoop () {
           debug('reply130851 %j', reply130851);
           if (reply130851.join(',') == '41,9f,01,ff,ff,0a,09,00,ff,ff,ff') {
             debug('Going into auto mode');
-            state = 'auto';
+            pilot_state = 'auto';
+            AC12_pilotmode_02();
           } else if (reply130851.join(',') == '41,9f,01,ff,ff,0a,06,00,ff,ff,ff') {
             debug('Going into standby mode');
-            state = 'standby';
+            pilot_state = 'standby';
+            AC12_pilotmode_02();
           }
 
           if (reply130851.length > 8) { // We have 2 parts now
