@@ -159,23 +159,28 @@ function AC12_pilotmode_0b () {
   canbus.sendPGN(msg)
 }
 
+function sendPGNList () {
+  debug('Broadcasting PGN list');
+  canbus.sendPGNList(canbus.candevice.address, 255);
+}
+
 switch (emulate) {
+  case 'default':
+      setTimeout(PGN130822, 5000) // Once at startup
+      setTimout(sendPGNList, 5000) // Once at startuo
   case 'keypad':
       debug('Emulate: B&G Triton2 Keypad')
-      setTimeout(PGN130822, 5000) // Once at startup
       setInterval(PGN130822, 300000) // Every 5 minutes
       setInterval(heartbeat, 60000) // Heart beat PGN
       break;
 	case 'AP44':
 	    debug('Emulate: Simrad AP44 Autopilot controller')
-      setTimeout(PGN130822, 5000) // Once at startup
       setInterval(PGN130822, 300000) // Every 5 minutes
       setInterval(AP44_PGN65305, 1000) // Every 1 minute
       setInterval(heartbeat, 60000) // Heart beat PGN
 	    break;
 	case 'AC12':
 	    debug('Emulate: Simrad AC12-1 Autopilot')
-      setTimeout(PGN130822, 5000) // Once at startup
       setInterval(PGN130822, 300000) // Every 5 minutes
       setInterval(AC12_pilotmode, 1000) // Every second
       setInterval(AC12_pilotmode_0b, 5000) // Every 5 second
