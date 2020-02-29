@@ -167,7 +167,7 @@ function sendPGNList () {
 switch (emulate) {
   case 'default':
       setTimeout(PGN130822, 5000) // Once at startup
-      setTimout(sendPGNList, 5000) // Once at startuo
+      setTimeout(sendPGNList, 5000) // Once at startup
   case 'keypad':
       debug('Emulate: B&G Triton2 Keypad')
       setInterval(PGN130822, 300000) // Every 5 minutes
