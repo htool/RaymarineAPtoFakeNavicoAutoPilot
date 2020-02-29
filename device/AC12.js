@@ -1,8 +1,13 @@
-const debug = require('debug')('device')
-debug('Emulate: Simrad AC12-1 autopilot')
+const debug = require('debug')('device');
+debug('Emulate: Simrad AC12-1 autopilot');
+
+
 
 // Device address (suggested)
-deviceAddress = 16
+deviceAddress = 16;
+
+// Track/heading
+
 
 // AddressClaim PGN
 addressClaim = {
@@ -33,3 +38,12 @@ productInfo = {
   "Certification Level": 1,
   "Load Equivalency": 1
 }
+
+const defaultTransmitPGNs = [
+  60928,
+  59904,
+  59392,
+  59904
+]
+
+module.exports.defaultTransmitPGNs = defaultTransmitPGNs

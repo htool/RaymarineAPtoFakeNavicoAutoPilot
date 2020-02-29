@@ -33,3 +33,13 @@ productInfo = {
   "Certification Level": 2,
   "Load Equivalency": 4
 }
+
+const defaultTransmitPGNs = [
+  60928,
+  59904,
+  59392,
+  59904,
+  130130
+]
+
+module.exports.defaultTransmitPGNs = defaultTransmitPGNs

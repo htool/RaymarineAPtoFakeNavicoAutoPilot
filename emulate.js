@@ -7,6 +7,8 @@ emulate_init = './device/' + emulate + '.js'
 // Load device specific init info
 debug('Loading %s', emulate_init)
 require(emulate_init)
+const defaultTransmitPGNs = require(emulate_init).defaultTransmitPGNs
+module.exports.defaultTransmitPGNs = defaultTransmitPGNs
 
 require('./canboatjs')
 require('./canboatjs/lib/canbus')

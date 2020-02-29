@@ -34,25 +34,6 @@ const deviceClassNames = invert(deviceClassCodes)
 const industryNames = invert(industryCodes)
 industryNames['Marine'] = 4
 
-const defaultTransmitPGNs = [
-  60928,
-  59904,
-  59392,
-  59904,
-  60160,
-  60416,
-  60928,
-  65240,
-  65305,
-  65323,
-  65340,
-  65341,
-  65342,
-  126208,
-  126996,
-  127237,
-  127245
-]
 
 const manufacturerCodes = invert(manufacturerNames)
 module.exports.manufacturerCodes = manufacturerCodes
@@ -62,4 +43,3 @@ module.exports.getIndustryCode = propertyOf(industryNames)
 module.exports.getManufacturerCode = propertyOf(manufacturerNames)
 module.exports.getDeviceClassCode = propertyOf(deviceClassNames)
 module.exports.getDeviceClassName = propertyOf(deviceClassCodes)
-module.exports.defaultTransmitPGNs = defaultTransmitPGNs
