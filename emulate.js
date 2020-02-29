@@ -17,7 +17,7 @@ const util = require('util')
 
 var reply130851 = [];
 var state = 'standby';
-var heading = 0;
+var heading = 199;
 
 debug('Using device id: %i', canbus.candevice.address)
 
