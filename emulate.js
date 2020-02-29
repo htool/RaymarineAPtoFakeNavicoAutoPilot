@@ -96,6 +96,7 @@ function AC12_PGN127237 () {
 
   switch (pilot_state) {
     case 'auto':
+    case 'NFU':
       var new_value = Math.trunc(degsToRad(heading) * 10000)
       var msg = util.format(heading_track_pgn[pilot_state], (new Date()).toISOString(), canbus.candevice.address,
                             255, padd((new_value & 0xff).toString(16), 2), padd(((new_value >> 8) & 0xff).toString(16), 2))
