@@ -97,7 +97,7 @@ function AC12_PGN127237 () {
     case 'auto':
       var new_value = Math.trunc(degsToRad(heading) * 10000)
       var msg = util.format(heading_track_pgn[state], (new Date()).toISOString(), canbus.candevice.address,
-                            autopilot_dst, padd((new_value & 0xff).toString(16), 2), padd(((new_value >> 8) & 0xff).toString(16), 2))
+                            255, padd((new_value & 0xff).toString(16), 2), padd(((new_value >> 8) & 0xff).toString(16), 2))
       debug('127237 (auto): %j', msg);
       canbus.sendPGN(msg);
       break;
