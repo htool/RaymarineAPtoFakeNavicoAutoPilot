@@ -160,7 +160,7 @@ function AC12_pilotmode_0b () {
 }
 
 function sendPGNList () {
-  debug('Broadcasting PGN list');
+  debug('Broadcasting PGN list: %j', defaultTransmitPGNs);
   canbus.sendPGNList(canbus.candevice.address, 255);
 }
 
