@@ -196,10 +196,10 @@ function mainLoop () {
             reply130851 = reply130851.concat(buf2hex(msg.data).slice(1,6)); // Skip multipart byte and 1 stuffing byte
           }
           debug('reply130851 %j', reply130851);
-          if (reply130851.join(',) == '41,9f,01,ff,ff,0a,09,00,ff,ff,ff') {
+          if (reply130851.join(',') == '41,9f,01,ff,ff,0a,09,00,ff,ff,ff') {
             debug('Going into auto mode');
             state = 'auto';
-          } else if (reply130851.join(',) == '41,9f,01,ff,ff,0a,06,00,ff,ff,ff') {
+          } else if (reply130851.join(',') == '41,9f,01,ff,ff,0a,06,00,ff,ff,ff') {
             debug('Going into standby mode');
             state = 'standby';
           }
