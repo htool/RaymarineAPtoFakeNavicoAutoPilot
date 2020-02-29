@@ -139,13 +139,13 @@ async function AC12_pilotmode () {
 }
 
 function AC12_pilotmode_02 () {
-  const pilotmode = {
+  const pgn65341_02 = {
       "auto":    "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,15,9a",
       "wind":    "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,00,00",
       "route":   "",
       "standby": "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,ff,ff"
   }
-  msg = util.format(message[pilot_state], (new Date()).toISOString(), canbus.candevice.address)
+  msg = util.format(pgn65341_02[pilot_state], (new Date()).toISOString(), canbus.candevice.address)
   canbus.sendPGN(msg)
 }
 
