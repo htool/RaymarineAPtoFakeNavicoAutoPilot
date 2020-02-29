@@ -34,6 +34,13 @@ function degsToRad(degrees) {
   return degrees * (Math.PI/180.0);
 }
 
+function padd(n, p, c)
+{
+  var pad_char = typeof c !== 'undefined' ? c : '0';
+  var pad = new Array(1 + p).join(pad_char);
+  return (pad + n).slice(-pad.length);
+}
+
 // Sleep
 const sleep = (milliseconds) => {
   return new Promise(resolve => setTimeout(resolve, milliseconds))
