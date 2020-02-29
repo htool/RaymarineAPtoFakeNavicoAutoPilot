@@ -86,10 +86,10 @@ function AC12_PGN130860 () {
 
 function AC12_PGN127237 () {
   const heading_track_pgn = {
-      "auto":    "%s,2,127237,%s,%s,21,ff,3f,ff,ff,7f,%s,%s,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,ff",
+      "auto":    "%s,2,127237,%s,%s,21,ff,7f,ff,ff,7f,%s,%s,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,ff",
       "wind":    "",
       "route":   "",
-      "standby": "%s,2,127237,%s,%s,21,ff,3f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,ff" // Magnetic
+      "standby": "%s,2,127237,%s,%s,21,ff,7f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,ff" // Magnetic
       // True    "%s,2,127237,%s,%s,21,ff,7f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,ff"
   }
 
@@ -98,12 +98,12 @@ function AC12_PGN127237 () {
       var new_value = Math.trunc(degsToRad(heading) * 10000)
       var msg = util.format(heading_track_pgn[state], (new Date()).toISOString(), canbus.candevice.address,
                             255, padd((new_value & 0xff).toString(16), 2), padd(((new_value >> 8) & 0xff).toString(16), 2))
-      debug('127237 (auto): %j', msg);
+      // debug('127237 (auto): %j', msg);
       canbus.sendPGN(msg);
       break;
     default:
       var msg = util.format(heading_track_pgn[state], (new Date()).toISOString(), canbus.candevice.address, 255)
-      debug('127237 (standby): %j', msg);
+      // debug('127237 (standby): %j', msg);
       canbus.sendPGN(msg);
   }
 }
