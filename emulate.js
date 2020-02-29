@@ -87,10 +87,11 @@ function AC12_PGN130860 () {
 function AC12_PGN127237 () {
   const heading_track_pgn = {
       "auto":    "%s,2,127237,%s,%s,21,ff,7f,ff,ff,7f,%s,%s,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,ff",
+      "NFU":     "%s,2,127237,%s,%s,21,ff,7f,ff,ff,7f,%s,%s,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,ff",
       "wind":    "",
       "route":   "",
       "standby": "%s,2,127237,%s,%s,21,ff,7f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,ff" // Magnetic
-      // True    "%s,2,127237,%s,%s,21,ff,7f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,ff"
+      // True    "%s,2,127237,%s,%s,21,ff,3f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,ff"
   }
 
   switch (pilot_state) {
@@ -101,7 +102,7 @@ function AC12_PGN127237 () {
       // debug('127237 (auto): %j', msg);
       canbus.sendPGN(msg);
       break;
-    default:
+    case 'standby':
       var msg = util.format(heading_track_pgn[pilot_state], (new Date()).toISOString(), canbus.candevice.address, 255)
       // debug('127237 (standby): %j', msg);
       canbus.sendPGN(msg);
@@ -141,7 +142,7 @@ async function AC12_pilotmode () {
 function AC12_pilotmode_02 () {
   const pgn65341_02 = {
       "auto":    "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,15,9a",
-      "wind":    "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,00,00",
+      "NFU":     "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,00,00",
       "route":   "",
       "standby": "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,ff,ff"
   }
@@ -230,8 +231,11 @@ function mainLoop () {
             debug('Going into standby mode');
             pilot_state = 'standby';
             AC12_pilotmode_02();
+          } else if (reply130851.join(',') == '41,9f,01,ff,ff,02,0e,00,ff,ff,ff') {
+            debug('Going into NFU mode');
+            pilot_state = 'NFU';
+            AC12_pilotmode_02();
           }
-
           if (reply130851.length > 8) { // We have 2 parts now
               msg = "%s,7,130851,%s,255,12," + reply130851.join(',');
               debug('Sending %j', msg);
