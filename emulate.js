@@ -26,6 +26,14 @@ function buf2hex(buffer) { // buffer is an ArrayBuffer
   return Array.prototype.map.call(new Uint8Array(buffer), x => ('00' + x.toString(16)).slice(-2));
 }
 
+function radsToDeg(radians) {
+  return radians * 180 / Math.PI
+}
+
+function degsToRad(degrees) {
+  return degrees * (Math.PI/180.0);
+}
+
 // Sleep
 const sleep = (milliseconds) => {
   return new Promise(resolve => setTimeout(resolve, milliseconds))
