@@ -164,10 +164,10 @@ function sendPGNList () {
   canbus.sendPGNList(canbus.candevice.address, 255);
 }
 
+setTimeout(PGN130822, 5000) // Once at startup
+setTimeout(sendPGNList, 5000) // Once at startup
+
 switch (emulate) {
-  case 'default':
-      setTimeout(PGN130822, 5000) // Once at startup
-      setTimeout(sendPGNList, 5000) // Once at startup
   case 'keypad':
       debug('Emulate: B&G Triton2 Keypad')
       setInterval(PGN130822, 300000) // Every 5 minutes
