@@ -74,8 +74,8 @@ function AC12_PGN127237 () {
       "auto":    "%s,2,127237,%s,%s,21,ff,3f,ff,ff,7f,%s,%s,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,ff",
       "wind":    "",
       "route":   "",
-      "standby": "%s,2,127237,%s,%s,21,ff,7f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,ff" // Magnetic
-      //"standbyTrue":     "%s,2,127237,%s,%s,8,15,ff,7f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f"
+      "standby": "%s,2,127237,%s,%s,21,ff,3f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,ff" // Magnetic
+      // True    "%s,2,127237,%s,%s,21,ff,7f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,ff"
   }
 
   switch (state) {
@@ -196,6 +196,14 @@ function mainLoop () {
             reply130851 = reply130851.concat(buf2hex(msg.data).slice(1,6)); // Skip multipart byte and 1 stuffing byte
           }
           debug('reply130851 %j', reply130851);
+          if (reply130851.join(',) == '41,9f,01,ff,ff,0a,09,00,ff,ff,ff') {
+            debug('Going into auto mode');
+            state = 'auto';
+          } else if (reply130851.join(',) == '41,9f,01,ff,ff,0a,06,00,ff,ff,ff') {
+            debug('Going into standby mode');
+            state = 'standby';
+          }
+
           if (reply130851.length > 8) { // We have 2 parts now
               msg = "%s,7,130851,%s,255,12," + reply130851.join(',');
               debug('Sending %j', msg);
