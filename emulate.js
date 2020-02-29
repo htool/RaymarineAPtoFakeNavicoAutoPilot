@@ -14,7 +14,7 @@ require('./canboatjs')
 require('./canboatjs/lib/canbus')
 const canDevice = require('./canboatjs/lib/canbus').canDevice
 const device = require('./canboatjs/lib/candevice').device
-const sendPGNList = require('./canboatjs/lib/candevice').sendPGNList
+const CanDeviceSendPGNList = require('./canboatjs/lib/candevice').sendPGNList
 const canbus = new (require('./canboatjs').canbus)({})
 const util = require('util')
 
@@ -162,7 +162,7 @@ function AC12_pilotmode_0b () {
 
 function sendPGNList () {
   debug('Broadcasting PGN list: %j', defaultTransmitPGNs);
-  sendPGNList(canbus.candevice.address, 255);
+  CanDeviceSendPGNList(canbus.candevice.address, 255);
 }
 
 setTimeout(PGN130822, 5000) // Once at startup
