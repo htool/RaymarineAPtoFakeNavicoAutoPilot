@@ -165,8 +165,6 @@ function sendPGNList () {
   CanDeviceSendPGNList(canbus.candevice.address, defaultTransmitPGNs);
 }
 
-setTimeout(PGN130822, 5000) // Once at startup
-setTimeout(sendPGNList, 5000) // Once at startup
 
 switch (emulate) {
   case 'keypad':
@@ -264,6 +262,8 @@ function mainLoop () {
 // Wait for cansend
 function waitForSend () {
   if (canbus.candevice.cansend) {
+    setTimeout(PGN130822, 5000) // Once at startup
+    setTimeout(sendPGNList, 5000) // Once at startup
     mainLoop()
     return
   }
