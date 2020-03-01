@@ -4,7 +4,7 @@ debug('Emulate: Simrad AC12-1 autopilot');
 
 
 // Device address (suggested)
-const deviceAddress = 2;
+deviceAddress = 1;
 
 // Track/heading
 
@@ -49,4 +49,3 @@ const defaultTransmitPGNs = [
 ]
 
 module.exports.defaultTransmitPGNs = defaultTransmitPGNs
-module.exports.deviceAddress = deviceAddress
