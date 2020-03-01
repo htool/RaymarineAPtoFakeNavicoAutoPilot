@@ -22,8 +22,6 @@ const { defaultTransmitPGNs, getIndustryCode, getManufacturerCode, getDeviceClas
 const { toPgn } = require('./toPgn')
 // const defaultTransmitPGNs = require ('../../emulate.js').defaultTransmitPGNs
 
-debug('I can see mode: %j', emulate_init);
-
 var transmitPGNs = defaultTransmitPGNs;
 
 debug ('Candevice loaded PGNs (defaultTransmitPGNs): %j', defaultTransmitPGNs)
