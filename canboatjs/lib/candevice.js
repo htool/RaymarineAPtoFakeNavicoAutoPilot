@@ -20,9 +20,10 @@ const _ = require('lodash')
 const Uint64LE = require('int64-buffer').Uint64LE
 const { getIndustryCode, getManufacturerCode, getDeviceClassCode } = require('./codes')
 const { toPgn } = require('./toPgn')
-const defaultTransmitPGNs = require ('../../emulate.js').defaultTransmitPGNs
 
+const defaultTransmitPGNs = require ('../../emulate.js').defaultTransmitPGNs
 debug ('Candevice loaded PGNs (defaultTransmitPGNs): %j', defaultTransmitPGNs)
+var transmitPGNs = defaultTransmitPGNs
 
 class CanDevice extends EventEmitter {
   constructor (canbus, options) {
