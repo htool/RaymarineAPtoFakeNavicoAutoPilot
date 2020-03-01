@@ -44,7 +44,7 @@ class CanDevice extends EventEmitter {
                                   this.options.transmitPGNs)
     }
 
-    debug('transmitPGNs: %j', transmitPGNs);
+    debug('transmitPGNs: %j', this.transmitPGNs);
 
     if ( options.app ) {
       options.app.on('N2KAnalyzerOut', this.n2kMessage.bind(this))
