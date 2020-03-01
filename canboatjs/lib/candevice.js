@@ -264,7 +264,7 @@ function sendPGNList(device, src) {
     list: device.transmitPGNs
   }
   debug('SendPGNList: %j', pgnList)
-  sendPGN(device, pgnList)
+  sendPGN(device, src, pgnList)
 }
 
 function getISOAddressClaimAsUint64(pgn) {
