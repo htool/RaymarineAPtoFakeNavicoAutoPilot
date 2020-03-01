@@ -88,7 +88,7 @@ class CanDevice extends EventEmitter {
 }
 
 function sendPGN(device, pgn, src, dest) {
-  pgn.src = src || device.address || 255;
+  pgn.src = src || device.address;
   debug('Sending PGN %j', pgn);
   device.canbus.sendPGN(pgn);
 }
@@ -99,7 +99,8 @@ function handleISORequest(device, n2kMsg) {
   switch (n2kMsg.fields.PGN) {
   case 126996:  // Product Information request
     sendProductInformation(device)
-    break;
+    sendPGNList(device, n2kMsg.src)
+  break;
   case 60928:   // ISO address claim request
     //sendAddressClaim(device)
     let ac = JSON.parse(JSON.stringify(addressClaim))
