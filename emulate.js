@@ -1,8 +1,8 @@
 const debug = require('debug')('emulate')
 
 var myArgs = process.argv.slice(2);
-emulate = myArgs[0] || 'AC12'
-emulate_init = './device/' + emulate + '.js'
+const emulate = myArgs[0] || 'AC12'
+const emulate_init = './device/' + emulate + '.js'
 
 // Load device specific init info
 debug('Loading %s', emulate_init)
