@@ -14,7 +14,6 @@ require('./canboatjs')
 require('./canboatjs/lib/canbus')
 const canDevice = require('./canboatjs/lib/canbus').canDevice
 // const device = require('./canboatjs/lib/candevice').device
-const CanDeviceSendPGNList = require('./canboatjs/lib/candevice').sendPGNList
 const canbus = new (require('./canboatjs').canbus)({})
 const util = require('util')
 
@@ -160,13 +159,8 @@ function AC12_pilotmode_0b () {
   canbus.sendPGN(msg)
 }
 
-function sendPGNList () {
-  debug('Broadcasting PGN list: %j', defaultTransmitPGNs);
-  CanDeviceSendPGNList(canbus.candevice.address, 255);
-}
-
-
 switch (emulate) {
+  setTimeout(PGN130822, 5000) // Once at startup
   case 'keypad':
       debug('Emulate: B&G Triton2 Keypad')
       setInterval(PGN130822, 300000) // Every 5 minutes
@@ -215,6 +209,8 @@ function mainLoop () {
           case 255: // PGN1: 255  PGN2: 24
             if (PGN2 == 24) { msg.pgn.fields.PGN = 65304}
             canbus.candevice.n2kMessage(msg.pgn)
+            msg.pgn.fields.PGN = 126464
+            canbus.candevice.n2kMessage(msg.pgn)
             break;
         }
       }
@@ -262,8 +258,6 @@ function mainLoop () {
 // Wait for cansend
 function waitForSend () {
   if (canbus.candevice.cansend) {
-    setTimeout(PGN130822, 5000) // Once at startup
-    setTimeout(sendPGNList, 5000) // Once at startup
     mainLoop()
     return
   }
