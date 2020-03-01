@@ -22,9 +22,8 @@ const { getIndustryCode, getManufacturerCode, getDeviceClassCode } = require('./
 const { toPgn } = require('./toPgn')
 const defaultTransmitPGNs = require ('../../emulate.js').defaultTransmitPGNs
 
-var transmitPGNs = defaultTransmitPGNs;
-
 debug ('Candevice loaded PGNs (defaultTransmitPGNs): %j', defaultTransmitPGNs)
+var transmitPGNs = defaultTransmitPGNs;
 
 class CanDevice extends EventEmitter {
   constructor (canbus, options) {
@@ -45,7 +44,6 @@ class CanDevice extends EventEmitter {
       this.transmitPGNs = _.union(this.transmitPGNs,
                                   this.options.transmitPGNs)
     }
-    transmitPGNs = this.transmitPGNs;
 
     if ( options.app ) {
       options.app.on('N2KAnalyzerOut', this.n2kMessage.bind(this))
@@ -260,7 +258,6 @@ function sendNAKAcknowledgement(device, src, requestedPGN) {
 function sendPGNList(device, src) {
   //FIXME: for now, adding everything that signalk-to-nmea2000 supports
   //need a way for plugins, etc. to register the pgns they provide
-  debug('transmitPGNs: %j', transmitPGNs);
   const pgnList = {
     pgn: 126464,
     dst: src,
