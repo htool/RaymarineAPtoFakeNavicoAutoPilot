@@ -3,12 +3,15 @@ const debug = require('debug')('emulate')
 var myArgs = process.argv.slice(2);
 const emulate = myArgs[0] || 'AC12'
 const emulate_init = './device/' + emulate + '.js'
+module.exports.emulate_init = emulate_init
 
 // Load device specific init info
 debug('Loading %s', emulate_init)
 require(emulate_init)
 const defaultTransmitPGNs = require(emulate_init).defaultTransmitPGNs
 module.exports.defaultTransmitPGNs = defaultTransmitPGNs
+const deviceAddress = require(emulate_init).deviceAddress
+module.exports.deviceAddress = deviceAddress
 
 require('./canboatjs')
 require('./canboatjs/lib/canbus')
