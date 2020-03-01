@@ -104,7 +104,7 @@ function handleISORequest(device, n2kMsg) {
     sendPGN(device, ac)
     break;
   case 126464:
-    sendPGNList(device)
+    sendPGNList(device, n2kMsg.src)
     break;
   default:
     debug(`Got unsupported ISO request for PGN ${n2kMsg.fields.PGN}. Sending NAK.`)
@@ -252,11 +252,12 @@ function sendNAKAcknowledgement(device, src, requestedPGN) {
   sendPGN(device, acknowledgement)
 }
 
-function sendPGNList(device) {
+function sendPGNList(device, src) {
   //FIXME: for now, adding everything that signalk-to-nmea2000 supports
   //need a way for plugins, etc. to register the pgns they provide
   const pgnList = {
     pgn: 126464,
+    dst: src,
     "Function Code": 0,
     list: device.transmitPGNs
   }
