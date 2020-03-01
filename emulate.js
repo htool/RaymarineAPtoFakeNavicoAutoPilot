@@ -160,7 +160,8 @@ function AC12_pilotmode_0b () {
 }
 
 switch (emulate) {
-  setTimeout(PGN130822, 5000) // Once at startup
+  case 'default':
+      setTimeout(PGN130822, 5000) // Once at startup
   case 'keypad':
       debug('Emulate: B&G Triton2 Keypad')
       setInterval(PGN130822, 300000) // Every 5 minutes
