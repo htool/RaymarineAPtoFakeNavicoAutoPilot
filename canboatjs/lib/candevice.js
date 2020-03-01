@@ -260,6 +260,7 @@ function sendPGNList(device) {
     "Function Code": 0,
     list: device.transmitPGNs
   }
+  debug('SendPGNList: %j', pgnList)
   sendPGN(device, pgnList)
 }
 
