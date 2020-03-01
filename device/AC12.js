@@ -4,7 +4,7 @@ debug('Emulate: Simrad AC12-1 autopilot');
 
 
 // Device address (suggested)
-const deviceAddress = 3 ;
+const deviceAddress = 2;
 
 // Track/heading
 
