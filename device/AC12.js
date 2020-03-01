@@ -43,7 +43,8 @@ const defaultTransmitPGNs = [
   60928,
   59904,
   59392,
-  59904
+  59904,
+  130822
 ]
 
 module.exports.defaultTransmitPGNs = defaultTransmitPGNs
