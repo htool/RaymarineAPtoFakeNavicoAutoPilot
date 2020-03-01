@@ -162,7 +162,7 @@ function AC12_pilotmode_0b () {
 
 function sendPGNList () {
   debug('Broadcasting PGN list: %j', defaultTransmitPGNs);
-  CanDeviceSendPGNList(canbus.candevice.address, 255);
+  CanDeviceSendPGNList(canbus.candevice.address, defaultTransmitPGNs);
 }
 
 setTimeout(PGN130822, 5000) // Once at startup
