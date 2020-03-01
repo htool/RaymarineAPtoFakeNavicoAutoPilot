@@ -22,6 +22,8 @@ const { getIndustryCode, getManufacturerCode, getDeviceClassCode } = require('./
 const { toPgn } = require('./toPgn')
 const defaultTransmitPGNs = require ('../../emulate.js').defaultTransmitPGNs
 
+var transmitPGNs = defaultTransmitPGNs;
+
 debug ('Candevice loaded PGNs (defaultTransmitPGNs): %j', defaultTransmitPGNs)
 
 class CanDevice extends EventEmitter {
@@ -43,8 +45,8 @@ class CanDevice extends EventEmitter {
       this.transmitPGNs = _.union(this.transmitPGNs,
                                   this.options.transmitPGNs)
     }
-
-    debug('transmitPGNs: %j', this.transmitPGNs);
+    transmitPGNs = this.transmitPGNs;
+    debug('transmitPGNs: %j', transmitPGNs);
 
     if ( options.app ) {
       options.app.on('N2KAnalyzerOut', this.n2kMessage.bind(this))
