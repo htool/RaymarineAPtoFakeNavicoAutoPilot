@@ -13,7 +13,7 @@ module.exports.defaultTransmitPGNs = defaultTransmitPGNs
 require('./canboatjs')
 require('./canboatjs/lib/canbus')
 const canDevice = require('./canboatjs/lib/canbus').canDevice
-const device = require('./canboatjs/lib/candevice').device
+// const device = require('./canboatjs/lib/candevice').device
 const CanDeviceSendPGNList = require('./canboatjs/lib/candevice').sendPGNList
 const canbus = new (require('./canboatjs').canbus)({})
 const util = require('util')
