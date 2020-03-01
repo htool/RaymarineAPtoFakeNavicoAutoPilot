@@ -31,7 +31,7 @@ productInfo = {
   dst: 255,
   "NMEA 2000 Version": 2100,
   "Product Code": 18846,
-  "Model ID": "AC12_Autopilot",
+  "Model ID": "AC12-1 Autopilot",
   "Software Version Code": "1.3.03.00",
   "Model Version": "",
   "Model Serial Code": "014817",
@@ -44,7 +44,8 @@ const defaultTransmitPGNs = [
   59904,
   59392,
   59904,
-  130822
+  126996,
+  127258
 ]
 
 module.exports.defaultTransmitPGNs = defaultTransmitPGNs
