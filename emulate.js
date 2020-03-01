@@ -206,11 +206,12 @@ function mainLoop () {
             if (PGN2 == 20) { msg.pgn.fields.PGN = 126996 }
             if (PGN2 == 22) { msg.pgn.fields.PGN = 126998 }
             canbus.candevice.n2kMessage(msg.pgn)
+            debug('Triggering sending PGN list')
+            msg.pgn.fields.PGN = 126464
+            canbus.candevice.n2kMessage(msg.pgn)
             break;
           case 255: // PGN1: 255  PGN2: 24
             if (PGN2 == 24) { msg.pgn.fields.PGN = 65304}
-            canbus.candevice.n2kMessage(msg.pgn)
-            msg.pgn.fields.PGN = 126464
             canbus.candevice.n2kMessage(msg.pgn)
             break;
         }
