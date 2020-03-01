@@ -258,7 +258,6 @@ function sendNAKAcknowledgement(device, src, requestedPGN) {
 function sendPGNList(device, src) {
   //FIXME: for now, adding everything that signalk-to-nmea2000 supports
   //need a way for plugins, etc. to register the pgns they provide
-  debug('transmitPGNs: %j', transmitPGNs);
   const pgnList = {
     pgn: 126464,
     dst: src,
