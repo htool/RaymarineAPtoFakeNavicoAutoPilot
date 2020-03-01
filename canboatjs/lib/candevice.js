@@ -22,6 +22,8 @@ const { getIndustryCode, getManufacturerCode, getDeviceClassCode } = require('./
 const { toPgn } = require('./toPgn')
 const defaultTransmitPGNs = require ('../../emulate.js').defaultTransmitPGNs
 
+debug ('Candevice loaded PGNs: %j', defaultTransmitPGNs)
+
 class CanDevice extends EventEmitter {
   constructor (canbus, options) {
     super()
