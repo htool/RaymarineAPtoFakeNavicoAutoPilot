@@ -91,7 +91,7 @@ class CanDevice extends EventEmitter {
 }
 
 function sendPGN(device, pgn, src, dest) {
-  pgn.src = src || device.address;
+  pgn.src = src || device.address || 255;
   debug('pgn.src %j', pgn.src);
   debug('Sending PGN %j', pgn);
   device.canbus.sendPGN(pgn);
