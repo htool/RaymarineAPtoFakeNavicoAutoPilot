@@ -11,12 +11,13 @@ const defaultTransmitPGNs = require(emulate_init).defaultTransmitPGNs
 module.exports.defaultTransmitPGNs = defaultTransmitPGNs
 
 if ( myArgs.length >= 1) {
-  var deviceAddress = myArgs[1]
+  const deviceAddress = myArgs[1]
 } else {
-  var deviceAddress = require(emulate_init).deviceAddress
+  const deviceAddress = require(emulate_init).deviceAddress
 }
 
 debug('deviceAdress: %j', deviceAddress)
+
 require('./canboatjs')
 require('./canboatjs/lib/canbus')
 const canDevice = require('./canboatjs/lib/canbus').canDevice
