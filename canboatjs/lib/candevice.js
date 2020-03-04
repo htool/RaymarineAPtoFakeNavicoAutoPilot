@@ -106,7 +106,7 @@ function handleISORequest(device, n2kMsg) {
     let ac = JSON.parse(JSON.stringify(addressClaim))
     ac.dst = n2kMsg.src
     sendPGN(device, ac)
-    // break;
+    break;
   case 126464:
     sendPGNList(device, n2kMsg.src)
     break;
