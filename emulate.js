@@ -310,7 +310,7 @@ function mainLoop () {
       if (msg.pgn.pgn == 59904) {
         PGN1 = msg.data[1]
         PGN2 = msg.data[0]
-        debug('ISO request from %d to %d Data: %j', msg)
+        debug('ISO request: %j', msg)
         debug('ISO request from %d to %d Data PGN1: %i  PGN2: %i', msg.pgn.src, msg.pgn.dst, PGN1, PGN2)
         switch (PGN1) {
           case 238: // ISO Address claim
