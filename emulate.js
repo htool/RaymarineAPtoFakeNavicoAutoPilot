@@ -12,7 +12,7 @@ module.exports.defaultTransmitPGNs = defaultTransmitPGNs
 
 const deviceAddress = myArgs[1];
 //  const deviceAddress = require(emulate_init).deviceAddress;
-
+module.exports.deviceAddress = deviceAddress;
 
 debug('deviceAddress: %j', deviceAddress)
 

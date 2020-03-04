@@ -25,6 +25,8 @@ const defaultTransmitPGNs = require ('../../emulate.js').defaultTransmitPGNs
 debug ('Candevice loaded PGNs (defaultTransmitPGNs): %j', defaultTransmitPGNs)
 var transmitPGNs = defaultTransmitPGNs
 
+const deviceAddress = require ('../../emulate.js').deviceAddress
+
 class CanDevice extends EventEmitter {
   constructor (canbus, options) {
     super()
