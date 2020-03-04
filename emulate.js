@@ -10,8 +10,7 @@ require(emulate_init)
 const defaultTransmitPGNs = require(emulate_init).defaultTransmitPGNs
 module.exports.defaultTransmitPGNs = defaultTransmitPGNs
 
-debug ('myArgs.length: %j', myArgs.length);
-if ( myArgs.length > 1) {
+if ( myArgs.length >= 1) {
   var deviceAddress = myArgs[1]
 } else {
   var deviceAddress = require(emulate_init).deviceAddress
