@@ -13,8 +13,7 @@ deviceAddress = 3;
 addressClaim = {
   pgn: 60928,
   dst: 255,
-  //"Unique Number": 4226,
-  "Unique Number": 1ab9e1,
+  "Unique Number": 4226,
   "Manufacturer Code": 1857,
   "Device Function": 150,
   "Device Class": 40,
