@@ -16,6 +16,7 @@ if ( myArgs.length >= 1) {
   var deviceAddress = require(emulate_init).deviceAddress
 }
 
+debug('deviceAdress: %j', deviceAddress)
 require('./canboatjs')
 require('./canboatjs/lib/canbus')
 const canDevice = require('./canboatjs/lib/canbus').canDevice
