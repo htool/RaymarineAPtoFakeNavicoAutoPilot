@@ -110,6 +110,9 @@ function handleISORequest(device, n2kMsg) {
   case 126464:
     sendPGNList(device, n2kMsg.src)
     break;
+  case 126998:
+    sendPGNList(device, n2kMsg.src)
+    break;
   default:
     debug(`Got unsupported ISO request for PGN ${n2kMsg.fields.PGN}. Sending NAK.`)
     sendNAKAcknowledgement(device, n2kMsg.src, n2kMsg.fields.PGN)
