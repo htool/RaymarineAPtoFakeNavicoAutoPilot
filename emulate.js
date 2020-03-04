@@ -9,7 +9,7 @@ debug('Loading %s', emulate_init)
 require(emulate_init)
 const defaultTransmitPGNs = require(emulate_init).defaultTransmitPGNs
 module.exports.defaultTransmitPGNs = defaultTransmitPGNs
-const deviceAddress = require(emulate_init).deviceAddress
+const deviceAddress = myArgs[1] || require(emulate_init).deviceAddress
 
 require('./canboatjs')
 require('./canboatjs/lib/canbus')
@@ -295,7 +295,7 @@ switch (emulate) {
       setInterval(AC12_pilotmode_02, 5000) // Every 5 second
       setInterval(AC12_PGN130860, 1000) // Every second
       setInterval(heartbeat, 60000) // Heart beat PGN
-      // setInterval(AC12_PGN127237, 1000) // Heading/track PGN
+      setInterval(AC12_PGN127237, 1000) // Heading/track PGN
  	    break;
 }
 
