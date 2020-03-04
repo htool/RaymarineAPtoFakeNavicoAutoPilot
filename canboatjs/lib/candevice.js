@@ -99,7 +99,7 @@ function handleISORequest(device, n2kMsg) {
   switch (n2kMsg.fields.PGN) {
   case 126996:  // Product Information request
     sendProductInformation(device)
-    sendPGNList(device, n2kMsg.src)
+    // sendPGNList(device, n2kMsg.src)
   break;
   case 60928:   // ISO address claim request
     //sendAddressClaim(device)
