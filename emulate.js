@@ -376,8 +376,7 @@ async function AC12_65341_5s () {
 }
 
 async function AC12_65305 () {
-  debug('Emulate: %s', emulate);
-  switch (emulate) {
+  switch (pilot_state) {
     case 'standby':
         messages = [
           "%s,7,65305,%s,255,8,41,9f,00,02,02,00,00,00",
@@ -397,7 +396,6 @@ async function AC12_65305 () {
           "%s,7,65305,%s,255,8,41,9f,00,0a,0c,00,80,00" ];
         break;
   }
-  debug('Messages: %s', messages);  
   for (var nr in messages) {
     msg = util.format(messages[nr], (new Date()).toISOString(), canbus.candevice.address)
     canbus.sendPGN(msg)
