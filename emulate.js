@@ -377,7 +377,7 @@ async function AC12_65341_5s () {
 
 async function AC12_65305 () {
   switch (emulate) {
-    case 'default':
+    case 'standby':
         const messages = [
           "%s,7,65305,%s,255,8,41,9f,00,02,02,00,00,00",
           "%s,7,65305,%s,255,8,41,9f,00,0a,0a,00,80,00" ];
