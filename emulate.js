@@ -353,8 +353,8 @@ async function AC12_pilotmode () {
 }
 
 function AC12_65341_1s () {
-  const messages = "%s,6,65341,%s,255,8,41,9f,ff,ff,0d,ff,ff,7f";
-  msg = util.format(messages[nr], (new Date()).toISOString(), canbus.candevice.address)
+  const message = "%s,6,65341,%s,255,8,41,9f,ff,ff,0d,ff,ff,7f";
+  msg = util.format(message, (new Date()).toISOString(), canbus.candevice.address)
   canbus.sendPGN(msg)
 }
 
