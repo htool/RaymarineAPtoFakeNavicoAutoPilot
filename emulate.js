@@ -377,7 +377,7 @@ async function AC12_65341_5s () {
 
 async function AC12_65305 () {
   switch (emulate) {
-    messages = []
+    var messages = []
     case 'standby':
         messages = [
           "%s,7,65305,%s,255,8,41,9f,00,02,02,00,00,00",
