@@ -186,7 +186,7 @@ function AC12_PGN127237 () {
       "NFU":     "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,%s,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s",
       "wind":    "",
       "route":   "",
-      //"standby": "%s,2,127237,%s,%s,15,ff,78,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,ff" // Magnetic 
+      //"standby": "%s,2,127237,%s,%s,15,ff,78,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,ff" // Magnetic
       // "standby": "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,ff" // Magnetic
       "standby": "%s,2,127237,%s,%s,15,ff,3f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s" // True
   }
@@ -345,10 +345,7 @@ async function AC12_pilotmode () {
     "%s,7,65305,%s,255,8,41,9f,00,0a,14,00,80,00",
     pgn65340[pilot_state],
     "%s,7,65302,%s,255,8,41,9f,0a,69,00,00,28,ff",
-    pgn65340[pilot_state],
-    "%s,6,65341,%s,255,8,41,9f,ff,ff,0d,ff,ff,7f",
-    "%s,6,65341,%s,255,8,41,9f,ff,ff,0c,ff,ff,ff",
-    "%s,6,65341,%s,255,8,41,9f,ff,ff,03,ff,ff,ff" ]
+    pgn65340[pilot_state] ]
 
   for (var nr in messages) {
     msg = util.format(messages[nr], (new Date()).toISOString(), canbus.candevice.address)
@@ -357,7 +354,7 @@ async function AC12_pilotmode () {
   }
 }
 
-async function AC12_65341_1s () {
+function AC12_65341_1s () {
   const messages = "%s,6,65341,%s,255,8,41,9f,ff,ff,0d,ff,ff,7f";
   msg = util.format(messages[nr], (new Date()).toISOString(), canbus.candevice.address)
   canbus.sendPGN(msg)
@@ -447,7 +444,7 @@ function mainLoop () {
           // Using 130850 and turning it into 130851
           debug ('Event AP command: %j %j', msg.pgn, msg.data);
           if (reply130851.length == 0) {
-            reply130851 = reply130851.concat(buf2hex(msg.data).slice(1)); // Skip multipart byte 
+            reply130851 = reply130851.concat(buf2hex(msg.data).slice(1)); // Skip multipart byte
           } else {
             reply130851 = reply130851.concat(buf2hex(msg.data).slice(1)); // Skip multipart byte and 1 stuffing byte
           }
@@ -483,7 +480,7 @@ function mainLoop () {
         // Seatalk1 pilot mode
         } else if (msg.pgn.pgn == 126720) {
           // 16,3b,9f,f0,81
-          pilotmode126720 = pilotmode126720.concat(buf2hex(msg.data).slice(1)); // Skip multipart byte 
+          pilotmode126720 = pilotmode126720.concat(buf2hex(msg.data).slice(1)); // Skip multipart byte
           Seatalkmode = pilotmode126720.join(',');
           if (!Seatalkmode.match(/^16,3b,9f,f0,81,84/)) {
             pilotmode126720 = [];
