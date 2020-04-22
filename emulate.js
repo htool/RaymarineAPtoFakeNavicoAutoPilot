@@ -340,10 +340,14 @@ async function AC12_pilotmode () {
       "route":   "",
       "standby": "%s,3,65340,%s,255,8,41,9f,00,00,fe,f8,00,80"
   }
+  const pgn65302 = {
+      "standby":  "%s,7,65302,%s,255,8,41,9f,0a,6b,00,00,00,ff",
+      "auto":     "%s,7,65302,%s,255,8,41,9f,0a,4b,00,00,00,ff",
+      "NFU":      "%s,7,65302,%s,255,8,41,9f,0a,69,00,00,28,ff"
+  }
   const messages = [
     pgn65340[pilot_state],
-    "%s,7,65302,%s,255,8,41,9f,0a,69,00,00,28,ff",
-    pgn65340[pilot_state] ]
+    pgn65302[pilot_state] ]
 
   for (var nr in messages) {
     msg = util.format(messages[nr], (new Date()).toISOString(), canbus.candevice.address)
