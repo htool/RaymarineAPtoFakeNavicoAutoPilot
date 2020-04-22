@@ -341,8 +341,6 @@ async function AC12_pilotmode () {
       "standby": "%s,3,65340,%s,255,8,41,9f,00,00,fe,f8,00,80"
   }
   const messages = [
-    "%s,7,65305,%s,255,8,41,9f,00,02,10,00,00,00",
-    "%s,7,65305,%s,255,8,41,9f,00,0a,14,00,80,00",
     pgn65340[pilot_state],
     "%s,7,65302,%s,255,8,41,9f,0a,69,00,00,28,ff",
     pgn65340[pilot_state] ]
@@ -366,6 +364,17 @@ async function AC12_65341_5s () {
     "%s,6,65341,%s,255,8,41,9f,ff,ff,0c,ff,ff,ff",
     "%s,6,65341,%s,255,8,41,9f,ff,ff,03,ff,ff,ff",
     "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,ff,ff" ]
+  for (var nr in messages) {
+    msg = util.format(messages[nr], (new Date()).toISOString(), canbus.candevice.address)
+    canbus.sendPGN(msg)
+    await sleep(25)
+  }
+}
+
+async function AC12_65305 () {
+  const messages = [
+    "%s,7,65305,%s,255,8,41,9f,00,02,10,00,00,00",
+    "%s,7,65305,%s,255,8,41,9f,00,0a,14,00,80,00" ]
   for (var nr in messages) {
     msg = util.format(messages[nr], (new Date()).toISOString(), canbus.candevice.address)
     canbus.sendPGN(msg)
