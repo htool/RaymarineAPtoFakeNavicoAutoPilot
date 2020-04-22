@@ -423,10 +423,11 @@ switch (emulate) {
       // setTimeout(AC12_bootconfig, 5000) // Once at startup
       setInterval(PGN130822, 300000) // Every 5 minutes
       setInterval(AC12_pilotmode, 1000) // Every second
-      setInterval(AC12_pilotmode_0b, 5000) // Every 5 second
-      setInterval(AC12_pilotmode_02, 5000) // Every 5 second
+      // setInterval(AC12_pilotmode_0b, 5000) // Every 5 second
+      // setInterval(AC12_pilotmode_02, 5000) // Every 5 second
       setInterval(AC12_65341_1s, 1000) // Every second
       setInterval(AC12_65341_5s, 5000) // Every second
+      setInterval(AC12_65305, 1000)
       setInterval(AC12_PGN130860, 1000) // Every second
       setInterval(heartbeat, 60000) // Heart beat PGN
       setInterval(AC12_PGN127237, 1000) // Heading/track PGN
