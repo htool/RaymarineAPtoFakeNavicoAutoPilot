@@ -335,13 +335,14 @@ async function AC12_bootconfig () {
 async function AC12_PGN65340 () {
   const pgn65340 = {
       "auto":    "%s,3,65340,%s,255,8,41,9f,10,01,fe,fa,00,80",
-      "NFU":     "%s,3,65340,%s,255,8,41,9f,00,03,fe,fa,00,80",
-      "wind":    "%s,3,65340,%s,255,8,41,9f,10,00,fe,fa,00,80",
-      "route":   "",
+      "NFU":     "%s,3,65340,%s,255,8,41,9f,10,02,fe,fa,00,80",
+      "wind":    "%s,3,65340,%s,255,8,41,9f,10,03,fe,fa,00,80",
+      "route":   "%s,3,65340,%s,255,8,41,9f,10,04,fe,fa,00,80",
       "standby": "%s,3,65340,%s,255,8,41,9f,00,00,fe,f8,00,80"
   }
   const pgn65302 = {
       "standby":  "%s,7,65302,%s,255,8,41,9f,0a,6b,00,00,00,ff",
+      "wind":     "%s,7,65302,%s,255,8,41,9f,0a,69,00,00,00,ff", // guessing
       "auto":     "%s,7,65302,%s,255,8,41,9f,0a,4b,00,00,00,ff",
       "NFU":      "%s,7,65302,%s,255,8,41,9f,0a,69,00,00,28,ff"
   }
@@ -373,6 +374,18 @@ async function AC12_PGN65341_5s () {
     canbus.sendPGN(msg)
     await sleep(25)
   }
+}
+
+function AC12_PGN65341_02 () {
+  const pgn65341_02 = {
+      "auto":    "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,15,9a",
+      "NFU":     "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,00,00",
+      "wind":     "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,00,00",
+      "route":   "",
+      "standby": "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,ff,ff"
+  }
+  msg = util.format(pgn65341_02[pilot_state], (new Date()).toISOString(), canbus.candevice.address)
+  canbus.sendPGN(msg)
 }
 
 async function AC12_PGN65305 () {
@@ -409,16 +422,7 @@ async function AC12_PGN65305 () {
   }
 }
 
-function AC12_PGN65341_02 () {
-  const pgn65341_02 = {
-      "auto":    "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,15,9a",
-      "NFU":     "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,00,00",
-      "route":   "",
-      "standby": "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,ff,ff"
-  }
-  msg = util.format(pgn65341_02[pilot_state], (new Date()).toISOString(), canbus.candevice.address)
-  canbus.sendPGN(msg)
-}
+
 
 switch (emulate) {
   case 'default':
