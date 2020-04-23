@@ -332,7 +332,7 @@ async function AC12_bootconfig () {
   }
 }
 
-async function AC12_pilotmode () {
+async function AC12_PGN65340 () {
   const pgn65340 = {
       "auto":    "%s,3,65340,%s,255,8,41,9f,10,01,fe,fa,00,80",
       "NFU":     "%s,3,65340,%s,255,8,41,9f,00,03,fe,fa,00,80",
@@ -356,13 +356,13 @@ async function AC12_pilotmode () {
   }
 }
 
-function AC12_65341_1s () {
+function AC12_PGN65341_1s () {
   const message = "%s,6,65341,%s,255,8,41,9f,ff,ff,0d,ff,ff,7f";
   msg = util.format(message, (new Date()).toISOString(), canbus.candevice.address)
   canbus.sendPGN(msg)
 }
 
-async function AC12_65341_5s () {
+async function AC12_PGN65341_5s () {
   const messages = [
     "%s,6,65341,%s,255,8,41,9f,ff,ff,0b,ff,00,00",
     "%s,6,65341,%s,255,8,41,9f,ff,ff,0c,ff,ff,ff",
@@ -375,7 +375,7 @@ async function AC12_65341_5s () {
   }
 }
 
-async function AC12_65305 () {
+async function AC12_PGN65305 () {
   switch (pilot_state) {
     case 'standby':
         messages = [
@@ -409,7 +409,7 @@ async function AC12_65305 () {
   }
 }
 
-function AC12_pilotmode_02 () {
+function AC12_PGN65341_02 () {
   const pgn65341_02 = {
       "auto":    "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,15,9a",
       "NFU":     "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,00,00",
@@ -417,12 +417,6 @@ function AC12_pilotmode_02 () {
       "standby": "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,ff,ff"
   }
   msg = util.format(pgn65341_02[pilot_state], (new Date()).toISOString(), canbus.candevice.address)
-  canbus.sendPGN(msg)
-}
-
-function AC12_pilotmode_0b () {
-  const message = "%s,6,65341,%s,255,8,41,9f,ff,ff,0b,ff,00,00"
-  msg = util.format(message, (new Date()).toISOString(), canbus.candevice.address)
   canbus.sendPGN(msg)
 }
 
@@ -445,12 +439,11 @@ switch (emulate) {
 	    debug('Emulate: Simrad AC12 Autopilot')
       // setTimeout(AC12_bootconfig, 5000) // Once at startup
       setInterval(PGN130822, 300000) // Every 5 minutes
-      setInterval(AC12_pilotmode, 1000) // Every second
-      // setInterval(AC12_pilotmode_0b, 5000) // Every 5 second
-      // setInterval(AC12_pilotmode_02, 5000) // Every 5 second
-      setInterval(AC12_65341_1s, 1000) // Every second
-      setInterval(AC12_65341_5s, 5000) // Every second
-      setInterval(AC12_65305, 1000)
+      setInterval(AC12_PGN65340, 1000) // Every second
+      setInterval(AC12_PGN65341_02, 5000) // Every 5 second
+      setInterval(AC12_PGN65341_1s, 1000) // Every second
+      setInterval(AC12_PGN65341_5s, 5000) // Every second
+      setInterval(AC12_PGN65305, 1000)
       setInterval(AC12_PGN130860, 1000) // Every second
       setInterval(heartbeat, 60000) // Heart beat PGN
       setInterval(AC12_PGN127237, 1000) // Heading/track PGN
@@ -495,15 +488,15 @@ function mainLoop () {
               if (msg.match(/41,9f,01,ff,ff,0a,09,00,ff,ff,ff/)) {
                 debug('Going into auto mode');
                 pilot_state = 'auto';
-                AC12_pilotmode_02();
+                AC12_PGN65341_02();
               } else if (msg.match(/41,9f,01,ff,ff,0a,06,00,ff,ff,ff/)) {
                 debug('Going into standby mode');
                 pilot_state = 'standby';
-                AC12_pilotmode_02();
+                AC12_PGN65341_02();
               } else if (msg.match(/41,9f,01,ff,ff,02,0e,00,ff,ff,ff/)) {
                 debug('Going into NFU mode');
                 pilot_state = 'NFU';
-                AC12_pilotmode_02();
+                AC12_PGN65341_02();
               } else if (msg.match(/41,9f,ff,ff,ff,1f,51,00,c4,49,29/)) {
                 // Clear 'No Autopilot' alarm?
                 msg.replace(',51,', ',52,');
