@@ -522,7 +522,7 @@ function mainLoop () {
                   pilot_state = 'auto';
                   AC12_PGN65341_02();
                 }
-              } else if (Seatalkmode.match(/16,3b,9f,f0,81,84,..,..,..,46,,/)) {
+              } else if (Seatalkmode.match(/16,3b,9f,f0,81,84,..,..,..,46,/)) {
                 if (pilot_state != 'wind') {
                   debug('Following Seatalk1 pilot mode wind: %s', Seatalkmode);
                   pilot_state = 'wind';
