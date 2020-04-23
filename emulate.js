@@ -520,19 +520,19 @@ function mainLoop () {
                 if (pilot_state != 'auto') {
                   debug('Following Seatalk1 pilot mode auto: %s', Seatalkmode);
                   pilot_state = 'auto';
-                  AC12_pilotmode_02();
+                  AC12_PGN65341_02();
                 }
               } else if (Seatalkmode.match(/16,3b,9f,f0,81,84,..,..,..,46,,/)) {
                 if (pilot_state != 'wind') {
                   debug('Following Seatalk1 pilot mode wind: %s', Seatalkmode);
                   pilot_state = 'wind';
-                  AC12_pilotmode_02();
+                  AC12_PGN65341_02();
                 }
               } else if (Seatalkmode.match(/16,3b,9f,f0,81,84,..,..,..,40,/) || Seatalkmode.match(/16,3b,9f,f0,81,84,..,..,..,44,/) ) {
                 if (pilot_state != 'standby') {
                   debug('Following Seatalk1 pilot mode standby: %s', Seatalkmode);
                   pilot_state = 'standby'
-                  AC12_pilotmode_02();
+                  AC12_PGN65341_02();
                 }
               }
               pilotmode126720=[];
