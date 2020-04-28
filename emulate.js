@@ -491,23 +491,23 @@ function mainLoop () {
               reply130851_size = reply130851[0];
               reply130851_size_int = parseInt(reply130851[0], 16);
               reply_msg = "%s,7,130851,%s,255," + reply130851_size + "," + (reply130851.slice(1,reply130851_size_int + 1)).join(',');
-              if (msg.match(/41,9f,01,ff,ff,0a,09,00,ff,ff,ff/)) {
+              if (reply_msg.match(/41,9f,01,ff,ff,0a,09,00,ff,ff,ff/)) {
                 debug('Going into auto mode');
                 pilot_state = 'auto';
                 AC12_PGN65341_02();
-              } else if (msg.match(/41,9f,01,ff,ff,0a,06,00,ff,ff,ff/)) {
+              } else if (reply_msg.match(/41,9f,01,ff,ff,0a,06,00,ff,ff,ff/)) {
                 debug('Going into standby mode');
                 pilot_state = 'standby';
                 AC12_PGN65341_02();
-              } else if (msg.match(/41,9f,01,ff,ff,02,0e,00,ff,ff,ff/)) {
+              } else if (reply_msg.match(/41,9f,01,ff,ff,02,0e,00,ff,ff,ff/)) {
                 debug('Going into NFU mode');
                 pilot_state = 'NFU';
                 AC12_PGN65341_02();
-              } else if (msg.match(/41,9f,ff,ff,ff,1f,51,00,c4,49,29/)) {
+              } else if (reply_msg.match(/41,9f,ff,ff,ff,1f,51,00,c4,49,29/)) {
                 // Clear 'No Autopilot' alarm?
                 reply_msg.replace(',51,', ',52,');
               }
-              msg = util.format(reply_msg, (new Date()).toISOString(), canbus.candevice.address)
+              reply_msg = util.format(reply_msg, (new Date()).toISOString(), canbus.candevice.address)
               debug('Sending reply 130851 %j', reply_msg);
               canbus.sendPGN(reply_msg)
               reply130851=[];
