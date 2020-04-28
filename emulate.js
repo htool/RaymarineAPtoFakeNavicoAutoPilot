@@ -485,9 +485,6 @@ function mainLoop () {
           }
 
           if (pgn130850.length > 8) { // We have 2 parts now
-            pgn130851_size = pgn130850[0];
-            pgn130851_size_int = parseInt(pgn130850[0], 16);
-            pgn130851 = "%s,7,130851,%s,255," + pgn130850_size + "," + (pgn130850.slice(1,pgn130850_size_int + 1)).join(',');
             if (PGN130850.match(/41,9f,01,ff,ff,0a,09,00,ff,ff,ff/)) {
               debug('Going into auto mode');
               pilot_state = 'auto';
@@ -541,6 +538,9 @@ function mainLoop () {
             }
 
             // Send 130851 reply packet
+            pgn130851_size = pgn130850[0];
+            pgn130851_size_int = parseInt(pgn130850[0], 16);
+            pgn130851 = "%s,7,130851,%s,255," + pgn130851_size + "," + (pgn130850.slice(1,pgn130851_size_int + 1)).join(',');
             pgn130851 = util.format(pgn130851, (new Date()).toISOString(), canbus.candevice.address)
             debug('Sending reply 130851 %j', pgn130851);
             canbus.sendPGN(pgn130851)
