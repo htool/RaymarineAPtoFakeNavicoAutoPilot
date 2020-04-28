@@ -605,7 +605,6 @@ function mainLoop () {
           mag_variation = radsToDeg(mag_variation)/10000;
         }
         break;
-      }
       default:
     }
 	}
