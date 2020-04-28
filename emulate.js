@@ -520,7 +520,7 @@ function mainLoop () {
             } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,0a,06,00,auto/)) { // Route
               pgn126720 = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,03,fc,3c,42,00,00,00,00,ff,ff,ff,ff,ff";
               debug('Setting Seatalk1 pilot mode Route');
-            } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,0a,06,00,auto/)) { // Auto
+            } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,0a,09,00,ff,ff,ff/)) { // Auto
               pgn126720 = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,01,fe,00,00,00,00,00,00,ff,ff,ff,ff,ff";
               debug('Setting Seatalk1 pilot mode Auto');
 
