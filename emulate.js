@@ -477,7 +477,6 @@ function mainLoop () {
     switch (emulate) {
       case 'AC12':
         if (msg.pgn.pgn == 130850) { // Simnet Event, requires reply
-          debug ('Event AP command: %j %j', msg.pgn, msg.data);
           pgn130850 = pgn130850.concat(buf2hex(msg.data).slice(1)); // Skip multipart byte
           PGN130850 = pgn130850.join(',');
           if (!PGN130850.match(/^..,41,9f,01,ff,ff,/)) {
@@ -485,6 +484,7 @@ function mainLoop () {
           }
 
           if (pgn130850.length > 8) { // We have 2 parts now
+            debug ('Event AP command: %j %j', msg.pgn, msg.data);
             // if (PGN130850.match(/41,9f,01,ff,ff,0a,09,00,ff,ff,ff/)) {
             //   debug('Going into auto mode');
             //   pilot_state = 'auto';
@@ -543,7 +543,7 @@ function mainLoop () {
             pgn130851 = util.format(pgn130851, (new Date()).toISOString(), canbus.candevice.address)
             debug('Sending reply 130851 %j', pgn130851);
             canbus.sendPGN(pgn130851)
-            pgn130851=[];
+            pgn130850 = [];
           }
 
         // Seatalk1 pilot mode
