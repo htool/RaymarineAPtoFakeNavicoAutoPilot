@@ -490,7 +490,7 @@ function mainLoop () {
           if (reply130851.length > 8) { // We have 2 parts now
               reply130851_size = reply130851[0];
               reply130851_size_int = parseInt(reply130851[0], 16);
-              msg = "%s,7,130851,%s,255," + reply130851_size + "," + (reply130851.slice(1,reply130851_size_int + 1)).join(',');
+              reply_msg = "%s,7,130851,%s,255," + reply130851_size + "," + (reply130851.slice(1,reply130851_size_int + 1)).join(',');
               if (msg.match(/41,9f,01,ff,ff,0a,09,00,ff,ff,ff/)) {
                 debug('Going into auto mode');
                 pilot_state = 'auto';
@@ -505,11 +505,11 @@ function mainLoop () {
                 AC12_PGN65341_02();
               } else if (msg.match(/41,9f,ff,ff,ff,1f,51,00,c4,49,29/)) {
                 // Clear 'No Autopilot' alarm?
-                msg.replace(',51,', ',52,');
+                reply_msg.replace(',51,', ',52,');
               }
-              msg = util.format(msg, (new Date()).toISOString(), canbus.candevice.address)
-              debug('Sending reply 130851 %j', msg);
-              canbus.sendPGN(msg)
+              msg = util.format(reply_msg, (new Date()).toISOString(), canbus.candevice.address)
+              debug('Sending reply 130851 %j', reply_msg);
+              canbus.sendPGN(reply_msg)
               reply130851=[];
           }
 
