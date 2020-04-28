@@ -513,16 +513,16 @@ function mainLoop () {
               debug('B&G button press +10');
             } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,0a,06,00,ff,ff,ff/)) { // Standby
               pgn126720 = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,02,fd,00,00,00,00,00,00,ff,ff,ff,ff,ff"
-              debug('Setting Seatalk1 pilot mode Standby: %s', Button);
+              debug('Setting Seatalk1 pilot mode Standby');
             } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,0a,06,00,auto/)) { // Wind
               pgn126720 = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,23,dc,00,00,00,00,00,00,ff,ff,ff,ff,ff";
-              debug('Setting Seatalk1 pilot mode Wind: %s', Button);
+              debug('Setting Seatalk1 pilot mode Wind');
             } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,0a,06,00,auto/)) { // Route
               pgn126720 = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,03,fc,3c,42,00,00,00,00,ff,ff,ff,ff,ff";
-              debug('Setting Seatalk1 pilot mode Route: %s', Button);
+              debug('Setting Seatalk1 pilot mode Route');
             } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,0a,06,00,auto/)) { // Auto
               pgn126720 = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,01,fe,00,00,00,00,00,00,ff,ff,ff,ff,ff";
-              debug('Setting Seatalk1 pilot mode Auto: %s', Button);
+              debug('Setting Seatalk1 pilot mode Auto');
 
             // Clear 'No Autopilot' alarm?
             } else if (PGN130850.match(/41,9f,ff,ff,ff,1f,51,00,c4,49,29/)) {
