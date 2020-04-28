@@ -525,7 +525,7 @@ function mainLoop () {
               debug('Setting Seatalk1 pilot mode Auto: %s', Button);
 
             // Clear 'No Autopilot' alarm?
-            } else if (pgn130850.match(/41,9f,ff,ff,ff,1f,51,00,c4,49,29/)) {
+            } else if (PGN130850.match(/41,9f,ff,ff,ff,1f,51,00,c4,49,29/)) {
               pgn130851.replace(',51,', ',52,');
             }
 
