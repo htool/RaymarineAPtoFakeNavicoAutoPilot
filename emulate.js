@@ -485,21 +485,21 @@ function mainLoop () {
           }
 
           if (pgn130850.length > 8) { // We have 2 parts now
-            if (PGN130850.match(/41,9f,01,ff,ff,0a,09,00,ff,ff,ff/)) {
-              debug('Going into auto mode');
-              pilot_state = 'auto';
-              AC12_PGN65341_02();
-            } else if (PGN130850.match(/41,9f,01,ff,ff,0a,06,00,ff,ff,ff/)) {
-              debug('Going into standby mode');
-              pilot_state = 'standby';
-              AC12_PGN65341_02();
-            } else if (PGN130850.match(/41,9f,01,ff,ff,02,0e,00,ff,ff,ff/)) {
-              debug('Going into NFU mode');
-              pilot_state = 'NFU';
-              AC12_PGN65341_02();
+            // if (PGN130850.match(/41,9f,01,ff,ff,0a,09,00,ff,ff,ff/)) {
+            //   debug('Going into auto mode');
+            //   pilot_state = 'auto';
+            //   AC12_PGN65341_02();
+            // } else if (PGN130850.match(/41,9f,01,ff,ff,0a,06,00,ff,ff,ff/)) {
+            //   debug('Going into standby mode');
+            //   pilot_state = 'standby';
+            //   AC12_PGN65341_02();
+            // } else if (PGN130850.match(/41,9f,01,ff,ff,02,0e,00,ff,ff,ff/)) {
+            //   debug('Going into NFU mode');
+            //   pilot_state = 'NFU';
+            //   AC12_PGN65341_02();
 
             // B&G autopilot button matching
-            } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,0a,1a,00,02,ae,00/)) { // -1
+            if (PGN130850.match(/^0c,41,9f,01,ff,ff,0a,1a,00,02,ae,00/)) { // -1
               pgn126720 = "%s,7,126720,%s,%s,16,3b,9f,f0,81,86,21,05,fa,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff";
               debug('B&G button press -1');
             } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,0a,1a,00,03,ae,00/)) { // +1
