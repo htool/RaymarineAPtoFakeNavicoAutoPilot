@@ -23,12 +23,15 @@ const canDevice = require('./canboatjs/lib/canbus').canDevice
 const canbus = new (require('./canboatjs').canbus)({})
 const util = require('util')
 
-var reply130851 = [];
-var pilotmode126720 = [];
 var pilot_state = 'standby';
 var heading;
 var heading_rad = 'ff,ff';
 var mag_variation;
+
+// Variables for multipacket pgns
+var reply130851 = [];
+var pilotmode126720 = [];
+var bandgbutton = [];
 
 // Raymarine setup
 key_command = "%s,7,126720,%s,%s,16,3b,9f,f0,81,86,21,%s,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff" // ok
