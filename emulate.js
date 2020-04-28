@@ -482,7 +482,6 @@ function mainLoop () {
           } else {
             reply130851 = reply130851.concat(buf2hex(msg.data).slice(1)); // Skip multipart byte and 1 stuffing byte
           }
-          // debug('reply130851 %j', reply130851);
 
 
           if (reply130851.length > 8) { // We have 2 parts now
@@ -542,46 +541,46 @@ function mainLoop () {
               pilotmode126720=[];
           }
 
-        // B&G autopilot buttons
-        } else if (msg.pgn.pgn == 130850) {
-            bandgbutton = bandgbutton.concat(buf2hex(msg.data).slice(1)); // Skip multipart byte
-            Button = bandgbutton.join(',');
-            if (!Button.match(/^0c,41,9f,01,ff,ff/)) {
-              bandgbutton = [];
-            }
-            if (bandgbutton.length > 10) { // Have 2 parts now
-              debug('B&G button press: %s', Button);
-              if (Button.match(/0c,41,9f,01,ff,ff,0a,1a,00,02,ae,00/)) { // -1
-                msg = "%s,7,126720,%s,%s,16,3b,9f,f0,81,86,21,05,fa,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff";
-                debug('B&G button press -1');
-              } else if (Button.match(/0c,41,9f,01,ff,ff,0a,1a,00,03,ae,00/)) { // +1
-                msg = "%s,7,126720,%s,%s,16,3b,9f,f0,81,86,21,07,f8,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff";
-                debug('B&G button press +1');
-              } else if (Button.match(/0c,41,9f,01,ff,ff,0a,1a,00,02,d1,06/)) { // -10
-                msg = "%s,7,126720,%s,%s,16,3b,9f,f0,81,86,21,06,f9,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff";
-                debug('B&G button press -10');
-              } else if (Button.match(/0c,41,9f,01,ff,ff,0a,1a,00,03,d1,06/)) { // +10
-                msg = "%s,7,126720,%s,%s,16,3b,9f,f0,81,86,21,08,f7,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff";
-                debug('B&G button press +10');
-              } else if (Button.match(/0c,41,9f,01,ff,ff,0a,06,00,ff,ff,ff/)) { // Standby
-                msg = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,02,fd,00,00,00,00,00,00,ff,ff,ff,ff,ff"
-                debug('Setting Seatalk1 pilot mode Standby: %s', Button);
-              } else if (Button.match(/0c,41,9f,01,ff,ff,0a,06,00,auto/)) { // Wind
-                msg = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,23,dc,00,00,00,00,00,00,ff,ff,ff,ff,ff";
-                debug('Setting Seatalk1 pilot mode Wind: %s', Button);
-              } else if (Button.match(/0c,41,9f,01,ff,ff,0a,06,00,auto/)) { // Route
-                msg = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,03,fc,3c,42,00,00,00,00,ff,ff,ff,ff,ff";
-                debug('Setting Seatalk1 pilot mode Route: %s', Button);
-              } else if (Button.match(/0c,41,9f,01,ff,ff,0a,06,00,auto/)) { // Auto
-                msg = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,01,fe,00,00,00,00,00,00,ff,ff,ff,ff,ff";
-                debug('Setting Seatalk1 pilot mode Auto: %s', Button);
-              }
-              msg = util.format(msg, (new Date()).toISOString(), canbus.candevice.address, 115)
-              debug('Sending Seatalk1 button %j', msg);
-              canbus.sendPGN(msg)
-              bandgbutton = []
-          }
+        }
 
+        // B&G autopilot button matching
+        if (msg.pgn.pgn == 130850) {
+          bandgbutton = bandgbutton.concat(buf2hex(msg.data).slice(1)); // Skip multipart byte
+          Button = bandgbutton.join(',');
+          if (!Button.match(/^0c,41,9f,01,ff,ff/)) {
+            bandgbutton = [];
+          }
+          if (bandgbutton.length > 10) { // Have 2 parts now
+            debug('B&G button press: %s', Button);
+            if (Button.match(/0c,41,9f,01,ff,ff,0a,1a,00,02,ae,00/)) { // -1
+              msg = "%s,7,126720,%s,%s,16,3b,9f,f0,81,86,21,05,fa,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff";
+              debug('B&G button press -1');
+            } else if (Button.match(/0c,41,9f,01,ff,ff,0a,1a,00,03,ae,00/)) { // +1
+              msg = "%s,7,126720,%s,%s,16,3b,9f,f0,81,86,21,07,f8,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff";
+              debug('B&G button press +1');
+            } else if (Button.match(/0c,41,9f,01,ff,ff,0a,1a,00,02,d1,06/)) { // -10
+              msg = "%s,7,126720,%s,%s,16,3b,9f,f0,81,86,21,06,f9,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff";
+              debug('B&G button press -10');
+            } else if (Button.match(/0c,41,9f,01,ff,ff,0a,1a,00,03,d1,06/)) { // +10
+              msg = "%s,7,126720,%s,%s,16,3b,9f,f0,81,86,21,08,f7,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff";
+              debug('B&G button press +10');
+            } else if (Button.match(/0c,41,9f,01,ff,ff,0a,06,00,ff,ff,ff/)) { // Standby
+              msg = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,02,fd,00,00,00,00,00,00,ff,ff,ff,ff,ff"
+              debug('Setting Seatalk1 pilot mode Standby: %s', Button);
+            } else if (Button.match(/0c,41,9f,01,ff,ff,0a,06,00,auto/)) { // Wind
+              msg = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,23,dc,00,00,00,00,00,00,ff,ff,ff,ff,ff";
+              debug('Setting Seatalk1 pilot mode Wind: %s', Button);
+            } else if (Button.match(/0c,41,9f,01,ff,ff,0a,06,00,auto/)) { // Route
+              msg = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,03,fc,3c,42,00,00,00,00,ff,ff,ff,ff,ff";
+              debug('Setting Seatalk1 pilot mode Route: %s', Button);
+            } else if (Button.match(/0c,41,9f,01,ff,ff,0a,06,00,auto/)) { // Auto
+              msg = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,01,fe,00,00,00,00,00,00,ff,ff,ff,ff,ff";
+              debug('Setting Seatalk1 pilot mode Auto: %s', Button);
+            }
+            msg = util.format(msg, (new Date()).toISOString(), canbus.candevice.address, 115)
+            debug('Sending Seatalk1 button %j', msg);
+            canbus.sendPGN(msg)
+            bandgbutton = []
         }
         else if (msg.pgn.pgn == 65359) {
         // Get heading from Seatalk1 packet
