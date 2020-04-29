@@ -531,7 +531,7 @@ function mainLoop () {
 
             // Send Seatalk Button
             if (typeof pgn126720 != 'undefined' && pgn126720) {
-                pgn126720 = util.format(pgn126720, (new Date()).toISOString(), canbus.candevice.address);
+                pgn126720 = util.format(pgn126720, (new Date()).toISOString(), canbus.candevice.address, autopilot_dst);
                 debug('Sending reply 126720 %j', pgn126720);
                 canbus.sendPGN(pgn126720)
             }
