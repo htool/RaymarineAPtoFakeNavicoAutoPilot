@@ -26,6 +26,8 @@ const util = require('util')
 var pilot_state = 'standby';
 var heading;
 var heading_rad = 'ff,ff';
+var locked_heading;
+var locked_heading_rad = 'ff,ff';
 var mag_variation;
 
 // Variables for multipacket pgns
@@ -200,7 +202,7 @@ function AC12_PGN127237 () {
       // var msg = util.format(heading_track_pgn[pilot_state], (new Date()).toISOString(), canbus.candevice.address,
       //                      255, padd((new_value & 0xff).toString(16), 2), padd(((new_value >> 8) & 0xff).toString(16), 2))
       var msg = util.format(heading_track_pgn[pilot_state], (new Date()).toISOString(), canbus.candevice.address,
-                            255, heading_rad, heading_rad)
+                            255, locked_heading_rad, locked_heading_rad)
       // debug('127237 (auto): %j', msg);
       canbus.sendPGN(msg);
       break;
@@ -577,8 +579,7 @@ function mainLoop () {
             pilotmode126720=[];
           }
 
-        }
-        else if (msg.pgn.pgn == 65359) {
+        } else if (msg.pgn.pgn == 65359) {
         // Get heading from Seatalk1 packet
           // debug ('Seatalk1 Pilot heading info: %j %j', msg.pgn, msg.data);
           var heading_true_rad = buf2hex(msg.data).slice(3,5);
@@ -590,7 +591,22 @@ function mainLoop () {
             heading_rad = heading_mag_rad
           }
           heading = radsToDeg(parseInt('0x' + heading_rad[1] + heading_rad[0]))/10000;
-          // debug('heading: %s', heading)
+          debug('heading: %s', heading)
+        } else if (msg.pgn.pgn == 65360) {
+        // Get locked heading from Seatalk1 packet
+          // debug ('Seatalk1 Pilot locked heading info: %j %j', msg.pgn, msg.data);
+          var locked_heading_true_rad = buf2hex(msg.data).slice(3,5);
+          var locked_heading_mag_rad = buf2hex(msg.data).slice(5,7);
+          // debug ("heading_true_rad: %s heading_mag_rad: %s", heading_true_rad, heading_mag_rad);
+          if (locked_heading_true_rad[0] != 'ff') {
+            locked_heading_rad = locked_heading_true_rad
+          } else {
+            locked_heading_rad = locked_heading_mag_rad
+          }
+          locked_heading = radsToDeg(parseInt('0x' + locked_heading_rad[1] + locked_heading_rad[0]))/10000;
+          debug('locked heading: %s', locked_heading)
+
+
         } else if (msg.pgn.pgn == 127245 && msg.pgn.src == 115) {
         // Get rudder angle info from Seatalk1 packet
           rudder_pgn_data = buf2hex(msg.data);
