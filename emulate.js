@@ -534,7 +534,7 @@ function mainLoop () {
             // Send Seatalk Button
             if (typeof pgn126720 != 'undefined' && pgn126720) {
                 pgn126720 = util.format(pgn126720, (new Date()).toISOString(), canbus.candevice.address, autopilot_dst);
-                debug('Sending reply 126720 %j', pgn126720);
+                debug('Sending Seatalk pgn 126720 %j', pgn126720);
                 canbus.sendPGN(pgn126720)
             }
 
@@ -543,7 +543,7 @@ function mainLoop () {
             pgn130851_size_int = parseInt(pgn130850[0], 16);
             pgn130851 = "%s,7,130851,%s,255," + pgn130851_size + "," + (pgn130850.slice(1,pgn130851_size_int + 1)).join(',');
             pgn130851 = util.format(pgn130851, (new Date()).toISOString(), canbus.candevice.address)
-            debug('Sending reply 130851 %j', pgn130851);
+            // debug('Sending reply 130851 %j', pgn130851);
             canbus.sendPGN(pgn130851)
             pgn130850 = [];
           }
