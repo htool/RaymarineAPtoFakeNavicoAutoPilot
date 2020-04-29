@@ -33,6 +33,7 @@ var mag_variation;
 // Variables for multipacket pgns
 var pgn130850 = [];
 var pilotmode126720 = [];
+var pgn129284 = [];
 
 // Raymarine setup
 key_command = "%s,7,126720,%s,%s,16,3b,9f,f0,81,86,21,%s,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff" // ok
@@ -591,7 +592,7 @@ function mainLoop () {
             heading_rad = heading_mag_rad
           }
           heading = radsToDeg(parseInt('0x' + heading_rad[1] + heading_rad[0]))/10000;
-          // debug('heading: %s', heading)
+          debug('heading: %s', heading)
         } else if (msg.pgn.pgn == 65360) {
         // Get locked heading from Seatalk1 packet
           // debug ('Seatalk1 Pilot locked heading info: %j %j', msg.pgn, msg.data);
@@ -604,7 +605,7 @@ function mainLoop () {
             locked_heading_rad = locked_heading_mag_rad
           }
           locked_heading = radsToDeg(parseInt('0x' + locked_heading_rad[1] + locked_heading_rad[0]))/10000;
-          debug('locked heading: %s', locked_heading)
+          // debug('locked heading: %s', locked_heading)
 
 
         } else if (msg.pgn.pgn == 127245 && msg.pgn.src == 115) {
@@ -619,6 +620,15 @@ function mainLoop () {
           mag_variation = buf2hex(msg.data)
           mag_variation = parseInt('0x' + mag_variation[5] + mag_variation[4]);
           mag_variation = radsToDeg(mag_variation)/10000;
+        } else if (msg.pgn.pgn == 129284) { // Navigation bearing info
+          pgn129284 = pgn129284.concat(buf2hex(msg.data).slice(1)); // Skip multipart byte
+          PGN129284 = pgn129284.join(',');
+          if (!PGN129284.match(/^[02468ace]0,22,/)) {
+            pgn129284 = [];
+          }
+          if (pgn129284.length > 8) { // We have 2 parts now
+            // debug('PGN129284: %s', PGN129284)
+          }
         }
         break;
       default:
