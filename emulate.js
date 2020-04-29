@@ -591,7 +591,7 @@ function mainLoop () {
             heading_rad = heading_mag_rad
           }
           heading = radsToDeg(parseInt('0x' + heading_rad[1] + heading_rad[0]))/10000;
-          debug('heading: %s', heading)
+          // debug('heading: %s', heading)
         } else if (msg.pgn.pgn == 65360) {
         // Get locked heading from Seatalk1 packet
           // debug ('Seatalk1 Pilot locked heading info: %j %j', msg.pgn, msg.data);
