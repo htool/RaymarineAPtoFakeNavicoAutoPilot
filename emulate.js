@@ -486,7 +486,7 @@ function mainLoop () {
           }
 
           if (pgn130850.length > 8) { // We have 2 parts now
-            debug ('Event AP command: %j %j', msg.pgn, msg.data);
+            // debug ('Event AP command: %j %j', msg.pgn, msg.data);
             // if (PGN130850.match(/41,9f,01,ff,ff,0a,09,00,ff,ff,ff/)) {
             //   debug('Going into auto mode');
             //   pilot_state = 'auto';
