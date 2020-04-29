@@ -19,3 +19,6 @@ For now I start it in screen on the Raspberry Pi like this:
 $ node ./emulate.js <device to emulate> <device address>
 so I use
 $ node ./emulate.js AC12 1
+
+
+![Vulcan screenshot](/doc/vulcan.jpg)
