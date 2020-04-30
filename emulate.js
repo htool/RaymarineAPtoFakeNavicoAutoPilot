@@ -484,168 +484,168 @@ function mainLoop () {
         msg.pgn.fields.PGN = PGN;
         canbus.candevice.n2kMessage(msg.pgn);
       }
-		}
-    switch (emulate) {
-      case 'AC12':
-        if (msg.pgn.pgn == 130850) { // Simnet Event, requires reply
-          pgn130850 = pgn130850.concat(buf2hex(msg.data).slice(1)); // Skip multipart byte
-          PGN130850 = pgn130850.join(',');
-          if (!PGN130850.match(/^..,41,9f,01,ff,ff,/)) {
-            pgn130850 = [];
-          }
-
-          if (pgn130850.length > 8) { // We have 2 parts now
-            // debug ('Event AP command: %j %j', msg.pgn, msg.data);
-            // if (PGN130850.match(/41,9f,01,ff,ff,0a,09,00,ff,ff,ff/)) {
-            //   debug('Going into auto mode');
-            //   pilot_state = 'auto';
-            //   AC12_PGN65341_02();
-            // } else if (PGN130850.match(/41,9f,01,ff,ff,0a,06,00,ff,ff,ff/)) {
-            //   debug('Going into standby mode');
-            //   pilot_state = 'standby';
-            //   AC12_PGN65341_02();
-            // } else if (PGN130850.match(/41,9f,01,ff,ff,02,0e,00,ff,ff,ff/)) {
-            //   debug('Going into NFU mode');
-            //   pilot_state = 'NFU';
-            //   AC12_PGN65341_02();
-
-            // B&G autopilot button matching
-            if (PGN130850.match(/^0c,41,9f,01,ff,ff,0a,1a,00,02,ae,00/)) { // -1
-              pgn126720 = "%s,7,126720,%s,%s,16,3b,9f,f0,81,86,21,05,fa,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff";
-              debug('B&G button press -1');
-            } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,0a,1a,00,03,ae,00/)) { // +1
-              pgn126720 = "%s,7,126720,%s,%s,16,3b,9f,f0,81,86,21,07,f8,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff";
-              debug('B&G button press +1');
-            } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,0a,1a,00,02,d1,06/)) { // -10
-              pgn126720 = "%s,7,126720,%s,%s,16,3b,9f,f0,81,86,21,06,f9,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff";
-              debug('B&G button press -10');
-            } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,0a,1a,00,03,d1,06/)) { // +10
-              pgn126720 = "%s,7,126720,%s,%s,16,3b,9f,f0,81,86,21,08,f7,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff";
-              debug('B&G button press +10');
-            } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,0a,06,00,ff,ff,ff/)) { // Standby
-              pgn126720 = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,02,fd,00,00,00,00,00,00,ff,ff,ff,ff,ff"
-              debug('Setting Seatalk1 pilot mode Standby');
-            } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,0a,06,00,auto/)) { // Wind
-              pgn126720 = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,23,dc,00,00,00,00,00,00,ff,ff,ff,ff,ff";
-              debug('Setting Seatalk1 pilot mode Wind');
-            } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,0a,06,00,auto/)) { // Route/navigation
-              pgn126720 = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,03,fc,3c,42,00,00,00,00,ff,ff,ff,ff,ff";
-              debug('Setting Seatalk1 pilot mode Route (navigation)');
-            } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,0a,09,00,ff,ff,ff/)) { // Auto
-              pgn126720 = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,01,fe,00,00,00,00,00,00,ff,ff,ff,ff,ff";
-              debug('Setting Seatalk1 pilot mode Auto');
-
-            // Clear 'No Autopilot' alarm?
-            } else if (PGN130850.match(/41,9f,ff,ff,ff,1f,51,00,c4,49,29/)) {
-              pgn130851.replace(',51,', ',52,');
+      switch (emulate) {
+        case 'AC12':
+          if (msg.pgn.pgn == 130850) { // Simnet Event, requires reply
+            pgn130850 = pgn130850.concat(buf2hex(msg.data).slice(1)); // Skip multipart byte
+            PGN130850 = pgn130850.join(',');
+            if (!PGN130850.match(/^..,41,9f,01,ff,ff,/)) {
+              pgn130850 = [];
             }
 
-            // Send Seatalk Button
-            if (typeof pgn126720 != 'undefined' && pgn126720) {
-                pgn126720 = util.format(pgn126720, (new Date()).toISOString(), canbus.candevice.address, autopilot_dst);
-                debug('Sending Seatalk pgn 126720 %j', pgn126720);
-                canbus.sendPGN(pgn126720)
+            if (pgn130850.length > 8) { // We have 2 parts now
+              debug ('Event AP command: %j %j', msg.pgn, msg.data);
+              // if (PGN130850.match(/41,9f,01,ff,ff,0a,09,00,ff,ff,ff/)) {
+              //   debug('Going into auto mode');
+              //   pilot_state = 'auto';
+              //   AC12_PGN65341_02();
+              // } else if (PGN130850.match(/41,9f,01,ff,ff,0a,06,00,ff,ff,ff/)) {
+              //   debug('Going into standby mode');
+              //   pilot_state = 'standby';
+              //   AC12_PGN65341_02();
+              // } else if (PGN130850.match(/41,9f,01,ff,ff,02,0e,00,ff,ff,ff/)) {
+              //   debug('Going into NFU mode');
+              //   pilot_state = 'NFU';
+              //   AC12_PGN65341_02();
+
+              // B&G autopilot button matching
+              if (PGN130850.match(/^0c,41,9f,01,ff,ff,0a,1a,00,02,ae,00/)) { // -1
+                pgn126720 = "%s,7,126720,%s,%s,16,3b,9f,f0,81,86,21,05,fa,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff";
+                debug('B&G button press -1');
+              } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,0a,1a,00,03,ae,00/)) { // +1
+                pgn126720 = "%s,7,126720,%s,%s,16,3b,9f,f0,81,86,21,07,f8,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff";
+                debug('B&G button press +1');
+              } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,0a,1a,00,02,d1,06/)) { // -10
+                pgn126720 = "%s,7,126720,%s,%s,16,3b,9f,f0,81,86,21,06,f9,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff";
+                debug('B&G button press -10');
+              } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,0a,1a,00,03,d1,06/)) { // +10
+                pgn126720 = "%s,7,126720,%s,%s,16,3b,9f,f0,81,86,21,08,f7,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff";
+                debug('B&G button press +10');
+              } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,0a,06,00,ff,ff,ff/)) { // Standby
+                pgn126720 = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,02,fd,00,00,00,00,00,00,ff,ff,ff,ff,ff"
+                debug('Setting Seatalk1 pilot mode Standby');
+              } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,0a,06,00,auto/)) { // Wind
+                pgn126720 = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,23,dc,00,00,00,00,00,00,ff,ff,ff,ff,ff";
+                debug('Setting Seatalk1 pilot mode Wind');
+              } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,0a,06,00,auto/)) { // Route/navigation
+                pgn126720 = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,03,fc,3c,42,00,00,00,00,ff,ff,ff,ff,ff";
+                debug('Setting Seatalk1 pilot mode Route (navigation)');
+              } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,0a,09,00,ff,ff,ff/)) { // Auto
+                pgn126720 = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,01,fe,00,00,00,00,00,00,ff,ff,ff,ff,ff";
+                debug('Setting Seatalk1 pilot mode Auto');
+
+              // Clear 'No Autopilot' alarm?
+              } else if (PGN130850.match(/41,9f,ff,ff,ff,1f,51,00,c4,49,29/)) {
+                pgn130851.replace(',51,', ',52,');
+              }
+
+              // Send Seatalk Button
+              if (typeof pgn126720 != 'undefined' && pgn126720) {
+                  pgn126720 = util.format(pgn126720, (new Date()).toISOString(), canbus.candevice.address, autopilot_dst);
+                  debug('Sending Seatalk pgn 126720 %j', pgn126720);
+                  canbus.sendPGN(pgn126720)
+              }
+
+              // Send 130851 reply packet
+              pgn130851_size = pgn130850[0];
+              pgn130851_size_int = parseInt(pgn130850[0], 16);
+              pgn130851 = "%s,7,130851,%s,255," + pgn130851_size + "," + (pgn130850.slice(1,pgn130851_size_int + 1)).join(',');
+              pgn130851 = util.format(pgn130851, (new Date()).toISOString(), canbus.candevice.address)
+              // debug('Sending reply 130851 %j', pgn130851);
+              canbus.sendPGN(pgn130851)
+              pgn130850 = [];
             }
 
-            // Send 130851 reply packet
-            pgn130851_size = pgn130850[0];
-            pgn130851_size_int = parseInt(pgn130850[0], 16);
-            pgn130851 = "%s,7,130851,%s,255," + pgn130851_size + "," + (pgn130850.slice(1,pgn130851_size_int + 1)).join(',');
-            pgn130851 = util.format(pgn130851, (new Date()).toISOString(), canbus.candevice.address)
-            // debug('Sending reply 130851 %j', pgn130851);
-            canbus.sendPGN(pgn130851)
-            pgn130850 = [];
-          }
-
-        // Seatalk1 pilot mode
-        } else if (msg.pgn.pgn == 126720) {
-          // 16,3b,9f,f0,81
-          pilotmode126720 = pilotmode126720.concat(buf2hex(msg.data).slice(1)); // Skip multipart byte
-          Seatalkmode = pilotmode126720.join(',');
-          if (!Seatalkmode.match(/^16,3b,9f,f0,81,84/)) {
-            pilotmode126720 = [];
-          }
-          if (pilotmode126720.length > 24) { // We have 4 parts now
-            if (Seatalkmode.match(/16,3b,9f,f0,81,84,..,..,..,42,/)) {
-              if (pilot_state != 'auto') {
-                debug('Following Seatalk1 pilot mode auto: %s', Seatalkmode);
-                pilot_state = 'auto';
-                AC12_PGN65341_02();
-              }
-            } else if (Seatalkmode.match(/16,3b,9f,f0,81,84,..,..,..,46,/)) {
-              if (pilot_state != 'wind') {
-                debug('Following Seatalk1 pilot mode wind: %s', Seatalkmode);
-                pilot_state = 'wind';
-                AC12_PGN65341_02();
-              }
-            } else if (Seatalkmode.match(/16,3b,9f,f0,81,84,..,..,..,40,/) || Seatalkmode.match(/16,3b,9f,f0,81,84,..,..,..,44,/) ) {
-              if (pilot_state != 'standby') {
-                debug('Following Seatalk1 pilot mode standby: %s', Seatalkmode);
-                pilot_state = 'standby'
-                AC12_PGN65341_02();
-              }
-            } else if (Seatalkmode.match(/16,3b,9f,f0,81,86,21,03,fc,3c,42/) || Seatalkmode.match(/16,3b,9f,f0,81,84,..,..,..,44,/) ) {
-              if (pilot_state != 'navigation') {
-                debug('Following Seatalk1 pilot mode route (navigation): %s', Seatalkmode);
-                pilot_state = 'navigation'
-                AC12_PGN65341_02();
-              }
+          // Seatalk1 pilot mode
+          } else if (msg.pgn.pgn == 126720) {
+            // 16,3b,9f,f0,81
+            pilotmode126720 = pilotmode126720.concat(buf2hex(msg.data).slice(1)); // Skip multipart byte
+            Seatalkmode = pilotmode126720.join(',');
+            if (!Seatalkmode.match(/^16,3b,9f,f0,81,84/)) {
+              pilotmode126720 = [];
             }
-            pilotmode126720=[];
-          }
+            if (pilotmode126720.length > 24) { // We have 4 parts now
+              if (Seatalkmode.match(/16,3b,9f,f0,81,84,..,..,..,42,/)) {
+                if (pilot_state != 'auto') {
+                  debug('Following Seatalk1 pilot mode auto: %s', Seatalkmode);
+                  pilot_state = 'auto';
+                  AC12_PGN65341_02();
+                }
+              } else if (Seatalkmode.match(/16,3b,9f,f0,81,84,..,..,..,46,/)) {
+                if (pilot_state != 'wind') {
+                  debug('Following Seatalk1 pilot mode wind: %s', Seatalkmode);
+                  pilot_state = 'wind';
+                  AC12_PGN65341_02();
+                }
+              } else if (Seatalkmode.match(/16,3b,9f,f0,81,84,..,..,..,40,/) || Seatalkmode.match(/16,3b,9f,f0,81,84,..,..,..,44,/) ) {
+                if (pilot_state != 'standby') {
+                  debug('Following Seatalk1 pilot mode standby: %s', Seatalkmode);
+                  pilot_state = 'standby'
+                  AC12_PGN65341_02();
+                }
+              } else if (Seatalkmode.match(/16,3b,9f,f0,81,86,21,03,fc,3c,42/) || Seatalkmode.match(/16,3b,9f,f0,81,84,..,..,..,44,/) ) {
+                if (pilot_state != 'navigation') {
+                  debug('Following Seatalk1 pilot mode route (navigation): %s', Seatalkmode);
+                  pilot_state = 'navigation'
+                  AC12_PGN65341_02();
+                }
+              }
+              pilotmode126720=[];
+            }
 
-        } else if (msg.pgn.pgn == 65359) {
-        // Get heading from Seatalk1 packet
-          // debug ('Seatalk1 Pilot heading info: %j %j', msg.pgn, msg.data);
-          var heading_true_rad = buf2hex(msg.data).slice(3,5);
-          var heading_mag_rad = buf2hex(msg.data).slice(5,7);
-          // debug ("heading_true_rad: %s heading_mag_rad: %s", heading_true_rad, heading_mag_rad);
-          if (heading_true_rad[0] != 'ff') {
-            heading_rad = heading_true_rad
-          } else {
-            heading_rad = heading_mag_rad
-          }
-          heading = radsToDeg(parseInt('0x' + heading_rad[1] + heading_rad[0]))/10000;
-          // debug('heading: %s', heading)
-        } else if (msg.pgn.pgn == 65360) {
-        // Get locked heading from Seatalk1 packet
-          // debug ('Seatalk1 Pilot locked heading info: %j %j', msg.pgn, msg.data);
-          var locked_heading_true_rad = buf2hex(msg.data).slice(3,5);
-          var locked_heading_mag_rad = buf2hex(msg.data).slice(5,7);
-          // debug ("heading_true_rad: %s heading_mag_rad: %s", heading_true_rad, heading_mag_rad);
-          if (locked_heading_true_rad[0] != 'ff') {
-            locked_heading_rad = locked_heading_true_rad
-          } else {
-            locked_heading_rad = locked_heading_mag_rad
-          }
-          locked_heading = radsToDeg(parseInt('0x' + locked_heading_rad[1] + locked_heading_rad[0]))/10000;
-          // debug('locked heading: %s', locked_heading)
+          } else if (msg.pgn.pgn == 65359) {
+          // Get heading from Seatalk1 packet
+            // debug ('Seatalk1 Pilot heading info: %j %j', msg.pgn, msg.data);
+            var heading_true_rad = buf2hex(msg.data).slice(3,5);
+            var heading_mag_rad = buf2hex(msg.data).slice(5,7);
+            // debug ("heading_true_rad: %s heading_mag_rad: %s", heading_true_rad, heading_mag_rad);
+            if (heading_true_rad[0] != 'ff') {
+              heading_rad = heading_true_rad
+            } else {
+              heading_rad = heading_mag_rad
+            }
+            heading = radsToDeg(parseInt('0x' + heading_rad[1] + heading_rad[0]))/10000;
+            // debug('heading: %s', heading)
+          } else if (msg.pgn.pgn == 65360) {
+          // Get locked heading from Seatalk1 packet
+            // debug ('Seatalk1 Pilot locked heading info: %j %j', msg.pgn, msg.data);
+            var locked_heading_true_rad = buf2hex(msg.data).slice(3,5);
+            var locked_heading_mag_rad = buf2hex(msg.data).slice(5,7);
+            // debug ("heading_true_rad: %s heading_mag_rad: %s", heading_true_rad, heading_mag_rad);
+            if (locked_heading_true_rad[0] != 'ff') {
+              locked_heading_rad = locked_heading_true_rad
+            } else {
+              locked_heading_rad = locked_heading_mag_rad
+            }
+            locked_heading = radsToDeg(parseInt('0x' + locked_heading_rad[1] + locked_heading_rad[0]))/10000;
+            // debug('locked heading: %s', locked_heading)
 
 
-        } else if (msg.pgn.pgn == 127245 && msg.pgn.src == 115) {
-        // Get rudder angle info from Seatalk1 packet
-          rudder_pgn_data = buf2hex(msg.data);
-          AC12_PGN127245(rudder_pgn_data);
-        } else if (msg.pgn.pgn == 128275 && msg.pgn.src == 115) {
-        // Get distance log info from Seatalk1 packet
-          AC12_PGN128275(buf2hex(msg.data));
-        } else if (msg.pgn.pgn == 127258)  {
-        // Get variation info to turn into true heading
-          mag_variation = buf2hex(msg.data)
-          mag_variation = parseInt('0x' + mag_variation[5] + mag_variation[4]);
-          mag_variation = radsToDeg(mag_variation)/10000;
-        } else if (msg.pgn.pgn == 129284) { // Navigation bearing info
-          pgn129284 = pgn129284.concat(buf2hex(msg.data).slice(1)); // Skip multipart byte
-          PGN129284 = pgn129284.join(',');
-          if (!PGN129284.match(/^[02468ace]0,22,/)) {
-            pgn129284 = [];
+          } else if (msg.pgn.pgn == 127245 && msg.pgn.src == 115) {
+          // Get rudder angle info from Seatalk1 packet
+            rudder_pgn_data = buf2hex(msg.data);
+            AC12_PGN127245(rudder_pgn_data);
+          } else if (msg.pgn.pgn == 128275 && msg.pgn.src == 115) {
+          // Get distance log info from Seatalk1 packet
+            AC12_PGN128275(buf2hex(msg.data));
+          } else if (msg.pgn.pgn == 127258)  {
+          // Get variation info to turn into true heading
+            mag_variation = buf2hex(msg.data)
+            mag_variation = parseInt('0x' + mag_variation[5] + mag_variation[4]);
+            mag_variation = radsToDeg(mag_variation)/10000;
+          } else if (msg.pgn.pgn == 129284) { // Navigation bearing info
+            pgn129284 = pgn129284.concat(buf2hex(msg.data).slice(1)); // Skip multipart byte
+            PGN129284 = pgn129284.join(',');
+            if (!PGN129284.match(/^[02468ace]0,22,/)) {
+              pgn129284 = [];
+            }
+            if (pgn129284.length > 8) { // We have 2 parts now
+              // debug('PGN129284: %s', PGN129284)
+            }
           }
-          if (pgn129284.length > 8) { // We have 2 parts now
-            // debug('PGN129284: %s', PGN129284)
-          }
-        }
-        break;
-      default:
+          break;
+        default:
+      }
     }
 	}
   setTimeout(mainLoop, 50)
