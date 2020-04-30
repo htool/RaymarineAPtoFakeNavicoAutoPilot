@@ -36,9 +36,10 @@ var pilotmode126720 = [];
 var pgn129284 = [];
 
 // Raymarine setup
-key_command = "%s,7,126720,%s,%s,16,3b,9f,f0,81,86,21,%s,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff" // ok
+key_command     = "%s,7,126720,%s,%s,16,3b,9f,f0,81,86,21,%s,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff" // ok
 heading_command = "%s,3,126208,%s,%s,14,01,50,ff,00,f8,03,01,3b,07,03,04,06,%s,%s"
-wind_direction_command = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,23,dc,00,00,00,00,00,00,ff,ff,ff,ff,ff",
+wind_command    = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,23,dc,00,00,00,00,00,00,ff,ff,ff,ff,ff",
+route_command   = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,03,fc,3c,42,00,00,00,00,ff,ff,ff,ff,ff",
 autopilot_dst = '115' // default converter device id
 
 function changeHeading(app, deviceid, command_json)
@@ -339,17 +340,18 @@ async function AC12_bootconfig () {
 
 async function AC12_PGN65340 () {
   const pgn65340 = {
-      "auto":    "%s,3,65340,%s,255,8,41,9f,10,01,fe,fa,00,80",
-      "NFU":     "%s,3,65340,%s,255,8,41,9f,10,02,fe,fa,00,80",
-      "wind":    "%s,3,65340,%s,255,8,41,9f,10,03,fe,fa,00,80",
-      "route":   "%s,3,65340,%s,255,8,41,9f,10,04,fe,fa,00,80",
-      "standby": "%s,3,65340,%s,255,8,41,9f,00,00,fe,f8,00,80"
+      "auto":        "%s,3,65340,%s,255,8,41,9f,10,01,fe,fa,00,80",
+      "NFU":         "%s,3,65340,%s,255,8,41,9f,10,02,fe,fa,00,80",
+      "wind":        "%s,3,65340,%s,255,8,41,9f,10,03,fe,fa,00,80",
+      "navigation":  "%s,3,65340,%s,255,8,41,9f,10,04,fe,fa,00,80",
+      "standby":     "%s,3,65340,%s,255,8,41,9f,00,00,fe,f8,00,80"
   }
   const pgn65302 = {
-      "standby":  "%s,7,65302,%s,255,8,41,9f,0a,6b,00,00,00,ff",
-      "wind":     "%s,7,65302,%s,255,8,41,9f,0a,69,00,00,00,ff", // guessing
-      "auto":     "%s,7,65302,%s,255,8,41,9f,0a,4b,00,00,00,ff",
-      "NFU":      "%s,7,65302,%s,255,8,41,9f,0a,69,00,00,28,ff"
+      "standby":    "%s,7,65302,%s,255,8,41,9f,0a,6b,00,00,00,ff",
+      "wind":       "%s,7,65302,%s,255,8,41,9f,0a,69,00,00,00,ff", // guessing
+      "navigation": "%s,7,65302,%s,255,8,41,9f,0a,69,00,00,00,ff", // guessing
+      "auto":       "%s,7,65302,%s,255,8,41,9f,0a,4b,00,00,00,ff",
+      "NFU":        "%s,7,65302,%s,255,8,41,9f,0a,69,00,00,28,ff"
   }
   const messages = [
     pgn65340[pilot_state],
@@ -383,11 +385,11 @@ async function AC12_PGN65341_5s () {
 
 function AC12_PGN65341_02 () {
   const pgn65341_02 = {
-      "auto":    "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,15,9a",
-      "NFU":     "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,00,00",
-      "wind":     "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,00,00",
-      "route":   "",
-      "standby": "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,ff,ff"
+      "auto":       "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,15,9a",
+      "NFU":        "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,00,00",
+      "wind":       "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,00,00",
+      "navigation": "",
+      "standby":    "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,ff,ff"
   }
   msg = util.format(pgn65341_02[pilot_state], (new Date()).toISOString(), canbus.candevice.address)
   canbus.sendPGN(msg)
@@ -406,6 +408,12 @@ async function AC12_PGN65305 () {
           "%s,7,65305,%s,255,8,41,9f,00,1d,81,00,00,00",
           "%s,7,65305,%s,255,8,41,9f,00,0a,14,00,80,00",
           "%s,7,65305,%s,255,8,41,9f,00,02,10,00,00,00" ];
+        break;
+    case 'navigation': // unknown
+      messages = [
+        "%s,7,65305,%s,255,8,41,9f,00,1d,80,00,00,00",
+        "%s,7,65305,%s,255,8,41,9f,00,03,10,00,00,00",
+        "%s,7,65305,%s,255,8,41,9f,00,0a,0c,00,80,00" ];
         break;
     case 'wind': // unknown
       messages = [
@@ -520,9 +528,9 @@ function mainLoop () {
             } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,0a,06,00,auto/)) { // Wind
               pgn126720 = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,23,dc,00,00,00,00,00,00,ff,ff,ff,ff,ff";
               debug('Setting Seatalk1 pilot mode Wind');
-            } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,0a,06,00,auto/)) { // Route
+            } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,0a,06,00,auto/)) { // Route/navigation
               pgn126720 = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,03,fc,3c,42,00,00,00,00,ff,ff,ff,ff,ff";
-              debug('Setting Seatalk1 pilot mode Route');
+              debug('Setting Seatalk1 pilot mode Route (navigation)');
             } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,0a,09,00,ff,ff,ff/)) { // Auto
               pgn126720 = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,01,fe,00,00,00,00,00,00,ff,ff,ff,ff,ff";
               debug('Setting Seatalk1 pilot mode Auto');
@@ -574,6 +582,12 @@ function mainLoop () {
               if (pilot_state != 'standby') {
                 debug('Following Seatalk1 pilot mode standby: %s', Seatalkmode);
                 pilot_state = 'standby'
+                AC12_PGN65341_02();
+              }
+            } else if (Seatalkmode.match(/16,3b,9f,f0,81,86,21,03,fc,3c,42/) || Seatalkmode.match(/16,3b,9f,f0,81,84,..,..,..,44,/) ) {
+              if (pilot_state != 'navigation') {
+                debug('Following Seatalk1 pilot mode route (navigation): %s', Seatalkmode);
+                pilot_state = 'navigation'
                 AC12_PGN65341_02();
               }
             }
