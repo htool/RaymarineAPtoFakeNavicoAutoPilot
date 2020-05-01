@@ -650,9 +650,10 @@ function mainLoop () {
                 pgn130845 = [];
               }
               if (pgn130845.length > 16) { // We have 3 parts now
-                // debug('PGN130845: %s', PGN130845)
+                debug('PGN130845: %s', PGN130845)
                 PGN130845 = "%s,3,130845,%s,255," + PGN130845;
                 PGN130845 = util.format(PGN130845, (new Date()).toISOString(), canbus.candevice.address)
+                debug('Sending PGN130845: %s', PGN130845)
                 canbus.sendPGN(PGN130845)
                 pgn130845 = [];
               }
