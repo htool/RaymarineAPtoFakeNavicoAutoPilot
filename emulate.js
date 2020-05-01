@@ -646,11 +646,11 @@ function mainLoop () {
           } else if (msg.pgn.pgn == 130845) { // Commission Simnet reply
               pgn130845 = pgn130845.concat(buf2hex(msg.data).slice(1)); // Skip multipart byte
               PGN130845 = pgn130845.join(',');
-              if (!PGN130845.match(/^[02468ace]0,22,/)) {
+              if (!PGN130845.match(/^[02468ace]0,0e,41,9f/)) {
                 pgn130845 = [];
               }
               if (pgn130845.length > 16) { // We have 3 parts now
-                debug('PGN130845: %s', PGN130845)
+                // debug('PGN130845: %s', PGN130845)
                 PGN130845 = "%s,3,130845,%s,255," + PGN130845;
                 PGN130845 = util.format(PGN130845, (new Date()).toISOString(), canbus.candevice.address)
                 debug('Sending PGN130845: %s', PGN130845)
@@ -658,7 +658,6 @@ function mainLoop () {
                 pgn130845 = [];
               }
             }
-          }
           break;
         default:
       }
