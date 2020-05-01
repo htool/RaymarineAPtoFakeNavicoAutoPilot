@@ -509,28 +509,29 @@ function mainLoop () {
               //   AC12_PGN65341_02();
 
               // B&G autopilot button matching
-              if (PGN130850.match(/^0c,41,9f,01,ff,ff,0a,1a,00,02,ae,00/)) { // -1
+              if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,1a,00,02,ae,00/)) { // -1
                 pgn126720 = "%s,7,126720,%s,%s,16,3b,9f,f0,81,86,21,05,fa,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff";
                 debug('B&G button press -1');
-              } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,0a,1a,00,03,ae,00/)) { // +1
+              } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,1a,00,03,ae,00/)) { // +1
                 pgn126720 = "%s,7,126720,%s,%s,16,3b,9f,f0,81,86,21,07,f8,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff";
                 debug('B&G button press +1');
-              } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,0a,1a,00,02,d1,06/)) { // -10
+              } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,1a,00,02,d1,06/)) { // -10
                 pgn126720 = "%s,7,126720,%s,%s,16,3b,9f,f0,81,86,21,06,f9,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff";
                 debug('B&G button press -10');
-              } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,0a,1a,00,03,d1,06/)) { // +10
+              } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,1a,00,03,d1,06/)) { // +10
                 pgn126720 = "%s,7,126720,%s,%s,16,3b,9f,f0,81,86,21,08,f7,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff";
                 debug('B&G button press +10');
-              } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,0a,06,00,ff,ff,ff/)) { // Standby
+              } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,06,00,ff,ff,ff/)) { // Standby
                 pgn126720 = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,02,fd,00,00,00,00,00,00,ff,ff,ff,ff,ff"
                 debug('Setting Seatalk1 pilot mode Standby');
-              } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,0a,06,00,auto/)) { // Wind
+              } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,06,00,auto/)) { // Wind
                 pgn126720 = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,23,dc,00,00,00,00,00,00,ff,ff,ff,ff,ff";
                 debug('Setting Seatalk1 pilot mode Wind');
-              } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,0a,06,00,auto/)) { // Route/navigation
+              } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,06,00,auto/)) { // Route/navigation
                 pgn126720 = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,03,fc,3c,42,00,00,00,00,ff,ff,ff,ff,ff";
                 debug('Setting Seatalk1 pilot mode Route (navigation)');
-              } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,0a,09,00,ff,ff,ff/)) { // Auto
+          //  } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,0a,09,00,ff,ff,ff/)) { // Auto
+              } else if (PGN130850.match(/^0c,41,9f,0c,ff,ff,..,1c,00,ff,ff,ff/)) { // Auto
                 pgn126720 = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,01,fe,00,00,00,00,00,00,ff,ff,ff,ff,ff";
                 debug('Setting Seatalk1 pilot mode Auto');
 
