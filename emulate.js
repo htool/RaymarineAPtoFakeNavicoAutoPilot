@@ -646,7 +646,7 @@ function mainLoop () {
           } else if (msg.pgn.pgn == 130845) { // Commission Simnet reply
               pgn130845 = pgn130845.concat(buf2hex(msg.data).slice(1)); // Skip multipart byte
               PGN130845 = pgn130845.join(',');
-              if (!PGN130845.match(/^[02468ace]0,0e,41,9f/)) {
+              if (!PGN130845.match(/^0e,41,9f/)) {
                 pgn130845 = [];
               }
               if (pgn130845.length > 16) { // We have 3 parts now
