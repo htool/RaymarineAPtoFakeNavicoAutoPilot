@@ -34,6 +34,7 @@ var mag_variation;
 var pgn130850 = [];
 var pilotmode126720 = [];
 var pgn129284 = [];
+var pgn130845 = [];
 
 // Raymarine setup
 key_command     = "%s,7,126720,%s,%s,16,3b,9f,f0,81,86,21,%s,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff" // ok
@@ -641,6 +642,20 @@ function mainLoop () {
             }
             if (pgn129284.length > 8) { // We have 2 parts now
               // debug('PGN129284: %s', PGN129284)
+            }
+            else if (msg.pgn.pgn == 130845) { // Commission Simnet reply
+              pgn130845 = pgn130845.concat(buf2hex(msg.data).slice(1)); // Skip multipart byte
+              PGN130845 = pgn130845.join(',');
+              if (!PGN130845.match(/^[02468ace]0,22,/)) {
+                pgn130845 = [];
+              }
+              if (pgn130845.length > 16) { // We have 3 parts now
+                // debug('PGN130845: %s', PGN130845)
+                PGN130845 = "%s,3,130845,%s,255," + PGN130845;
+                PGN130845 = util.format(PGN130845, (new Date()).toISOString(), canbus.candevice.address)
+                canbus.sendPGN(PGN130845)
+                pgn130845 = [];
+              }
             }
           }
           break;
