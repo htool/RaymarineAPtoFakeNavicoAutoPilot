@@ -512,26 +512,34 @@ function mainLoop () {
               // B&G autopilot button matching
               if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,1a,00,02,ae,00/)) { // -1
                 pgn126720 = "%s,7,126720,%s,%s,16,3b,9f,f0,81,86,21,05,fa,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff";
+                button = "05,fa,07,01,02";
                 debug('B&G button press -1');
               } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,1a,00,03,ae,00/)) { // +1
                 pgn126720 = "%s,7,126720,%s,%s,16,3b,9f,f0,81,86,21,07,f8,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff";
+                button = "07,f8,07,01,02";
                 debug('B&G button press +1');
               } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,1a,00,02,d1,06/)) { // -10
+                button = "06,f9,07,01,02";
                 pgn126720 = "%s,7,126720,%s,%s,16,3b,9f,f0,81,86,21,06,f9,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff";
                 debug('B&G button press -10');
               } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,1a,00,03,d1,06/)) { // +10
+                button = "08,f7,07,01,02";
                 pgn126720 = "%s,7,126720,%s,%s,16,3b,9f,f0,81,86,21,08,f7,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff";
                 debug('B&G button press +10');
               } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,06,00,ff,ff,ff/)) { // Standby
+                button = "08,f7,07,01,02";
                 pgn126720 = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,02,fd,00,00,00,00,00,00,ff,ff,ff,ff,ff"
                 debug('Setting Seatalk1 pilot mode Standby');
               } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,06,00,auto/)) { // Wind
+                button = "02,fd,00,00,00";
                 pgn126720 = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,23,dc,00,00,00,00,00,00,ff,ff,ff,ff,ff";
                 debug('Setting Seatalk1 pilot mode Wind');
               } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,06,00,auto/)) { // Route/navigation
+                button = "23,dc,00,00,00";
                 pgn126720 = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,03,fc,3c,42,00,00,00,00,ff,ff,ff,ff,ff";
                 debug('Setting Seatalk1 pilot mode Route (navigation)');
               } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,09,00,ff,ff,ff/)) { // Auto
+                button = "03,fc,42,00,00";
                 pgn126720 = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,01,fe,00,00,00,00,00,00,ff,ff,ff,ff,ff";
                 debug('Setting Seatalk1 pilot mode Auto');
 
@@ -542,7 +550,8 @@ function mainLoop () {
 
               // Send Seatalk Button
               if (typeof pgn126720 != 'undefined' && pgn126720) {
-                  pgn126720 = util.format(pgn126720, (new Date()).toISOString(), canbus.candevice.address, autopilot_dst);
+                  pgn126720 = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,%s,00,00,00,ff,ff,ff,ff,ff,ff,ff,ff";
+                  pgn126720 = util.format(pgn126720, (new Date()).toISOString(), canbus.candevice.address, autopilot_dst, button);
                   debug('Sending Seatalk pgn 126720 %j', pgn126720);
                   canbus.sendPGN(pgn126720);
                   delete pgn126720;
