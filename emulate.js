@@ -544,7 +544,8 @@ function mainLoop () {
               if (typeof pgn126720 != 'undefined' && pgn126720) {
                   pgn126720 = util.format(pgn126720, (new Date()).toISOString(), canbus.candevice.address, autopilot_dst);
                   debug('Sending Seatalk pgn 126720 %j', pgn126720);
-                  canbus.sendPGN(pgn126720)
+                  canbus.sendPGN(pgn126720);
+                  delete pgn126720;
               }
 
               // Send 130851 reply packet
