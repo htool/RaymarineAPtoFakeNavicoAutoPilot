@@ -572,8 +572,6 @@ function mainLoop () {
               canbus.sendPGN(pgn130851)
               pgn130850 = [];
             }
-            // clean up
-            pgn130850 = [];
           // Seatalk1 pilot mode
           } else if (msg.pgn.pgn == 126720) {
             // 16,3b,9f,f0,81
