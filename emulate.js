@@ -552,14 +552,14 @@ function mainLoop () {
               if (typeof key_button != 'undefined' && key_button) {
                   pgn126720 = "%s,3,126720,%s,%s,19,3b,9f,f0,81,86,21,%s,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff";
                   pgn126720 = util.format(pgn126720, (new Date()).toISOString(), canbus.candevice.address, autopilot_dst, key_button);
-                  debug('Sending Seatalk pgn 126720 %j', pgn126720);
+                  debug('Sending Seatalk key button pgn 126720 %j', pgn126720);
                   canbus.sendPGN(pgn126720);
               }
               // Send Seatalk State button
               if (typeof state_button != 'undefined' && state_button) {
                   pgn126720 = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,%s,00,00,00,00,ff,ff,ff,ff,ff";
                   pgn126720 = util.format(pgn126720, (new Date()).toISOString(), canbus.candevice.address, autopilot_dst, state_button);
-                  debug('Sending Seatalk pgn 126720 %j', pgn126720);
+                  debug('Sending Seatalk key state pgn 126720 %j', pgn126720);
                   canbus.sendPGN(pgn126720);
               }
 
