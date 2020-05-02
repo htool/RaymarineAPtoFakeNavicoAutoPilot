@@ -643,7 +643,7 @@ function mainLoop () {
             if (pgn129284.length > 8) { // We have 2 parts now
               // debug('PGN129284: %s', PGN129284)
             }
-          } else if (msg.pgn.pgn == 130845_notnow) { // Commission Simnet reply
+          } else if (msg.pgn.pgn == 130845123) { // Commission Simnet reply
               pgn130845 = pgn130845.concat(buf2hex(msg.data).slice(1)); // Skip multipart byte
               PGN130845 = pgn130845.join(',');
               if (!PGN130845.match(/^0e,41,9f/)) {
