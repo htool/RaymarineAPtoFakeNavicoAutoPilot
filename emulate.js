@@ -554,7 +554,6 @@ function mainLoop () {
                   pgn126720 = util.format(pgn126720, (new Date()).toISOString(), canbus.candevice.address, autopilot_dst, key_button);
                   debug('Sending Seatalk pgn 126720 %j', pgn126720);
                   canbus.sendPGN(pgn126720);
-                  delete pgn126720;
               }
               // Send Seatalk State button
               if (typeof state_button != 'undefined' && state_button) {
@@ -562,7 +561,6 @@ function mainLoop () {
                   pgn126720 = util.format(pgn126720, (new Date()).toISOString(), canbus.candevice.address, autopilot_dst, state_button);
                   debug('Sending Seatalk pgn 126720 %j', pgn126720);
                   canbus.sendPGN(pgn126720);
-                  delete pgn126720;
               }
 
               // Send 130851 reply packet
