@@ -37,6 +37,24 @@ var pgn129284 = [];
 var pgn130845 = [];
 
 // Raymarine setup
+const raymarine_state_command = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,%s,00,00,00,00,ff,ff,ff,ff,ff";
+const raymarine_state_code = {
+    "standby":      "08,f7,07,01,02",
+    "auto":         "03,fc,42,00,00",
+    "wind":         "02,fd,00,00,00",  // Windvane mode
+    "navigation":   "23,dc,00,00,00"   // Track mode
+}
+
+const raymarine_key_command = "%s,3,126720,%s,%s,19,3b,9f,f0,81,86,21,%s,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff";
+const raymarine_key_code = {
+    "+1":      "07,f8",
+    "+10":     "08,f7",
+    "-1":      "05,fa",
+    "-10":     "06,f9"
+    // "-1-10":   "21,de",
+    // "+1+10":   "22,dd"
+}
+
 key_command     = "%s,7,126720,%s,%s,16,3b,9f,f0,81,86,21,%s,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff" // ok
 heading_command = "%s,3,126208,%s,%s,14,01,50,ff,00,f8,03,01,3b,07,03,04,06,%s,%s"
 wind_command    = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,23,dc,00,00,00,00,00,00,ff,ff,ff,ff,ff",
@@ -341,18 +359,18 @@ async function AC12_bootconfig () {
 
 async function AC12_PGN65340 () {
   const pgn65340 = {
+      "standby":     "%s,3,65340,%s,255,8,41,9f,00,00,fe,f8,00,80",
       "auto":        "%s,3,65340,%s,255,8,41,9f,10,01,fe,fa,00,80",
       "NFU":         "%s,3,65340,%s,255,8,41,9f,10,02,fe,fa,00,80",
       "wind":        "%s,3,65340,%s,255,8,41,9f,10,03,fe,fa,00,80",
-      "navigation":  "%s,3,65340,%s,255,8,41,9f,10,04,fe,fa,00,80",
-      "standby":     "%s,3,65340,%s,255,8,41,9f,00,00,fe,f8,00,80"
+      "navigation":  "%s,3,65340,%s,255,8,41,9f,10,04,fe,fa,00,80"
   }
   const pgn65302 = {
       "standby":    "%s,7,65302,%s,255,8,41,9f,0a,6b,00,00,00,ff",
-      "wind":       "%s,7,65302,%s,255,8,41,9f,0a,69,00,00,00,ff", // guessing
-      "navigation": "%s,7,65302,%s,255,8,41,9f,0a,69,00,00,00,ff", // guessing
       "auto":       "%s,7,65302,%s,255,8,41,9f,0a,4b,00,00,00,ff",
-      "NFU":        "%s,7,65302,%s,255,8,41,9f,0a,69,00,00,28,ff"
+      "NFU":        "%s,7,65302,%s,255,8,41,9f,0a,69,00,00,28,ff",
+      "wind":       "%s,7,65302,%s,255,8,41,9f,0a,69,00,00,00,ff", // guessing
+      "navigation": "%s,7,65302,%s,255,8,41,9f,0a,69,00,00,00,ff"  // guessing
   }
   const messages = [
     pgn65340[pilot_state],
@@ -496,52 +514,28 @@ function mainLoop () {
 
             if (pgn130850.length > 8) { // We have 2 parts now
               debug ('Event AP command: %j %s', msg.pgn, PGN130850);
-              // if (PGN130850.match(/41,9f,01,ff,ff,0a,09,00,ff,ff,ff/)) {
-              //   debug('Going into auto mode');
-              //   pilot_state = 'auto';
-              //   AC12_PGN65341_02();
-              // } else if (PGN130850.match(/41,9f,01,ff,ff,0a,06,00,ff,ff,ff/)) {
-              //   debug('Going into standby mode');
-              //   pilot_state = 'standby';
-              //   AC12_PGN65341_02();
-              // } else if (PGN130850.match(/41,9f,01,ff,ff,02,0e,00,ff,ff,ff/)) {
-              //   debug('Going into NFU mode');
-              //   pilot_state = 'NFU';
-              //   AC12_PGN65341_02();
 
               // B&G autopilot button matching
               if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,1a,00,02,ae,00/)) { // -1
-                key_button = "05,fa";
-                //pgn126720 = "%s,7,126720,%s,%s,16,3b,9f,f0,81,86,21,05,fa,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff";
+                key_button = "-1";
                 debug('B&G button press -1');
               } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,1a,00,03,ae,00/)) { // +1
-                key_button = "07,f8";
-                //pgn126720 = "%s,7,126720,%s,%s,16,3b,9f,f0,81,86,21,07,f8,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff";
+                key_button = "+1";
                 debug('B&G button press +1');
               } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,1a,00,02,d1,06/)) { // -10
-                key_button = "06,f9";
-                //pgn126720 = "%s,7,126720,%s,%s,16,3b,9f,f0,81,86,21,06,f9,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff";
+                key_button = "-10";
                 debug('B&G button press -10');
               } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,1a,00,03,d1,06/)) { // +10
-                key_button = "08,f7";
-                //pgn126720 = "%s,7,126720,%s,%s,16,3b,9f,f0,81,86,21,08,f7,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff";
+                key_button = "+10";
                 debug('B&G button press +10');
               } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,06,00,ff,ff,ff/)) { // Standby
-                state_button = "02,fd,00,00";
-                //pgn126720 = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,02,fd,00,00,00,00,00,00,ff,ff,ff,ff,ff"
-                debug('Setting Seatalk1 pilot mode Standby');
-              } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,06,00,auto/)) { // Wind
-                state_button = "02,fd,00,00";
-                //pgn126720 = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,23,dc,00,00,00,00,00,00,ff,ff,ff,ff,ff";
-                debug('Setting Seatalk1 pilot mode Wind');
-              } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,06,00,auto/)) { // Route/navigation
-                state_button = "23,dc,3c,42";
-                // pgn126720 = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,03,fc,3c,42,00,00,00,00,ff,ff,ff,ff,ff";
-                debug('Setting Seatalk1 pilot mode Route (navigation)');
+                state_button = "standby";
+              } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,0e,00,ff,ff,ff/)) { // Wind
+                state_button = "wind";
+              } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,0a,00,ff,ff,ff/)) { // Route/navigation
+                state_button = "navigation";
               } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,09,00,ff,ff,ff/)) { // Auto
-                state_button = "01,fe,00,00";
-                // pgn126720 = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,01,fe,00,00,00,00,00,00,ff,ff,ff,ff,ff";
-                debug('Setting Seatalk1 pilot mode Auto');
+                state_button = "auto";
 
               // Clear 'No Autopilot' alarm?
               } else if (PGN130850.match(/41,9f,ff,ff,ff,1f,51,00,c4,49,29/)) {
@@ -550,16 +544,16 @@ function mainLoop () {
 
               // Send Seatalk Button
               if (typeof key_button != 'undefined' && key_button) {
-                  pgn126720 = "%s,3,126720,%s,%s,19,3b,9f,f0,81,86,21,%s,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff";
-                  pgn126720 = util.format(pgn126720, (new Date()).toISOString(), canbus.candevice.address, autopilot_dst, key_button);
+                  debug('Setting Seatalk1 pilot mode %s', state_button);
+                  pgn126720 = util.format(raymarine_key_command, (new Date()).toISOString(), canbus.candevice.address, autopilot_dst, raymarine_key_code[key_button]);
                   debug('Sending Seatalk key button pgn 126720 %j', pgn126720);
                   canbus.sendPGN(pgn126720);
                   delete key_button;
               }
               // Send Seatalk State button
               if (typeof state_button != 'undefined' && state_button) {
-                  pgn126720 = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,%s,00,00,00,00,ff,ff,ff,ff,ff";
-                  pgn126720 = util.format(pgn126720, (new Date()).toISOString(), canbus.candevice.address, autopilot_dst, state_button);
+                  debug('B&G button press %s', key_button);
+                  pgn126720 = util.format(raymarine_state_command, (new Date()).toISOString(), canbus.candevice.address, autopilot_dst, raymarine_state_code[state_button]);
                   debug('Sending Seatalk key state pgn 126720 %j', pgn126720);
                   canbus.sendPGN(pgn126720);
                   delete state_button;
