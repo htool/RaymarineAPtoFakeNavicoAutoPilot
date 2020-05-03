@@ -39,10 +39,10 @@ var pgn130845 = [];
 // Raymarine setup
 const raymarine_state_command = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,%s,00,00,00,00,ff,ff,ff,ff,ff";
 const raymarine_state_code = {
-    "standby":      "08,f7,07,01,02",
-    "auto":         "03,fc,42,00,00",
-    "wind":         "02,fd,00,00,00",  // Windvane mode
-    "navigation":   "23,dc,00,00,00"   // Track mode
+    "standby":      "02,fd,00,00,00",
+    "auto":         "01,fe,00,00,00",
+    "wind":         "23,dc,00,00,00",  // Windvane mode
+    "navigation":   "03,fc,3c,42,00"   // Track mode
 }
 
 const raymarine_key_command = "%s,3,126720,%s,%s,19,3b,9f,f0,81,86,21,%s,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff";
