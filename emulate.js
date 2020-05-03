@@ -552,7 +552,7 @@ function mainLoop () {
               }
               // Send Seatalk State button
               if (typeof state_button != 'undefined' && state_button) {
-                  debug('B&G button press %s', key_button);
+                  debug('B&G button press %s', state_button);
                   pgn126720 = util.format(raymarine_state_command, (new Date()).toISOString(), canbus.candevice.address, autopilot_dst, raymarine_state_code[state_button]);
                   debug('Sending Seatalk key state pgn 126720 %j', pgn126720);
                   canbus.sendPGN(pgn126720);
