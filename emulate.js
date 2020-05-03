@@ -597,7 +597,7 @@ function mainLoop () {
                   pilot_state = 'standby'
                   AC12_PGN65341_02();
                 }
-              } else if (Seatalkmode.match(/16,3b,9f,f0,81,84,..,..,..,4a,/) || Seatalkmode.match(/16,3b,9f,f0,81,84,..,..,..,44,/) ) {
+              } else if (Seatalkmode.match(/16,3b,9f,f0,81,84,..,..,01,4a,/) || Seatalkmode.match(/16,3b,9f,f0,81,84,..,..,..,44,/) ) {
                 if (pilot_state != 'navigation') {
                   debug('Following Seatalk1 pilot mode route (navigation): %s', Seatalkmode);
                   pilot_state = 'navigation'
