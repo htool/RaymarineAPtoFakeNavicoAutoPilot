@@ -370,7 +370,7 @@ async function AC12_PGN65340 () {
       "auto":       "%s,7,65302,%s,255,8,41,9f,0a,4b,00,00,00,ff",
       "NFU":        "%s,7,65302,%s,255,8,41,9f,0a,69,00,00,28,ff",
       "wind":       "%s,7,65302,%s,255,8,41,9f,0a,69,00,00,00,ff", // guessing
-      "navigation": "%s,7,65302,%s,255,8,41,9f,0a,69,00,00,00,ff"  // guessing
+      "navigation": "%s,7,65302,%s,255,8,41,9f,0a,0b,00,00,00,ff"  // guessing
   }
   const messages = [
     pgn65340[pilot_state],
@@ -407,7 +407,7 @@ function AC12_PGN65341_02 () {
       "auto":       "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,15,9a",
       "NFU":        "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,00,00",
       "wind":       "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,00,00",
-      "navigation": "",
+      "navigation": "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,14,9a", // guess
       "standby":    "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,ff,ff"
   }
   msg = util.format(pgn65341_02[pilot_state], (new Date()).toISOString(), canbus.candevice.address)
@@ -595,7 +595,7 @@ function mainLoop () {
                   pilot_state = 'standby'
                   AC12_PGN65341_02();
                 }
-              } else if (Seatalkmode.match(/16,3b,9f,f0,81,86,21,03,fc,3c,42/) || Seatalkmode.match(/16,3b,9f,f0,81,84,..,..,..,44,/) ) {
+              } else if (Seatalkmode.match(/16,3b,9f,f0,81,84,26,8e,01/) || Seatalkmode.match(/16,3b,9f,f0,81,84,..,..,..,44,/) ) {
                 if (pilot_state != 'navigation') {
                   debug('Following Seatalk1 pilot mode route (navigation): %s', Seatalkmode);
                   pilot_state = 'navigation'
