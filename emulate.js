@@ -409,7 +409,7 @@ function AC12_PGN65341_02 () {
       "auto":       "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,15,9a",
       "NFU":        "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,00,00",
       "wind":       "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,00,00",
-      "navigation": "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,13,9a", // guess
+      "navigation": "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,12,9a", // guess
       "followup":   "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,14,9a", // guess
       "standby":    "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,ff,ff"
   }
