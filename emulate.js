@@ -372,7 +372,7 @@ async function AC12_PGN65340 () {
       "NFU":        "%s,7,65302,%s,255,8,41,9f,0a,69,00,00,28,ff",
       "wind":       "%s,7,65302,%s,255,8,41,9f,0a,69,00,00,00,ff", // guessing
       "followup":   "%s,7,65302,%s,255,8,41,9f,0a,0b,00,00,00,ff", // guessing
-      "navigation": "%s,7,65302,%s,255,8,41,9f,0a,0a,00,00,00,ff"  // guessing
+      "navigation": "%s,7,65302,%s,255,8,41,9f,0a,2b,00,00,00,ff"  // guessing
   }
   const messages = [
     pgn65340[pilot_state],
