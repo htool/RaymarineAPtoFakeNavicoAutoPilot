@@ -589,7 +589,7 @@ function mainLoop () {
                   pilot_state = 'wind';
                   AC12_PGN65341_02();
                 }
-              } else if (Seatalkmode.match(/16,3b,9f,f0,81,84,..,..,..,40,/) || Seatalkmode.match(/16,3b,9f,f0,81,84,..,..,..,44,/) ) {
+              } else if (Seatalkmode.match(/16,3b,9f,f0,81,84,..,..,..,4[08],/) || Seatalkmode.match(/16,3b,9f,f0,81,84,..,..,..,44,/) ) {
                 if (pilot_state != 'standby') {
                   debug('Following Seatalk1 pilot mode standby: %s', Seatalkmode);
                   pilot_state = 'standby'
