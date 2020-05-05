@@ -547,7 +547,7 @@ function mainLoop () {
 
               // Send Seatalk Button
               if (typeof key_button != 'undefined' && key_button) {
-                  debug('Setting Seatalk1 pilot mode %s', keys_button);
+                  debug('Setting Seatalk1 pilot mode %s', key_button);
                   pgn126720 = util.format(raymarine_key_command, (new Date()).toISOString(), canbus.candevice.address, autopilot_dst, raymarine_key_code[key_button]);
                   debug('Sending Seatalk key button pgn 126720 %j', pgn126720);
                   canbus.sendPGN(pgn126720);
