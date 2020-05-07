@@ -519,6 +519,7 @@ function mainLoop () {
               debug ('Event AP command: %j %s', msg.pgn, PGN130850);
 
               // B&G autopilot button matching
+              // if (PGN130850.match(/^0c,41,9f,01 <- Autopilot device id
               if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,1a,00,02,ae,00/)) { // -1
                 key_button = "-1";
                 debug('B&G button press -1');
@@ -657,7 +658,7 @@ function mainLoop () {
             if (pgn129284.length > 8) { // We have 2 parts now
               // debug('PGN129284: %s', PGN129284)
             }
-          } else if (msg.pgn.pgn == 130845123) { // Commission Simnet reply
+          } else if (msg.pgn.pgn == 130845) { // Commission Simnet reply
               pgn130845 = pgn130845.concat(buf2hex(msg.data).slice(1)); // Skip multipart byte
               PGN130845 = pgn130845.join(',');
               if (!PGN130845.match(/^0e,41,9f/)) {
