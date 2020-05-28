@@ -511,7 +511,7 @@ function mainLoop () {
           if (msg.pgn.pgn == 130850) { // Simnet Event, requires reply
             pgn130850 = pgn130850.concat(buf2hex(msg.data).slice(1)); // Skip multipart byte
             PGN130850 = pgn130850.join(',');
-            if (!PGN130850.match(/^..,41,9f,01,ff,ff,/)) {
+            if (!PGN130850.match(/^..,41,9f,..,ff,ff,/)) {
               pgn130850 = [];
             }
 
@@ -520,25 +520,25 @@ function mainLoop () {
 
               // B&G autopilot button matching
               // if (PGN130850.match(/^0c,41,9f,01 <- Autopilot device id
-              if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,1a,00,02,ae,00/)) { // -1
+              if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,1a,00,02,ae,00/)) { // -1
                 key_button = "-1";
                 debug('B&G button press -1');
-              } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,1a,00,03,ae,00/)) { // +1
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,1a,00,03,ae,00/)) { // +1
                 key_button = "+1";
                 debug('B&G button press +1');
-              } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,1a,00,02,d1,06/)) { // -10
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,1a,00,02,d1,06/)) { // -10
                 key_button = "-10";
                 debug('B&G button press -10');
-              } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,1a,00,03,d1,06/)) { // +10
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,1a,00,03,d1,06/)) { // +10
                 key_button = "+10";
                 debug('B&G button press +10');
-              } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,06,00,ff,ff,ff/)) { // Standby
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,06,00,ff,ff,ff/)) { // Standby
                 state_button = "standby";
-              } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,0e,00,ff,ff,ff/)) { // Wind
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,0e,00,ff,ff,ff/)) { // Wind
                 state_button = "wind";
-              } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,0a,00,ff,ff,ff/)) { // Route/navigation
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,0a,00,ff,ff,ff/)) { // Route/navigation
                 state_button = "navigation";
-              } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,09,00,ff,ff,ff/)) { // Auto
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,09,00,ff,ff,ff/)) { // Auto
                 state_button = "auto";
 
               // Clear 'No Autopilot' alarm?
