@@ -208,7 +208,7 @@ function AC12_PGN127237 () {
   const heading_track_pgn = {
       //"auto":    "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,%s,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,ff",
       "auto":    "%s,2,127237,%s,%s,15,ff,7c,ff,ff,7f,%s,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s",
-      "NFU":     "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,%s,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s",
+      "NFU":     "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,%s,00,%s,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s",
       "wind":    "",
       "route":   "",
       //"standby": "%s,2,127237,%s,%s,15,ff,78,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,ff" // Magnetic
@@ -223,7 +223,7 @@ function AC12_PGN127237 () {
       // var msg = util.format(heading_track_pgn[pilot_state], (new Date()).toISOString(), canbus.candevice.address,
       //                      255, padd((new_value & 0xff).toString(16), 2), padd(((new_value >> 8) & 0xff).toString(16), 2))
       var msg = util.format(heading_track_pgn[pilot_state], (new Date()).toISOString(), canbus.candevice.address,
-                            255, locked_heading_rad, locked_heading_rad)
+                            255, locked_heading_rad, locked_heading_rad, locked_heading_rad)
       // debug('127237 (auto): %j', msg);
       canbus.sendPGN(msg);
       break;
