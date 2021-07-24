@@ -185,8 +185,9 @@ function AC12_PGN130850 () {
 function AC12_PGN127250 () {
   // 2020-04-19-18:45:46.934,3,127250,7,255,8,0,3b,8f,ff,7f,0e,01,fd
   // 2020-04-19-18:46:19.480 2 115 255 127250 Vessel Heading:  SID = 0; Heading = 210.1 deg; Deviation = Unknown; Variation = Unknown; Reference = Magnetic
-  const message = "%s,3,127250,%s,255,8,00,%s,ff,7f,ff7f,fc"
+  const message = "%s,3,127250,%s,255,8,00,%s,ff,7f,ff,7f,fc"
   true_heading = Math.trunc(degsToRad(heading + mag_variation) * 10000)
+  // debug ("heading_true_rad: %s  variation: %s", true_heading, mag_variation);
   true_heading_hex = padd((true_heading & 0xff).toString(16), 2) + "," + padd(((true_heading >> 8) & 0xff).toString(16), 2)
   msg = util.format(message, (new Date()).toISOString(), canbus.candevice.address, true_heading_hex)
   canbus.sendPGN(msg)
@@ -206,14 +207,14 @@ function AC12_PGN128275 (log_pgn_data) {
 
 function AC12_PGN127237 () {
   const heading_track_pgn = {
-      //"auto":    "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,%s,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,ff",
-      "auto":    "%s,2,127237,%s,%s,15,ff,7c,ff,ff,7f,%s,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s",
+      "auto":    "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,%s,00,%s,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,%s",
+      //"auto":    "%s,2,127237,%s,%s,15,ff,7c,ff,ff,7f,%s,00,%s,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s",
       "NFU":     "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,%s,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s",
       "wind":    "",
       "route":   "",
       //"standby": "%s,2,127237,%s,%s,15,ff,78,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,ff" // Magnetic
-      // "standby": "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,ff" // Magnetic
-      "standby": "%s,2,127237,%s,%s,15,ff,3f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s" // True
+      "standby": "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,ff" // Magnetic
+      // "standby": "%s,2,127237,%s,%s,15,ff,3f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s" // True
   }
 
   switch (pilot_state) {
@@ -223,7 +224,7 @@ function AC12_PGN127237 () {
       // var msg = util.format(heading_track_pgn[pilot_state], (new Date()).toISOString(), canbus.candevice.address,
       //                      255, padd((new_value & 0xff).toString(16), 2), padd(((new_value >> 8) & 0xff).toString(16), 2))
       var msg = util.format(heading_track_pgn[pilot_state], (new Date()).toISOString(), canbus.candevice.address,
-                            255, locked_heading_rad, locked_heading_rad)
+                            255, locked_heading_rad, locked_heading_rad, locked_heading_rad)
       // debug('127237 (auto): %j', msg);
       canbus.sendPGN(msg);
       break;
@@ -511,7 +512,7 @@ function mainLoop () {
           if (msg.pgn.pgn == 130850) { // Simnet Event, requires reply
             pgn130850 = pgn130850.concat(buf2hex(msg.data).slice(1)); // Skip multipart byte
             PGN130850 = pgn130850.join(',');
-            if (!PGN130850.match(/^..,41,9f,01,ff,ff,/)) {
+            if (!PGN130850.match(/^..,41,9f,..,ff,ff,/)) {
               pgn130850 = [];
             }
 
@@ -520,25 +521,25 @@ function mainLoop () {
 
               // B&G autopilot button matching
               // if (PGN130850.match(/^0c,41,9f,01 <- Autopilot device id
-              if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,1a,00,02,ae,00/)) { // -1
+              if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,1a,00,02,ae,00/)) { // -1
                 key_button = "-1";
                 debug('B&G button press -1');
-              } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,1a,00,03,ae,00/)) { // +1
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,1a,00,03,ae,00/)) { // +1
                 key_button = "+1";
                 debug('B&G button press +1');
-              } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,1a,00,02,d1,06/)) { // -10
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,1a,00,02,d1,06/)) { // -10
                 key_button = "-10";
                 debug('B&G button press -10');
-              } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,1a,00,03,d1,06/)) { // +10
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,1a,00,03,d1,06/)) { // +10
                 key_button = "+10";
                 debug('B&G button press +10');
-              } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,06,00,ff,ff,ff/)) { // Standby
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,06,00,ff,ff,ff/)) { // Standby
                 state_button = "standby";
-              } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,0e,00,ff,ff,ff/)) { // Wind
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,0e,00,ff,ff,ff/)) { // Wind
                 state_button = "wind";
-              } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,0a,00,ff,ff,ff/)) { // Route/navigation
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,0a,00,ff,ff,ff/)) { // Route/navigation
                 state_button = "navigation";
-              } else if (PGN130850.match(/^0c,41,9f,01,ff,ff,..,09,00,ff,ff,ff/)) { // Auto
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,09,00,ff,ff,ff/)) { // Auto
                 state_button = "auto";
 
               // Clear 'No Autopilot' alarm?
@@ -620,11 +621,11 @@ function mainLoop () {
             } else {
               heading_rad = heading_mag_rad
             }
-            heading = radsToDeg(parseInt('0x' + heading_rad[1] + heading_rad[0]))/10000;
+            heading = radsToDeg(parseInt('0x' + heading_rad[1] + heading_rad[0]))/10000
             // debug('heading: %s', heading)
           } else if (msg.pgn.pgn == 65360) {
           // Get locked heading from Seatalk1 packet
-            // debug ('Seatalk1 Pilot locked heading info: %j %j', msg.pgn, msg.data);
+            debug ('Seatalk1 Pilot locked heading info: %j %j', msg.pgn, msg.data);
             var locked_heading_true_rad = buf2hex(msg.data).slice(3,5);
             var locked_heading_mag_rad = buf2hex(msg.data).slice(5,7);
             // debug ("heading_true_rad: %s heading_mag_rad: %s", heading_true_rad, heading_mag_rad);
@@ -634,7 +635,7 @@ function mainLoop () {
               locked_heading_rad = locked_heading_mag_rad
             }
             locked_heading = radsToDeg(parseInt('0x' + locked_heading_rad[1] + locked_heading_rad[0]))/10000;
-            // debug('locked heading: %s', locked_heading)
+            debug('locked heading: %s', locked_heading)
 
 
           } else if (msg.pgn.pgn == 127245 && msg.pgn.src == 115) {
@@ -646,9 +647,8 @@ function mainLoop () {
             AC12_PGN128275(buf2hex(msg.data));
           } else if (msg.pgn.pgn == 127258)  {
           // Get variation info to turn into true heading
-            mag_variation = buf2hex(msg.data)
-            mag_variation = parseInt('0x' + mag_variation[5] + mag_variation[4]);
-            mag_variation = radsToDeg(mag_variation)/10000;
+            mag_variation = radsToDeg(parseInt('0x' + buf2hex(msg.data)[5] + buf2hex(msg.data)[4]))/10000;
+            // debug('Got variation from 127258: %s', mag_variation)
           } else if (msg.pgn.pgn == 129284) { // Navigation bearing info
             pgn129284 = pgn129284.concat(buf2hex(msg.data).slice(1)); // Skip multipart byte
             PGN129284 = pgn129284.join(',');
