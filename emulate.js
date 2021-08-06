@@ -482,12 +482,12 @@ switch (emulate) {
       setInterval(AC12_PGN65340, 1000) // Every second
       setInterval(AC12_PGN65341_02, 5000) // Every 5 second
       setInterval(AC12_PGN65341_1s, 1000) // Every second
-      setInterval(AC12_PGN65341_5s, 5000) // Every second
+      setInterval(AC12_PGN65341_5s, 5000) // Every 5 seconds
       setInterval(AC12_PGN65305, 1000)
       setInterval(AC12_PGN130860, 1000) // Every second
       setInterval(heartbeat, 60000) // Heart beat PGN
-      setInterval(AC12_PGN127237, 1000) // Heading/track PGN
-      setInterval(AC12_PGN127250, 1000) // True heading
+      setInterval(AC12_PGN127237, 500) // Heading/track PGN
+      setInterval(AC12_PGN127250, 500) // True heading
       // setInterval(AC12_PGN130850, 5000) // Controlling device
  	    break;
 }
