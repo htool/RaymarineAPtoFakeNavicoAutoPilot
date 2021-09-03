@@ -185,11 +185,12 @@ function AC12_PGN130850 () {
 function AC12_PGN127250 () {
   // 2020-04-19-18:45:46.934,3,127250,7,255,8,0,3b,8f,ff,7f,0e,01,fd
   // 2020-04-19-18:46:19.480 2 115 255 127250 Vessel Heading:  SID = 0; Heading = 210.1 deg; Deviation = Unknown; Variation = Unknown; Reference = Magnetic
-  const message = "%s,3,127250,%s,255,8,00,%s,ff,7f,ff,7f,fc"
-  true_heading = Math.trunc(degsToRad(heading + mag_variation) * 10000)
+  const message = "%s,3,127250,%s,255,8,00,%s,ff,7f,ff,7f,fd" // fc = true, fd = magnetic
+  // true_heading = Math.trunc(degsToRad(heading + mag_variation) * 10000)
+  magnetic_heading = Math.trunc(degsToRad(heading) * 10000)
   // debug ("heading_true_rad: %s  variation: %s", true_heading, mag_variation);
-  true_heading_hex = padd((true_heading & 0xff).toString(16), 2) + "," + padd(((true_heading >> 8) & 0xff).toString(16), 2)
-  msg = util.format(message, (new Date()).toISOString(), canbus.candevice.address, true_heading_hex)
+  heading_hex = padd((true_heading & 0xff).toString(16), 2) + "," + padd(((magnetic_heading >> 8) & 0xff).toString(16), 2)
+  msg = util.format(message, (new Date()).toISOString(), canbus.candevice.address, heading_hex)
   canbus.sendPGN(msg)
 }
 
