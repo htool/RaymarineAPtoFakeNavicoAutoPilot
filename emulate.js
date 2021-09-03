@@ -189,7 +189,7 @@ function AC12_PGN127250 () {
   // true_heading = Math.trunc(degsToRad(heading + mag_variation) * 10000)
   magnetic_heading = Math.trunc(degsToRad(heading) * 10000)
   // debug ("heading_true_rad: %s  variation: %s", true_heading, mag_variation);
-  heading_hex = padd((true_heading & 0xff).toString(16), 2) + "," + padd(((magnetic_heading >> 8) & 0xff).toString(16), 2)
+  heading_hex = padd((magnetic_heading & 0xff).toString(16), 2) + "," + padd(((magnetic_heading >> 8) & 0xff).toString(16), 2)
   msg = util.format(message, (new Date()).toISOString(), canbus.candevice.address, heading_hex)
   canbus.sendPGN(msg)
 }
