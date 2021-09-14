@@ -23,6 +23,48 @@ const canDevice = require('./canboatjs/lib/canbus').canDevice
 const canbus = new (require('./canboatjs').canbus)({})
 const util = require('util')
 
+const commission_reply = {
+  '0e419f02ff64ff042d0000ffffffff': '0e,41,9f,02,ff,64,ff,04,2d,00,00,a3,0d,ff,ff,ff,ff,ff,ff',
+  '0e419f02ffffff14010000ffffffff': '0e,41,9f,02,ff,ff,ff,14,01,00,00,43,ff,ff,ff,ff,ff,ff,ff',
+  '0e419f02ffffff14060000ffffffff': '0e,41,9f,02,ff,ff,ff,14,06,00,00,ae,00,ff,ff,ff,ff,ff,ff',
+  '0e419f02ffffff14090000ffffffff': '0e,41,9f,02,ff,ff,ff,14,09,00,00,50,0a,00,00,ff,ff,ff,ff',
+  '0e419f02ffffff141d0000ffffffff': '0e,41,9f,02,ff,ff,ff,14,1d,00,00,b0,04,ff,ff,ff,ff,ff,ff',
+  '0e419f02ffffff141d000160090000': '0e,41,9f,02,ff,ff,ff,14,1d,00,00,b0,04,ff,ff,ff,ff,ff,ff',
+  '0e419f02ffffff18020000ffffffff': '0e,41,9f,02,ff,ff,ff,18,02,00,00,00,00,ff,ff,ff,ff,ff,ff',
+  '0e419f02ffffff18060000ffffffff': '0e,41,9f,02,ff,ff,ff,18,06,00,00,00,ff,ff,ff,ff,ff,ff,ff',
+  '0e419f02ffffff18090000ffffffff': '0e,41,9f,02,ff,ff,ff,18,09,00,00,07,00,ff,ff,ff,ff,ff,ff',
+  '0e419f02ffffff180a0000ffffffff': '0e,41,9f,02,ff,ff,ff,18,0a,00,00,00,ff,ff,ff,ff,ff,ff,ff',
+  '0e419f02ffffff180a000100000000': '0e,41,9f,02,ff,ff,ff,18,0a,00,00,00,ff,ff,ff,ff,ff,ff,ff',
+  '0e419f02ffffff180b0000ffffffff': '0e,41,9f,02,ff,ff,ff,18,0b,00,00,1c,47,ff,ff,ff,ff,ff,ff',
+  '0e419f02ffffff180c0000ffffffff': '0e,41,9f,02,ff,ff,ff,18,0c,00,00,34,01,ff,ff,ff,ff,ff,ff',
+  '0e419f02ffffff190d0000ffffffff': '0e,41,9f,02,ff,ff,ff,19,0d,00,00,46,00,ff,ff,ff,ff,ff,ff',
+  '0e419f02ffffff190e0000ffffffff': '0e,41,9f,02,ff,ff,ff,19,0e,00,00,c8,00,ff,ff,ff,ff,ff,ff',
+  '0e419f02ffffff190f0000ffffffff': '0e,41,9f,02,ff,ff,ff,19,0f,00,00,46,00,ff,ff,ff,ff,ff,ff',
+  '0e419f02ffffff19100000ffffffff': '0e,41,9f,02,ff,ff,ff,19,10,00,00,1e,33,55,00,ff,ff,ff,ff',
+  '0e419f02ffffff19110000ffffffff': '0e,41,9f,02,ff,ff,ff,19,11,00,00,01,ff,ff,ff,ff,ff,ff,ff',
+  '0e419f02ffffff1a0d0000ffffffff': '0e,41,9f,02,ff,ff,ff,1a,0d,00,00,d7,00,ff,ff,ff,ff,ff,ff',
+  '0e419f02ffffff1a0e0000ffffffff': '0e,41,9f,02,ff,ff,ff,1a,0e,00,00,c8,00,ff,ff,ff,ff,ff,ff',
+  '0e419f02ffffff1a0f0000ffffffff': '0e,41,9f,02,ff,ff,ff,1a,0f,00,00,de,00,ff,ff,ff,ff,ff,ff',
+  '0e419f02ffffff1a100000ffffffff': '0e,41,9f,02,ff,ff,ff,1a,10,00,00,ab,1e,33,ff,ff,ff,ff,ff',
+  '0e419f02ffffff1a110000ffffffff': '0e,41,9f,02,ff,ff,ff,1a,11,00,00,03,ff,ff,ff,ff,ff,ff,ff',
+  '0e419f02ffffff1b0c0000ffffffff': '0e,41,9f,02,ff,ff,ff,1b,0c,00,00,d1,06,ff,ff,ff,ff,ff,ff',
+  '0e419f02ffffff1c010000ffffffff': '0e,41,9f,02,ff,ff,ff,1c,01,00,00,74,14,ff,ff,ff,ff,ff,ff',
+  '0e419f02ffffff1c020000ffffffff': '0e,41,9f,02,ff,ff,ff,1c,02,00,00,74,14,ff,ff,ff,ff,ff,ff',
+  '0e419f02ffffff1c080000ffffffff': '0e,41,9f,02,ff,ff,ff,1c,08,00,00,78,00,ff,ff,ff,ff,ff,ff',
+  '0e419f02ffffff1c090000ffffffff': '0e,41,9f,02,ff,ff,ff,1c,09,00,00,14,00,ff,ff,ff,ff,ff,ff',
+  '0e419f02ffffff1c110000ffffffff': '0e,41,9f,02,ff,ff,ff,1c,11,00,00,01,ff,ff,ff,ff,ff,ff,ff',
+  '0e419f02ffffff1e1a0000ffffffff': '0e,41,9f,02,ff,ff,ff,1e,1a,00,00,88,13,ff,ff,ff,ff,ff,ff',
+  '0e419f02ffffff1f1a0000ffffffff': '0e,41,9f,02,ff,ff,ff,1f,1a,00,00,d0,07,ff,ff,ff,ff,ff,ff',
+  '0e419f02ffffff1f1b0000ffffffff': '0e,41,9f,02,ff,ff,ff,1f,1b,00,00,d0,07,ff,ff,ff,ff,ff,ff',
+  '0e419f02ffffff200b0000ffffffff': '0e,41,9f,02,ff,ff,ff,20,0b,00,00,17,13,ff,ff,ff,ff,ff,ff',
+  '0e419f02ffffff201b0000ffffffff': '0e,41,9f,02,ff,ff,ff,20,1b,00,00,d0,07,ff,ff,ff,ff,ff,ff',
+  '0e419f02ffffff21190000ffffffff': '0e,41,9f,02,ff,ff,ff,21,19,00,00,aa,c7,0c,00,ff,ff,ff,ff',
+  '0e419f02ffffff220b0000ffffffff': '0e,41,9f,02,ff,ff,ff,22,0b,00,00,17,13,ff,ff,ff,ff,ff,ff',
+  '0e419f02ffffff221a0000ffffffff': '0e,41,9f,02,ff,ff,ff,22,1a,00,00,88,13,ff,ff,ff,ff,ff,ff',
+  '0e419f02ffffff230b0000ffffffff': '0e,41,9f,02,ff,ff,ff,23,0b,00,00,00,00,ff,ff,ff,ff,ff,ff',
+  '0e419f02ffffff230d0000ffffffff': '0e,41,9f,02,ff,ff,ff,23,0d,00,00,05,ff,ff,ff,ff,ff,ff,ff'
+}
+
 var pilot_state = 'standby';
 var heading;
 var heading_rad = 'ff,ff';
@@ -212,7 +254,7 @@ function AC12_PGN127237 () {
       //"auto":    "%s,2,127237,%s,%s,15,ff,7c,ff,ff,7f,%s,00,%s,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s",
       "NFU":     "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,%s,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s",
       "wind":    "",
-      "route":   "",
+      "navigation":    "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,%s,00,%s,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,%s",
       //"standby": "%s,2,127237,%s,%s,15,ff,78,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,ff" // Magnetic
       "standby": "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,ff" // Magnetic
       // "standby": "%s,2,127237,%s,%s,15,ff,3f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s" // True
@@ -220,6 +262,7 @@ function AC12_PGN127237 () {
 
   switch (pilot_state) {
     case 'auto':
+    case 'navigation':
     case 'NFU':
       // var new_value = Math.trunc(degsToRad(heading) * 10000)
       // var msg = util.format(heading_track_pgn[pilot_state], (new Date()).toISOString(), canbus.candevice.address,
@@ -360,6 +403,19 @@ async function AC12_bootconfig () {
 }
 
 async function AC12_PGN65340 () {
+  // Valid options:
+
+  // Standby
+  // 3,65340,2,255,8,41,9f,00,00,fe,f8,00,80
+  // 7,65302,2,255,8,41,9f,0a,6b,00,00,00,ff
+
+  // NFU
+  // 3,65340,2,255,8,41,9f,10,01,fe,fa,00,80
+  // 7,65302,2,255,8,41,9f,0a,69,00,00,28,ff
+
+  // 3,65340,2,255,8,41,9f,10,03,fe,fa,00,80
+  // 7,65302,2,255,8,41,9f,0a,69,00,00,30,ff
+  //
   const pgn65340 = {
       "standby":     "%s,3,65340,%s,255,8,41,9f,00,00,fe,f8,00,80",
       "auto":        "%s,3,65340,%s,255,8,41,9f,10,01,fe,fa,00,80",
@@ -372,9 +428,9 @@ async function AC12_PGN65340 () {
       "standby":    "%s,7,65302,%s,255,8,41,9f,0a,6b,00,00,00,ff",
       "auto":       "%s,7,65302,%s,255,8,41,9f,0a,4b,00,00,00,ff",
       "NFU":        "%s,7,65302,%s,255,8,41,9f,0a,69,00,00,28,ff",
-      "wind":       "%s,7,65302,%s,255,8,41,9f,0a,69,00,00,00,ff", // guessing
+      "wind":       "%s,7,65302,%s,255,8,41,9f,0a,69,00,00,30,ff", // guessing
       "followup":   "%s,7,65302,%s,255,8,41,9f,0a,0b,00,00,00,ff", // guessing
-      "navigation": "%s,7,65302,%s,255,8,41,9f,0a,2b,00,00,00,ff"  // guessing
+      "navigation": "%s,7,65302,%s,255,8,41,9f,0a,69,00,00,30,ff"  // guessing
   }
   const messages = [
     pgn65340[pilot_state],
@@ -663,10 +719,15 @@ function mainLoop () {
               pgn130845 = pgn130845.concat(buf2hex(msg.data).slice(1)); // Skip multipart byte
               PGN130845 = pgn130845.join(',');
               if (!PGN130845.match(/^0e,41,9f/)) {
+                debug('PGN130845 not ok: %s', PGN130845);
                 pgn130845 = [];
               }
-              if (pgn130845.length > 16) { // We have 3 parts now
-                // debug('PGN130845: %s', PGN130845)
+              if (pgn130845.length > 14) { // We have 3 parts now
+                debug('PGN130845 request: %s', PGN130845);
+                PGN130845 = PGN130845.replace(/,/g,'').substring(0,30);
+                // debug('PGN130845 2: %s', PGN130845);
+                PGN130845 = commission_reply[PGN130845];
+                debug('PGN130845 reply  : %s', PGN130845);
                 PGN130845 = "%s,3,130845,%s,255," + PGN130845;
                 PGN130845 = util.format(PGN130845, (new Date()).toISOString(), canbus.candevice.address)
                 debug('Sending PGN130845: %s', PGN130845)
