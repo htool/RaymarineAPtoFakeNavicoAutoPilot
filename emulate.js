@@ -24,45 +24,53 @@ const canbus = new (require('./canboatjs').canbus)({})
 const util = require('util')
 
 const commission_reply = {
-  '0e419f02ff64ff042d0000ffffffff': '0e,41,9f,02,ff,64,ff,04,2d,00,02,a3,0d,ff,ff,ff,ff,ff,ff',
-  '0e419f02ffffff14010000ffffffff': '0e,41,9f,02,ff,ff,ff,14,01,00,02,43,ff,ff,ff,ff,ff,ff,ff',
-  '0e419f02ffffff14060000ffffffff': '0e,41,9f,02,ff,ff,ff,14,06,00,02,ae,00,ff,ff,ff,ff,ff,ff',
-  '0e419f02ffffff14090000ffffffff': '0e,41,9f,02,ff,ff,ff,14,09,00,02,50,0a,00,00,ff,ff,ff,ff',
-  '0e419f02ffffff141d0000ffffffff': '0e,41,9f,02,ff,ff,ff,14,1d,00,02,b0,04,ff,ff,ff,ff,ff,ff',
-  '0e419f02ffffff141d000160090000': '0e,41,9f,02,ff,ff,ff,14,1d,00,02,b0,04,ff,ff,ff,ff,ff,ff',
-  '0e419f02ffffff18020000ffffffff': '0e,41,9f,02,ff,ff,ff,18,02,00,02,00,00,ff,ff,ff,ff,ff,ff',
-  '0e419f02ffffff18060000ffffffff': '0e,41,9f,02,ff,ff,ff,18,06,00,02,00,ff,ff,ff,ff,ff,ff,ff',
-  '0e419f02ffffff18090000ffffffff': '0e,41,9f,02,ff,ff,ff,18,09,00,02,07,00,ff,ff,ff,ff,ff,ff',
-  '0e419f02ffffff180a0000ffffffff': '0e,41,9f,02,ff,ff,ff,18,0a,00,02,00,ff,ff,ff,ff,ff,ff,ff',
-  '0e419f02ffffff180a000100000000': '0e,41,9f,02,ff,ff,ff,18,0a,00,02,00,ff,ff,ff,ff,ff,ff,ff',
-  '0e419f02ffffff180b0000ffffffff': '0e,41,9f,02,ff,ff,ff,18,0b,00,02,1c,47,ff,ff,ff,ff,ff,ff',
-  '0e419f02ffffff180c0000ffffffff': '0e,41,9f,02,ff,ff,ff,18,0c,00,02,34,01,ff,ff,ff,ff,ff,ff',
-  '0e419f02ffffff190d0000ffffffff': '0e,41,9f,02,ff,ff,ff,19,0d,00,02,46,00,ff,ff,ff,ff,ff,ff',
-  '0e419f02ffffff190e0000ffffffff': '0e,41,9f,02,ff,ff,ff,19,0e,00,02,c8,00,ff,ff,ff,ff,ff,ff',
-  '0e419f02ffffff190f0000ffffffff': '0e,41,9f,02,ff,ff,ff,19,0f,00,02,46,00,ff,ff,ff,ff,ff,ff',
-  '0e419f02ffffff19100000ffffffff': '0e,41,9f,02,ff,ff,ff,19,10,00,02,1e,33,55,00,ff,ff,ff,ff',
-  '0e419f02ffffff19110000ffffffff': '0e,41,9f,02,ff,ff,ff,19,11,00,02,01,ff,ff,ff,ff,ff,ff,ff',
-  '0e419f02ffffff1a0d0000ffffffff': '0e,41,9f,02,ff,ff,ff,1a,0d,00,02,d7,00,ff,ff,ff,ff,ff,ff',
-  '0e419f02ffffff1a0e0000ffffffff': '0e,41,9f,02,ff,ff,ff,1a,0e,00,02,c8,00,ff,ff,ff,ff,ff,ff',
-  '0e419f02ffffff1a0f0000ffffffff': '0e,41,9f,02,ff,ff,ff,1a,0f,00,02,de,00,ff,ff,ff,ff,ff,ff',
-  '0e419f02ffffff1a100000ffffffff': '0e,41,9f,02,ff,ff,ff,1a,10,00,02,ab,1e,33,ff,ff,ff,ff,ff',
-  '0e419f02ffffff1a110000ffffffff': '0e,41,9f,02,ff,ff,ff,1a,11,00,02,03,ff,ff,ff,ff,ff,ff,ff',
-  '0e419f02ffffff1b0c0000ffffffff': '0e,41,9f,02,ff,ff,ff,1b,0c,00,02,d1,06,ff,ff,ff,ff,ff,ff',
-  '0e419f02ffffff1c010000ffffffff': '0e,41,9f,02,ff,ff,ff,1c,01,00,02,74,14,ff,ff,ff,ff,ff,ff',
-  '0e419f02ffffff1c020000ffffffff': '0e,41,9f,02,ff,ff,ff,1c,02,00,02,74,14,ff,ff,ff,ff,ff,ff',
-  '0e419f02ffffff1c080000ffffffff': '0e,41,9f,02,ff,ff,ff,1c,08,00,02,78,00,ff,ff,ff,ff,ff,ff',
-  '0e419f02ffffff1c090000ffffffff': '0e,41,9f,02,ff,ff,ff,1c,09,00,02,14,00,ff,ff,ff,ff,ff,ff',
-  '0e419f02ffffff1c110000ffffffff': '0e,41,9f,02,ff,ff,ff,1c,11,00,02,01,ff,ff,ff,ff,ff,ff,ff',
-  '0e419f02ffffff1e1a0000ffffffff': '0e,41,9f,02,ff,ff,ff,1e,1a,00,02,88,13,ff,ff,ff,ff,ff,ff',
-  '0e419f02ffffff1f1a0000ffffffff': '0e,41,9f,02,ff,ff,ff,1f,1a,00,02,d0,07,ff,ff,ff,ff,ff,ff',
-  '0e419f02ffffff1f1b0000ffffffff': '0e,41,9f,02,ff,ff,ff,1f,1b,00,02,d0,07,ff,ff,ff,ff,ff,ff',
-  '0e419f02ffffff200b0000ffffffff': '0e,41,9f,02,ff,ff,ff,20,0b,00,02,17,13,ff,ff,ff,ff,ff,ff',
-  '0e419f02ffffff201b0000ffffffff': '0e,41,9f,02,ff,ff,ff,20,1b,00,02,d0,07,ff,ff,ff,ff,ff,ff',
-  '0e419f02ffffff21190000ffffffff': '0e,41,9f,02,ff,ff,ff,21,19,00,02,aa,c7,0c,00,ff,ff,ff,ff',
-  '0e419f02ffffff220b0000ffffffff': '0e,41,9f,02,ff,ff,ff,22,0b,00,02,17,13,ff,ff,ff,ff,ff,ff',
-  '0e419f02ffffff221a0000ffffffff': '0e,41,9f,02,ff,ff,ff,22,1a,00,02,88,13,ff,ff,ff,ff,ff,ff',
-  '0e419f02ffffff230b0000ffffffff': '0e,41,9f,02,ff,ff,ff,23,0b,00,02,00,00,ff,ff,ff,ff,ff,ff',
-  '0e419f02ffffff230d0000ffffffff': '0e,41,9f,02,ff,ff,ff,23,0d,00,02,05,ff,ff,ff,ff,ff,ff,ff'
+  'ff64ff042d0000ffffffff': 'ff,64,ff,04,2d,00,02,a3,0d,ff,ff',
+  'ffffff14010000ffffffff': 'ff,ff,ff,14,01,00,02,43,ff,ff,ff',
+  'ffffff14060000ffffffff': 'ff,ff,ff,14,06,00,02,ae,00,ff,ff',
+  'ffffff14090000ffffffff': 'ff,ff,ff,14,09,00,02,50,0a,00,00',
+  'ffffff141d0000ffffffff': 'ff,ff,ff,14,1d,00,02,b0,04,ff,ff',
+  'ffffff141d000160090000': 'ff,ff,ff,14,1d,00,02,b0,04,ff,ff',
+  'ffffff18020000ffffffff': 'ff,ff,ff,18,02,00,02,00,00,ff,ff',
+  'ffffff18060000ffffffff': 'ff,ff,ff,18,06,00,02,00,ff,ff,ff',
+  'ffffff18090000ffffffff': 'ff,ff,ff,18,09,00,02,07,00,ff,ff',
+  'ffffff180a0000ffffffff': 'ff,ff,ff,18,0a,00,02,00,ff,ff,ff',
+  'ffffff180a000100000000': 'ff,ff,ff,18,0a,00,02,00,ff,ff,ff',
+  'ffffff180b0000ffffffff': 'ff,ff,ff,18,0b,00,02,1c,47,ff,ff',
+  'ffffff180c0000ffffffff': 'ff,ff,ff,18,0c,00,02,34,01,ff,ff',
+  'ffffff190d0000ffffffff': 'ff,ff,ff,19,0d,00,02,46,00,ff,ff',
+  'ffffff190e0000ffffffff': 'ff,ff,ff,19,0e,00,02,c8,00,ff,ff',
+  'ffffff190f0000ffffffff': 'ff,ff,ff,19,0f,00,02,46,00,ff,ff',
+  'ffffff19100000ffffffff': 'ff,ff,ff,19,10,00,02,1e,33,55,00',
+  'ffffff19110000ffffffff': 'ff,ff,ff,19,11,00,02,01,ff,ff,ff',
+  'ffffff1a0d0000ffffffff': 'ff,ff,ff,1a,0d,00,02,d7,00,ff,ff',
+  'ffffff1a0e0000ffffffff': 'ff,ff,ff,1a,0e,00,02,c8,00,ff,ff',
+  'ffffff1a0f0000ffffffff': 'ff,ff,ff,1a,0f,00,02,de,00,ff,ff',
+  'ffffff1a100000ffffffff': 'ff,ff,ff,1a,10,00,02,ab,1e,33,ff',
+  'ffffff1a110000ffffffff': 'ff,ff,ff,1a,11,00,02,03,ff,ff,ff',
+  'ffffff1b0c0000ffffffff': 'ff,ff,ff,1b,0c,00,02,d1,06,ff,ff',
+  'ffffff1c010000ffffffff': 'ff,ff,ff,1c,01,00,02,74,14,ff,ff',
+  'ffffff1c020000ffffffff': 'ff,ff,ff,1c,02,00,02,74,14,ff,ff',
+  'ffffff1c080000ffffffff': 'ff,ff,ff,1c,08,00,02,78,00,ff,ff',
+  'ffffff1c090000ffffffff': 'ff,ff,ff,1c,09,00,02,14,00,ff,ff',
+  'ffffff1c110000ffffffff': 'ff,ff,ff,1c,11,00,02,01,ff,ff,ff',
+  'ffffff1e1a0000ffffffff': 'ff,ff,ff,1e,1a,00,02,88,13,ff,ff',
+  'ffffff1f1a0000ffffffff': 'ff,ff,ff,1f,1a,00,02,d0,07,ff,ff',
+  'ffffff1f1b0000ffffffff': 'ff,ff,ff,1f,1b,00,02,d0,07,ff,ff',
+  'ffffff200b0000ffffffff': 'ff,ff,ff,20,0b,00,02,17,13,ff,ff',
+  'ffffff201b0000ffffffff': 'ff,ff,ff,20,1b,00,02,d0,07,ff,ff',
+  'ffffff21190000ffffffff': 'ff,ff,ff,21,19,00,02,aa,c7,0c,00',
+  'ffffff220b0000ffffffff': 'ff,ff,ff,22,0b,00,02,17,13,ff,ff',
+  'ffffff221a0000ffffffff': 'ff,ff,ff,22,1a,00,02,88,13,ff,ff',
+  'ffffff230b0000ffffffff': 'ff,ff,ff,23,0b,00,02,00,00,ff,ff',
+  'ffffff230d0000ffffffff': 'ff,ff,ff,23,0d,00,02,05,ff,ff,ff',
+  'ffffff3a000000ffffffff': 'ff,ff,ff,3a,00,00,02,00,00,ff,ff',
+  'ffffff180a000100ffffff': 'ff,ff,ff,18,0a,00,01,02,00,00,00',
+  'ffffff06000000ffffffff': 'ff,ff,ff,06,00,00,02,00,00,ff,ff'
+   // ffffff180a000100ffffff Sail
+   // ffffff180a000101ffffff Outboard
+   // ffffff180a000102ffffff Displacement
+   // ffffff180a000103ffffff Planing
+
 }
 
 var pilot_state = 'standby';
@@ -726,9 +734,14 @@ function mainLoop () {
               }
               if (pgn130845.length > 14) { // We have 3 parts now
                 debug('PGN130845 request: %s', PGN130845);
-                PGN130845 = PGN130845.replace(/,/g,'').substring(0,30);
-                // debug('PGN130845 2: %s', PGN130845);
-                PGN130845 = commission_reply[PGN130845];
+                // PGN130845 = PGN130845.replace(/,/g,'').substring(0,30);
+                PGN130845_1 = PGN130845.replace(/,/g,'').substring(0,8);
+                PGN130845_2 = PGN130845.replace(/,/g,'').substring(8,30);
+                PGN130845 = PGN130845.substring(0,12);
+                debug('PGN130845_1: %s', PGN130845_1);
+                debug('PGN130845_2: %s', PGN130845_2);
+                PGN130845_2 = commission_reply[PGN130845_2];
+                PGN130845 = PGN130845 + PGN130845_2;
                 debug('PGN130845 reply  : %s', PGN130845);
                 PGN130845 = "%s,3,130845,%s,255," + PGN130845;
                 PGN130845 = util.format(PGN130845, (new Date()).toISOString(), canbus.candevice.address)
