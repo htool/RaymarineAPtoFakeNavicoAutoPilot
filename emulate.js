@@ -70,7 +70,6 @@ const commission_reply = {
    // ffffff180a000101ffffff Outboard
    // ffffff180a000102ffffff Displacement
    // ffffff180a000103ffffff Planing
-
 }
 
 var pilot_state = 'standby';
@@ -741,12 +740,16 @@ function mainLoop () {
                 debug('PGN130845_1: %s', PGN130845_1);
                 debug('PGN130845_2: %s', PGN130845_2);
                 PGN130845_2 = commission_reply[PGN130845_2];
-                PGN130845 = PGN130845 + PGN130845_2;
-                debug('PGN130845 reply  : %s', PGN130845);
-                PGN130845 = "%s,3,130845,%s,255," + PGN130845;
-                PGN130845 = util.format(PGN130845, (new Date()).toISOString(), canbus.candevice.address)
-                debug('Sending PGN130845: %s', PGN130845)
-                canbus.sendPGN(PGN130845)
+                if (PGN130845_2 === undefined) {
+                  debug('PGN130845 reply  : not found');
+                } else {
+                  PGN130845 = PGN130845 + PGN130845_2;
+                  debug('PGN130845 reply  : %s', PGN130845);
+                  PGN130845 = "%s,3,130845,%s,255," + PGN130845;
+                  PGN130845 = util.format(PGN130845, (new Date()).toISOString(), canbus.candevice.address)
+                  debug('Sending PGN130845: %s', PGN130845)
+                  canbus.sendPGN(PGN130845)
+                }
                 pgn130845 = [];
               }
             }
