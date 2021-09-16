@@ -64,7 +64,7 @@ const commission_reply = {
   'ffffff230b0000ffffffff': 'ff,ff,ff,23,0b,00,02,00,00,ff,ff',
   'ffffff230d0000ffffffff': 'ff,ff,ff,23,0d,00,02,05,ff,ff,ff',
   'ffffff3a000000ffffffff': 'ff,ff,ff,3a,00,00,02,00,00,ff,ff',
-  'ffffff180a000100ffffff': 'ff,ff,ff,18,0a,00,01,02,00,00,00',
+  'ffffff180a000100ffffff': 'ff,ff,ff,18,0a,00,02,00,ff,ff,ff',
   'ffffff06000000ffffffff': 'ff,ff,ff,06,00,00,02,00,00,ff,ff'
    // ffffff180a000100ffffff Sail
    // ffffff180a000101ffffff Outboard
