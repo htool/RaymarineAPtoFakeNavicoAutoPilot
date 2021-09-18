@@ -119,8 +119,8 @@ const raymarine_key_code = {
     "+10":     "08,f7",
     "-1":      "05,fa",
     "-10":     "06,f9"
-    // "-1-10":   "21,de",
-    // "+1+10":   "22,dd"
+    "-1-10":   "21,de",
+    "+1+10":   "22,dd"
 }
 
 key_command     = "%s,7,126720,%s,%s,16,3b,9f,f0,81,86,21,%s,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff" // ok
@@ -620,10 +620,10 @@ function mainLoop () {
                 key_button = "+10";
                 debug('B&G button press +10');
               } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,1a,00,03,d1,06/)) { // +10
-                key_button = "+10+1";
+                key_button = "+1+10";
                 debug('B&G button press tack > starboard');
               } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,1a,00,03,5b,3d/)) { // +10
-                key_button = "-10-1";
+                key_button = "-1-10";
                 debug('B&G button press tack < port');
               } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,1a,00,02,5b,3d/)) { // Standby
                 state_button = "standby";
