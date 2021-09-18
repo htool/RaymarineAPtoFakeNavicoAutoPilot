@@ -278,8 +278,9 @@ function AC12_PGN127237 () {
   const heading_track_pgn = {
       "auto":    "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,%s,00,%s,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,%s",
       //"auto":    "%s,2,127237,%s,%s,15,ff,7c,ff,ff,7f,%s,00,%s,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s",
-      "NFU":     "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,%s,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s",
-      "wind":    "",
+      "headinghold":     "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,%s,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s",
+      "wind":    "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,%s,00,%s,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,%s",
+      // "wind":    "",
       "navigation":    "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,%s,00,%s,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,%s",
       //"standby": "%s,2,127237,%s,%s,15,ff,78,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,ff" // Magnetic
       "standby": "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,ff" // Magnetic
@@ -289,7 +290,7 @@ function AC12_PGN127237 () {
   switch (pilot_state) {
     case 'auto':
     case 'navigation':
-    case 'NFU':
+    case 'headinghold':
       // var new_value = Math.trunc(degsToRad(heading) * 10000)
       // var msg = util.format(heading_track_pgn[pilot_state], (new Date()).toISOString(), canbus.candevice.address,
       //                      255, padd((new_value & 0xff).toString(16), 2), padd(((new_value >> 8) & 0xff).toString(16), 2))
@@ -435,7 +436,7 @@ async function AC12_PGN65340 () {
   // 3,65340,2,255,8,41,9f,00,00,fe,f8,00,80
   // 7,65302,2,255,8,41,9f,0a,6b,00,00,00,ff
 
-  // NFU
+  // headinghold
   // 3,65340,2,255,8,41,9f,10,01,fe,fa,00,80
   // 7,65302,2,255,8,41,9f,0a,69,00,00,28,ff
 
@@ -446,7 +447,7 @@ async function AC12_PGN65340 () {
       "standby":     "%s,3,65340,%s,255,8,41,9f,00,00,fe,f8,00,80",
       //  "auto":        "%s,3,65340,%s,255,8,41,9f,10,01,fe,fa,00,80", // Heading Hold
       "auto":        "%s,3,65340,%s,255,8,41,9f,10,03,fe,fa,00,80",
-      "NFU":         "%s,3,65340,%s,255,8,41,9f,10,02,fe,fa,00,80",
+      "headinghold":         "%s,3,65340,%s,255,8,41,9f,10,02,fe,fa,00,80",
       "wind":        "%s,3,65340,%s,255,8,41,9f,10,03,fe,fa,00,80",
       "navigation":  "%s,3,65340,%s,255,8,41,9f,10,06,fe,fa,00,80",
       "followup":    "%s,3,65340,%s,255,8,41,9f,10,04,fe,fa,00,80"
@@ -455,7 +456,7 @@ async function AC12_PGN65340 () {
       "standby":    "%s,7,65302,%s,255,8,41,9f,0a,6b,00,00,00,ff",
       // "auto":       "%s,7,65302,%s,255,8,41,9f,0a,4b,00,00,00,ff", // Heading Hold
       "auto":       "%s,7,65302,%s,255,8,41,9f,0a,69,00,00,00,ff",
-      "NFU":        "%s,7,65302,%s,255,8,41,9f,0a,69,00,00,28,ff",
+      "headinghold":        "%s,7,65302,%s,255,8,41,9f,0a,69,00,00,28,ff",
       "wind":       "%s,7,65302,%s,255,8,41,9f,0a,69,00,00,30,ff", // guessing
       "followup":   "%s,7,65302,%s,255,8,41,9f,0a,0b,00,00,00,ff", // guessing
       "navigation": "%s,7,65302,%s,255,8,41,9f,0a,69,00,00,30,ff"  // guessing
@@ -493,7 +494,7 @@ async function AC12_PGN65341_5s () {
 function AC12_PGN65341_02 () {
   const pgn65341_02 = {
       "auto":       "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,15,9a",
-      "NFU":        "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,00,00",
+      "headinghold":        "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,00,00",
       "wind":       "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,00,00",
       "navigation": "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,12,9a", // guess
       "followup":   "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,14,9a", // guess
@@ -521,19 +522,13 @@ async function AC12_PGN65305 () {
       messages = [
         "%s,7,65305,%s,255,8,41,9f,00,1d,80,00,00,00",
         "%s,7,65305,%s,255,8,41,9f,00,05,10,00,00,00",
-        "%s,7,65305,%s,255,8,41,9f,00,0a,0c,00,80,00" ];
+        "%s,7,65305,%s,255,8,41,9f,00,0a,0a,00,80,00" ];
         break;
     case 'wind': // unknown
       messages = [
         "%s,7,65305,%s,255,8,41,9f,00,1d,80,00,00,00",
         "%s,7,65305,%s,255,8,41,9f,00,03,10,00,00,00",
-        "%s,7,65305,%s,255,8,41,9f,00,0a,0c,00,80,00" ];
-        break;
-    case 'NFU':
-        messages = [
-          "%s,7,65305,%s,255,8,41,9f,00,1d,80,00,00,00",
-          "%s,7,65305,%s,255,8,41,9f,00,02,10,00,00,00",
-          "%s,7,65305,%s,255,8,41,9f,00,0a,0c,00,80,00" ];
+        "%s,7,65305,%s,255,8,41,9f,00,0a,0f,00,80,00" ];
         break;
   }
   for (var nr in messages) {
@@ -619,33 +614,26 @@ function mainLoop () {
               } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,1a,00,03,d1,06/)) { // +10
                 key_button = "+10";
                 debug('B&G button press +10');
-              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,1a,00,03,d1,06/)) { // +10
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,1a,00,03,d1,06/)) { // Tack Starboard
                 key_button = "+1+10";
                 debug('B&G button press tack > starboard');
-              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,1a,00,03,5b,3d/)) { // +10
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,1a,00,03,5b,3d/)) { // Tack Port
                 key_button = "-1-10";
                 debug('B&G button press tack < port');
-              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,1a,00,02,5b,3d/)) { // Standby
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,06,00,ff,ff,ff/)) { // Standby
                 state_button = "standby";
-                debug('B&G button press Standby');
               } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,0e,00,ff,ff,ff/)) { // Wind
                 state_button = "wind";
-                debug('B&G button press Wind');
-              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,0f,00,ff,ff,ff/)) { // Route/navigation
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,0f,00,ff,ff,ff/)) { // WindNavigation
                 state_button = "windnavigation";
-                debug('B&G button press WindNavigation');
-              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,10,00,ff,ff,ff/)) { // Route/navigation
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,10,00,ff,ff,ff/)) { // NoDrift
                 state_button = "nodrift";
-                debug('B&G button press NoDrift');
-              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,0c,00,ff,ff,ff/)) { // Route/navigation
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,0c,00,ff,ff,ff/)) { // Navigaten
                 state_button = "navigation";
-                debug('B&G button press Nagivate');
-              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,09,00,ff,ff,ff/)) { // Route/navigation
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,09,00,ff,ff,ff/)) { // Heading Hold
                 state_button = "auto";
-                debug('B&G button press Heading Hold');
               } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,0a,00,ff,ff,ff/)) { // Auto
                 state_button = "auto";
-                debug('B&G button press Auto');
 
               // Clear 'No Autopilot' alarm?
               } else if (PGN130850.match(/41,9f,ff,ff,ff,1f,51,00,c4,49,29/)) {
