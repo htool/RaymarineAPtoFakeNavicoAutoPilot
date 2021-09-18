@@ -619,14 +619,33 @@ function mainLoop () {
               } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,1a,00,03,d1,06/)) { // +10
                 key_button = "+10";
                 debug('B&G button press +10');
-              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,06,00,ff,ff,ff/)) { // Standby
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,1a,00,03,d1,06/)) { // +10
+                key_button = "+10+1";
+                debug('B&G button press tack > starboard');
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,1a,00,03,5b,3d/)) { // +10
+                key_button = "-10-1";
+                debug('B&G button press tack < port');
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,1a,00,02,5b,3d/)) { // Standby
                 state_button = "standby";
+                debug('B&G button press Standby');
               } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,0e,00,ff,ff,ff/)) { // Wind
                 state_button = "wind";
-              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,0a,00,ff,ff,ff/)) { // Route/navigation
+                debug('B&G button press Wind');
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,0f,00,ff,ff,ff/)) { // Route/navigation
+                state_button = "windnavigation";
+                debug('B&G button press WindNavigation');
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,10,00,ff,ff,ff/)) { // Route/navigation
+                state_button = "nodrift";
+                debug('B&G button press NoDrift');
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,0c,00,ff,ff,ff/)) { // Route/navigation
                 state_button = "navigation";
-              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,09,00,ff,ff,ff/)) { // Auto
+                debug('B&G button press Nagivate');
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,09,00,ff,ff,ff/)) { // Route/navigation
                 state_button = "auto";
+                debug('B&G button press Heading Hold');
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,0a,00,ff,ff,ff/)) { // Auto
+                state_button = "auto";
+                debug('B&G button press Auto');
 
               // Clear 'No Autopilot' alarm?
               } else if (PGN130850.match(/41,9f,ff,ff,ff,1f,51,00,c4,49,29/)) {
