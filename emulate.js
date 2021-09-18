@@ -734,6 +734,7 @@ function mainLoop () {
           } else if (msg.pgn.pgn == 127245 && msg.pgn.src == 115) {
           // Get rudder angle info from Seatalk1 packet
             rudder_pgn_data = buf2hex(msg.data);
+            rudder_pgn_data.replace(/ff,f8/, 'ff,ff');
           } else if (msg.pgn.pgn == 128275 && msg.pgn.src == 115) {
           // Get distance log info from Seatalk1 packet
             AC12_PGN128275(buf2hex(msg.data));
