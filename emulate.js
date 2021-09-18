@@ -102,6 +102,7 @@ var pgn130850 = [];
 var pilotmode126720 = [];
 var pgn129284 = [];
 var pgn130845 = [];
+var rudder_pgn_data = 'ff,f8,ff,ff,00,00,ff,ff';
 
 // Raymarine setup
 const raymarine_state_command = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,%s,00,00,00,00,ff,ff,ff,ff,ff";
@@ -261,7 +262,7 @@ function AC12_PGN127250 () {
   canbus.sendPGN(msg)
 }
 
-function AC12_PGN127245 (rudder_pgn_data) {
+function AC12_PGN127245 () {
   const message = "%s,2,127245,%s,255,8,%s"
   msg = util.format(message, (new Date()).toISOString(), canbus.candevice.address, rudder_pgn_data)
   canbus.sendPGN(msg)
@@ -568,6 +569,7 @@ switch (emulate) {
       setInterval(AC12_PGN65341_1s, 1000) // Every second
       setInterval(AC12_PGN65341_5s, 5000) // Every 5 seconds
       setInterval(AC12_PGN65305, 1000)
+      setInterval(AC12_PGN127245, 200); // Every 200ms
       setInterval(AC12_PGN130860, 1000) // Every second
       setInterval(heartbeat, 60000) // Heart beat PGN
       setInterval(AC12_PGN127237, 500) // Heading/track PGN
@@ -725,7 +727,6 @@ function mainLoop () {
           } else if (msg.pgn.pgn == 127245 && msg.pgn.src == 115) {
           // Get rudder angle info from Seatalk1 packet
             rudder_pgn_data = buf2hex(msg.data);
-            AC12_PGN127245(rudder_pgn_data);
           } else if (msg.pgn.pgn == 128275 && msg.pgn.src == 115) {
           // Get distance log info from Seatalk1 packet
             AC12_PGN128275(buf2hex(msg.data));
