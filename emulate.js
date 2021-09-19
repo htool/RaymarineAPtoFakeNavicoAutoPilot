@@ -505,14 +505,14 @@ async function AC12_PGN65340 () {
       "standby":     "%s,3,65340,%s,255,8,41,9f,00,00,fe,f8,00,80",
       "headinghold": "%s,3,65340,%s,255,8,41,9f,10,01,fe,fa,00,80", // Heading Hold
       "followup":    "%s,3,65340,%s,255,8,41,9f,10,03,fe,fa,00,80", // Follow up
-      "wind":        "%s,3,65340,%s,255,8,41,9f,10,03,fe,fa,00,80", 
+      "wind":        "%s,3,65340,%s,255,8,41,9f,10,03,fe,fa,00,80",
       "navigation":  "%s,3,65340,%s,255,8,41,9f,10,06,fe,f8,00,80"
   }
   const pgn65302 = {
       "standby":    "%s,7,65302,%s,255,8,41,9f,0a,6b,00,00,00,ff",
       "headinghold":"%s,7,65302,%s,255,8,41,9f,0a,69,00,00,28,ff", // Heading Hold
       "followup":   "%s,7,65302,%s,255,8,41,9f,0a,69,00,00,30,ff", // Follow up
-      "wind":       "%s,7,65302,%s,255,8,41,9f,0a,69,00,00,30,ff", 
+      "wind":       "%s,7,65302,%s,255,8,41,9f,0a,69,00,00,30,ff",
       "navigation": "%s,7,65302,%s,255,8,41,9f,0a,6b,00,00,28,ff"  // guessing
   }
   const messages = [
@@ -559,57 +559,65 @@ function AC12_PGN65341_02 () {
 }
 
 async function AC12_PGN65305 () {
-  /* 
+  /*
     Determines what's shown as mode on B&G plotter.
     41,9f,00,1d determines mode
     41,9f,00,0[0a] determines state (standby/engaged)
   */
 
   debug('AC12 mode: %s  state: %s', ac12mode, ac12state);
-  
-  switch (ac12mode) {
-    case 'navigation':
-      messages_mode = [
-        "%s,7,65305,%s,255,8,41,9f,00,02,02,00,00,00",
-        "%s,7,65305,%s,255,8,41,9f,00,0a,0e,00,80,00" ]
-      break;
-    case 'headinghold':
-      messages_mode = [
-        "%s,7,65305,%s,255,8,41,9f,00,1d,01,00,00,00",
-        "%s,7,65305,%s,255,8,41,9f,00,1d,81,00,00,00" ]
-      break;
-    case 'followup': // unknown
-      messages_mode = [
-        "%s,7,65305,%s,255,8,41,9f,00,02,10,00,00,00",
-        "%s,7,65305,%s,255,8,41,9f,00,1d,81,00,00,00" ]
-        // "%s,7,65305,%s,255,8,41,9f,00,0a,16,00,00,00" ]
-      break;
-    case 'wind': // unknown
-      messages_mode = [
-        "%s,7,65305,%s,255,8,41,9f,00,02,10,00,00,00",
-        "%s,7,65305,%s,255,8,41,9f,00,1d,81,00,00,00" ]
-        // "%s,7,65305,%s,255,8,41,9f,00,0a,16,00,00,00" ]
-      break;
+
+  if (ac12state == 'standby') {
+    switch (ac12mode) {
+      case 'headinghold':
+        messages_mode = [
+          "%s,7,65305,%s,255,8,41,9f,00,02,02,00,00,00",
+          "%s,7,65305,%s,255,8,41,9f,00,0a,0c,00,80,00" ]
+        break;
+      case 'navigation':
+          messages = [
+          "%s,7,65305,%s,255,8,41,9f,00,02,02,00,00,00",
+          "%s,7,65305,%s,255,8,41,9f,00,0a,0e,00,80,00" ]
+        break;
+      case 'followup': // unknown
+        messages_mode = [
+          "%s,7,65305,%s,255,8,41,9f,00,02,10,00,00,00",
+          "%s,7,65305,%s,255,8,41,9f,00,1d,81,00,00,00" ]
+          // "%s,7,65305,%s,255,8,41,9f,00,0a,16,00,00,00" ]
+        break;
+      case 'wind': // unknown
+        messages_mode = [
+          "%s,7,65305,%s,255,8,41,9f,00,02,10,00,00,00",
+          "%s,7,65305,%s,255,8,41,9f,00,1d,81,00,00,00" ]
+          // "%s,7,65305,%s,255,8,41,9f,00,0a,16,00,00,00" ]
+        break;
+    }
+  } else if (ac12state == 'engaged') {
+    switch (ac12mode) {
+      case 'headinghold':
+        messages_mode = [
+          "%s,7,65305,%s,255,8,41,9f,00,1d,01,00,00,00",
+          "%s,7,65305,%s,255,8,41,9f,00,1d,81,00,00,00" ]
+        break;
+        case 'navigation':
+            messages = [
+            "%s,7,65305,%s,255,8,41,9f,00,02,02,00,00,00",
+            "%s,7,65305,%s,255,8,41,9f,00,0a,0e,00,80,00" ]
+          break;
+      case 'followup': // unknown
+        messages_mode = [
+          "%s,7,65305,%s,255,8,41,9f,00,02,10,00,00,00",
+          "%s,7,65305,%s,255,8,41,9f,00,1d,81,00,00,00" ]
+          // "%s,7,65305,%s,255,8,41,9f,00,0a,16,00,00,00" ]
+        break;
+      case 'wind': // unknown
+        messages_mode = [
+          "%s,7,65305,%s,255,8,41,9f,00,02,10,00,00,00",
+          "%s,7,65305,%s,255,8,41,9f,00,1d,81,00,00,00" ]
+          // "%s,7,65305,%s,255,8,41,9f,00,0a,16,00,00,00" ]
+        break;
+    }
   }
-  switch (ac12state) {
-    case 'standby':
-      messages_state = [
-        "%s,7,65305,%s,255,8,41,9f,00,02,02,00,00,00",
-        // "%s,7,65305,%s,255,8,41,9f,00,02,04,00,00,00" ] // Non Follow up - Engaged
-        "%s,7,65305,%s,255,8,41,9f,00,0a,0a,00,00,00" ] // Heading Hold - Standby
-        // "%s,7,65305,%s,255,8,41,9f,00,0a,14,00,00,00" ] // Heading Hold - Engaged
-        // "%s,7,65305,%s,255,8,41,9f,00,02,12,00,00,00" ] // Follow up - Engaged
-        // "%s,7,65305,%s,255,8,41,9f,00,02,10,00,00,00" ] // Follow up - Engaged
-        // "%s,7,65305,%s,255,8,41,9f,00,02,04,00,00,00" ] // Non Follow up - Engaged
-        // "%s,7,65305,%s,255,8,41,9f,00,02,14,00,00,00" ]  // Non Follow Up - Engaged
-      break;
-    case 'engaged':
-      messages_state = [
-        // "%s,7,65305,%s,255,8,41,9f,00,02,10,00,00,00",
-        "%s,7,65305,%s,255,8,41,9f,00,0a,14,00,80,00" ]
-      break;
-  }
-  messages = messages_mode.concat(messages_state)
   for (var message in messages) {
     msg = util.format(messages[message], (new Date()).toISOString(), canbus.candevice.address)
     canbus.sendPGN(msg)
@@ -702,7 +710,7 @@ function mainLoop () {
                 debug('B&G button press tack < port');
               } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,06,00,ff,ff,ff/)) { // Standby
                 state_button = "standby";
-              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,0e,00,ff,ff,ff/)) { 
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,0e,00,ff,ff,ff/)) {
                 ac12mode = "navigation";
               } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,0f,00,ff,ff,ff/)) {
                 ac12mode = "wind";
@@ -710,7 +718,7 @@ function mainLoop () {
               } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,10,00,ff,ff,ff/)) {
                 ac12mode = "windnavigation";
                 debug('B&G mode now %s', ac12mode);
-              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,0c,00,ff,ff,ff/)) { 
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,0c,00,ff,ff,ff/)) {
                 ac12mode = "nodrift";
                 debug('B&G mode now %s', ac12mode);
               } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,09,00,ff,ff,ff/)) { // Heading Hold
@@ -841,7 +849,7 @@ function mainLoop () {
             rudder_pgn_data[1] = 'ff';
             rudder_pgn_data[3] = rudder_pgn_data[5];
             rudder_pgn_data[4] = rudder_pgn_data[4];
-            // rudder_pgn_data[5] = '0a';   
+            // rudder_pgn_data[5] = '0a';
             // 2,127245,2,255,8,ff,ff,ff,7f,ff,7f,ff,ff
             // rudder_pgn_data =  'ff,ff,90,f8,90,f8,ff,ff';
           } else if (msg.pgn.pgn == 128275 && msg.pgn.src == 115) {
