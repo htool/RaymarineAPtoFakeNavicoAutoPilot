@@ -23,6 +23,10 @@ const canDevice = require('./canboatjs/lib/canbus').canDevice
 const canbus = new (require('./canboatjs').canbus)({})
 const util = require('util')
 
+function hex2bin(hex){
+    return ("00000000" + (parseInt(hex, 16)).toString(2)).substr(-8);
+}
+
 if (debug) {
   debug('DEBUG enabled. Using keyboard input for state changes.')
 	const readline = require('readline');
@@ -41,11 +45,17 @@ if (debug) {
 	    ac12mode = 'nonfollowup'
 	  } else if (key.name === 'w') {
 	    ac12mode = 'wind'
+	  } else if (key.name === 'd') {
+	    ac12mode = 'nodrift'
 	  } else if (key.name === 'e') {
 	    ac12state = 'engaged'
 	  } else if (key.name === 's') {
 	    ac12state = 'standby'
-	  }
+	  } else if (key.name === 'return') {
+	    console.log('')
+	  } else {
+      debug('Key %s not mapped.\n', key.name)
+    }
 	});
 }
 
@@ -133,9 +143,9 @@ const commission_reply = {
 //    // ffffff180a000103ffffff Planing
 }
 
-var pilot_state = 'auto';
-var ac12mode = 'navigation';
-var ac12state = 'engaged';
+var pilot_state = 'standby';
+var ac12mode = 'headinghold';
+var ac12state = 'standby';
 var heading;
 var heading_rad = 'ff,ff';
 var locked_heading;
@@ -570,58 +580,80 @@ async function AC12_PGN65305 () {
   if (ac12state == 'standby') {
     switch (ac12mode) {
       case 'headinghold':
-        messages_mode = [
-          "%s,7,65305,%s,255,8,41,9f,00,02,02,00,00,00",
-          "%s,7,65305,%s,255,8,41,9f,00,0a,0c,00,80,00" ]
-        break;
-      case 'navigation':
-          messages = [
+        messages = [
           "%s,7,65305,%s,255,8,41,9f,00,02,02,00,00,00",
           "%s,7,65305,%s,255,8,41,9f,00,0a,0e,00,80,00" ]
         break;
-      case 'followup': // unknown
-        messages_mode = [
-          "%s,7,65305,%s,255,8,41,9f,00,02,10,00,00,00",
-          "%s,7,65305,%s,255,8,41,9f,00,1d,81,00,00,00" ]
-          // "%s,7,65305,%s,255,8,41,9f,00,0a,16,00,00,00" ]
+      case 'wind':
+          messages = [
+          "%s,7,65305,%s,255,8,41,9f,00,02,02,00,80,00" ]
+          // "%s,7,65305,%s,255,8,41,9f,00,0a,0c,00,80,00" ]
         break;
-      case 'wind': // unknown
-        messages_mode = [
-          "%s,7,65305,%s,255,8,41,9f,00,02,10,00,00,00",
-          "%s,7,65305,%s,255,8,41,9f,00,1d,81,00,00,00" ]
-          // "%s,7,65305,%s,255,8,41,9f,00,0a,16,00,00,00" ]
+      case 'followup': // unknown
+        messages = [
+          "%s,7,65305,%s,255,8,41,9f,00,02,02,00,00,00",
+          "%s,7,65305,%s,255,8,41,9f,00,0a,12,00,80,00" ]
+        break;
+      case 'navigation': // unknown
+        messages = [
+          "%s,7,65305,%s,255,8,41,9f,00,02,02,00,00,00",
+          "%s,7,65305,%s,255,8,41,9f,00,0a,0a,00,80,00" ]
+        break;
+      case 'nodrift': 
+        messages = [
+          "%s,7,65305,%s,255,8,41,9f,00,02,02,00,00,00",
+          "%s,7,65305,%s,255,8,41,9f,00,0a,0c,00,80,00" ]
+        break;
+      case 'nonfollowup': // unknown
+        messages = [
+          "%s,7,65305,%s,255,8,41,9f,00,02,02,00,00,00",
+          "%s,7,65305,%s,255,8,41,9f,00,0a,14,00,80,00" ]
         break;
     }
   } else if (ac12state == 'engaged') {
     switch (ac12mode) {
       case 'headinghold':
-        messages_mode = [
-          "%s,7,65305,%s,255,8,41,9f,00,1d,01,00,00,00",
-          "%s,7,65305,%s,255,8,41,9f,00,1d,81,00,00,00" ]
+        messages = [
+          // "%s,7,65305,%s,255,8,41,9f,00,02,10,00,00,00",
+          "%s,7,65305,%s,255,8,41,9f,00,0a,16,00,00,00" ]
         break;
-        case 'navigation':
-            messages = [
-            "%s,7,65305,%s,255,8,41,9f,00,02,02,00,00,00",
-            "%s,7,65305,%s,255,8,41,9f,00,0a,0e,00,80,00" ]
-          break;
-      case 'followup': // unknown
-        messages_mode = [
+      case 'wind':
+        messages = [
           "%s,7,65305,%s,255,8,41,9f,00,02,10,00,00,00",
-          "%s,7,65305,%s,255,8,41,9f,00,1d,81,00,00,00" ]
-          // "%s,7,65305,%s,255,8,41,9f,00,0a,16,00,00,00" ]
+          "%s,7,65305,%s,255,8,41,9f,00,0a,16,04,80,01" ]
         break;
-      case 'wind': // unknown
-        messages_mode = [
+      case 'followup':
+        messages = [
           "%s,7,65305,%s,255,8,41,9f,00,02,10,00,00,00",
-          "%s,7,65305,%s,255,8,41,9f,00,1d,81,00,00,00" ]
-          // "%s,7,65305,%s,255,8,41,9f,00,0a,16,00,00,00" ]
+          "%s,7,65305,%s,255,8,41,9f,00,0a,0e,00,80,00",
+          "%s,7,65305,%s,255,8,41,9f,00,1d,80,00,00,00" ]
+        break;
+      case 'nodrift':
+        messages = [
+          "%s,7,65305,%s,255,8,41,9f,00,02,10,00,00,00",
+          "%s,7,65305,%s,255,8,41,9f,00,0a,16,01,60,00" ]
+        break;
+      case 'navigation': // unknown
+        messages = [
+          "%s,7,65305,%s,255,8,41,9f,00,02,10,00,00,00",
+          "%s,7,65305,%s,255,8,41,9f,00,0a,14,06,60,00" ]
+        break;
+      case 'nonfollowup':
+        messages = [
+          "%s,7,65305,%s,255,8,41,9f,00,02,06,00,00,00",
+          "%s,7,65305,%s,255,8,41,9f,00,0a,0c,00,80,00" ]
         break;
     }
   }
   for (var message in messages) {
     msg = util.format(messages[message], (new Date()).toISOString(), canbus.candevice.address)
     canbus.sendPGN(msg)
-    debug('Sending PGN 65305: %s', msg);
+    msg = msg.replace(/.*255,8,41,9f,00,/, '');
+    msgbin = "";
+    msg.split(",").forEach(str => {
+      msgbin += hex2bin(str)
+    });
+    debug('Sending PGN 65305: %s %s', msg, msgbin);
     await sleep(25)
   }
 }
@@ -638,7 +670,7 @@ switch (emulate) {
       break;
 	case 'AP44':
 	    debug('Emulate: Simrad AP44 Autopilot controller')
-      setTimeout(AP44_bootconfig, 5000) // Once at startup
+      // setTimeout(AP44_bootconfig, 5000) // Once at startup
       setInterval(PGN130822, 300000) // Every 5 minutes
       setInterval(AP44_PGN65305, 1000) // Every 1 minute
       setInterval(heartbeat, 60000) // Heart beat PGN
