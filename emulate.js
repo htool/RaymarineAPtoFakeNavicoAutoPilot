@@ -27,36 +27,74 @@ function hex2bin(hex){
     return ("00000000" + (parseInt(hex, 16)).toString(2)).substr(-8);
 }
 
-if (debug) {
-  debug('DEBUG enabled. Using keyboard input for state changes.')
-	const readline = require('readline');
-	readline.emitKeypressEvents(process.stdin);
-	process.stdin.setRawMode(true);
-	process.stdin.on('keypress', (str, key) => {
-	  if (key.ctrl && key.name === 'c') {
-	    process.exit();
-	  } else if (key.name === 'n') {
-	    ac12mode = 'navigation'
-	  } else if (key.name === 'f') {
-	    ac12mode = 'followup'
-	  } else if (key.name === 'h') {
-	    ac12mode = 'headinghold'
-	  } else if (key.name === 'u') {
-	    ac12mode = 'nonfollowup'
-	  } else if (key.name === 'w') {
-	    ac12mode = 'wind'
-	  } else if (key.name === 'd') {
-	    ac12mode = 'nodrift'
-	  } else if (key.name === 'e') {
-	    ac12state = 'engaged'
-	  } else if (key.name === 's') {
-	    ac12state = 'standby'
-	  } else if (key.name === 'return') {
-	    console.log('')
-	  } else {
-      debug('Key %s not mapped.\n', key.name)
-    }
-	});
+
+switch (emulate) {
+  case 'AC12':
+		if (debug) {
+		  debug('DEBUG enabled. Using keyboard input for state changes.')
+			const readline = require('readline');
+			readline.emitKeypressEvents(process.stdin);
+			process.stdin.setRawMode(true);
+			process.stdin.on('keypress', (str, key) => {
+			  if (key.ctrl && key.name === 'c') {
+			    process.exit();
+			  } else if (key.name === 'n') {
+			    ac12mode = 'navigation'
+			  } else if (key.name === 'f') {
+			    ac12mode = 'followup'
+			  } else if (key.name === 'h') {
+			    ac12mode = 'headinghold'
+			  } else if (key.name === 'u') {
+			    ac12mode = 'nonfollowup'
+			  } else if (key.name === 'w') {
+			    ac12mode = 'wind'
+			  } else if (key.name === 'd') {
+			    ac12mode = 'nodrift'
+			  } else if (key.name === 'e') {
+			    ac12state = 'engaged'
+			  } else if (key.name === 's') {
+			    ac12state = 'standby'
+			  } else if (key.name === 'return') {
+			    console.log('')
+			  } else {
+		      debug('Key %s not mapped.\n', key.name)
+		    }
+			});
+		}
+  break;
+  case 'OP10keypad':
+    console.log('OP10 keypad emulator\nButtons: a=auto s=standby m=mode u=-10 i=-1 o=+1 p=+10')
+	  const readline = require('readline');
+		readline.emitKeypressEvents(process.stdin);
+		process.stdin.setRawMode(true);
+		process.stdin.on('keypress', (str, key) => {
+		  if (key.ctrl && key.name === 'c') {
+			  process.exit();
+			} else if (key.name === 'a') {
+			    button='auto'
+			} else if (key.name === 's') {
+			    button='standby'
+			} else if (key.name === 'm') {
+			    button='mode'
+			} else if (key.name === 'u') {
+			    button='-1'
+			} else if (key.name === 'i') {
+			    button='+1'
+			} else if (key.name === 'o') {
+			    button='-10'
+			} else if (key.name === 'p') {
+			    button='+10'
+      } else {
+        debug('Key not mapped: %s', key.name);
+      }
+      if (typeof button != 'undefined') {
+        msg = util.format(op10msg, (new Date()).toISOString(), canbus.candevice.address, hexByte(canbus.candevice.address), op10_key_code[button]);
+        debug('Sending pgn: %s', msg);
+        canbus.sendPGN(msg)
+      }
+      delete button
+    });
+  break;
 }
 
 const commission_reply = {
@@ -158,6 +196,20 @@ var pilotmode126720 = [];
 var pgn129284 = [];
 var pgn130845 = [];
 var rudder_pgn_data = 'ff,f8,ff,ff,00,00,ff,ff';
+
+const op10msg = '%s,2,130850,%s,255,0c,41,9f,%s,ff,ff,%s,00,00,00,ff';
+
+const op10_key_code = {
+    "+1":      "02,ff,ff,02,0d,00,04",
+    "+10":     "02,ff,ff,02,0d,00,05",
+    "-1":      "02,ff,ff,02,0d,00,ff",
+    "-10":     "02,ff,ff,0a,06,00,00",
+    "auto":    "02,ff,ff,0a,09,00,00",
+    "mode":    "02,ff,ff,0a,0f,00,00",
+    "standby": "02,ff,ff,0a,1c,00,00",
+    "-1-10":   "",
+    "+1+10":   ""
+}
 
 // Raymarine setup
 const raymarine_state_command = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,%s,00,00,00,00,ff,ff,ff,ff,ff";
@@ -285,7 +337,6 @@ async function PGN130822 () {
     "%s,3,130822,%s,255,0f,13,99,ff,01,00,0c,00,00,fc,13,6f,00,00,03,bb",
     "%s,3,130822,%s,255,0f,13,99,ff,01,00,0d,00,00,fc,13,25,00,00,74,be",
     "%s,3,130822,%s,255,0f,13,99,ff,01,00,0e,00,00,fc,13,25,00,00,74,be" ]
-
   for (var nr in messages) {
     msg = util.format(messages[nr], (new Date()).toISOString(), canbus.candevice.address)
     canbus.sendPGN(msg)
@@ -360,11 +411,21 @@ function AC12_PGN127237 () {
   }
 }
 
+async function OP10_PGN65305 () {
+  const messages = [
+    "%s,7,65305,%s,255,8,41,9f,01,0b,00,00,00,00",
+    "%s,7,65305,%s,255,8,41,9f,01,03,04,00,00,00" ]
+  for (var nr in messages) {
+    msg = util.format(messages[nr], (new Date()).toISOString(), canbus.candevice.address)
+    canbus.sendPGN(msg)
+    await sleep(25)
+  }
+}
+
 async function AP44_PGN65305 () {
   const messages = [
     "%s,7,65305,%s,255,8,41,9f,01,03,00,00,00,00",
     "%s,7,65305,%s,255,8,41,9f,01,0b,00,00,00,00" ]
-
   for (var nr in messages) {
     msg = util.format(messages[nr], (new Date()).toISOString(), canbus.candevice.address)
     canbus.sendPGN(msg)
@@ -582,23 +643,22 @@ async function AC12_PGN65305 () {
       case 'headinghold':
         messages = [
           // "%s,7,65305,%s,255,8,41,9f,00,02,02,00,00,00",
-          "%s,7,65305,%s,255,8,41,9f,00,0a,0a,00,00,00" ]
+          "%s,7,65305,%s,255,8,41,9f,00,0a,1e,00,00,00" ]
         break;
       case 'wind':
           messages = [
           // "%s,7,65305,%s,255,8,41,9f,00,02,02,00,00,00",
-          // "%s,7,65305,%s,255,8,41,9f,00,0a,0c,00,80,00" ]
-          "%s,7,65305,%s,255,8,41,9f,00,0a,0e,00,00,00" ]
+          "%s,7,65305,%s,255,8,41,9f,00,0a,1e,00,00,00" ]
         break;
       case 'followup': // unknown
         messages = [
           // "%s,7,65305,%s,255,8,41,9f,00,02,02,00,00,00",
-          "%s,7,65305,%s,255,8,41,9f,00,0a,0a,00,00,00" ]
+          "%s,7,65305,%s,255,8,41,9f,00,0a,0e,00,80,00" ]
         break;
       case 'navigation': // unknown
         messages = [
           // "%s,7,65305,%s,255,8,41,9f,00,02,02,00,00,00",
-          "%s,7,65305,%s,255,8,41,9f,00,0a,02,00,80,00" ]
+          "%s,7,65305,%s,255,8,41,9f,00,0a,0a,00,80,00" ]
         break;
       case 'nodrift': 
         messages = [
@@ -615,9 +675,8 @@ async function AC12_PGN65305 () {
     switch (ac12mode) {
       case 'headinghold':
         messages = [
-          "%s,7,65305,%s,255,8,41,9f,00,0a,16,00,00,00" ]
           // "%s,7,65305,%s,255,8,41,9f,00,02,10,00,00,00",
-          // "%s,7,65305,%s,255,8,41,9f,00,0a,16,00,00,00" ]
+          "%s,7,65305,%s,255,8,41,9f,00,0a,16,00,00,00" ]
         break;
       case 'wind':
         messages = [
@@ -627,7 +686,7 @@ async function AC12_PGN65305 () {
       case 'followup':
         messages = [
           // "%s,7,65305,%s,255,8,41,9f,00,02,10,00,00,00",
-          "%s,7,65305,%s,255,8,41,9f,00,0a,0a,00,80,00" ]
+          "%s,7,65305,%s,255,8,41,9f,00,0a,1e,00,80,00" ]
         break;
       case 'nodrift':
         messages = [
@@ -636,12 +695,13 @@ async function AC12_PGN65305 () {
         break;
       case 'navigation': // unknown
         messages = [
-          "%s,7,65305,%s,255,8,41,9f,00,0a,12,06,60,00" ]
+          // "%s,7,65305,%s,255,8,41,9f,00,02,10,00,00,00",
+          "%s,7,65305,%s,255,8,41,9f,00,0a,14,06,60,00" ]
         break;
       case 'nonfollowup':  // unknown
         messages = [
-          // "%s,7,65305,%s,255,8,41,9f,00,02,06,00,00,00",
-          "%s,7,65305,%s,255,8,41,9f,00,02,5c,00,80,00" ]
+          // "%s,7,65305,%s,255,8,41,9f,00,02,10,00,00,00",
+          "%s,7,65305,%s,255,8,41,9f,00,0a,14,00,80,00" ]
         break;
     }
   }
@@ -663,6 +723,12 @@ async function AC12_PGN65305 () {
 switch (emulate) {
   case 'default':
       setTimeout(PGN130822, 5000) // Once at startup
+  case 'OP10keypad':
+      debug('Emulate: B&G OP10 Keypad')
+      setInterval(PGN130822, 300000) // Every 5 minutes
+      setInterval(OP10_PGN65305, 1000) // unsure
+      setInterval(heartbeat, 60000) // Heart beat PGN
+      break;
   case 'keypad':
       debug('Emulate: B&G Triton2 Keypad')
       setInterval(PGN130822, 300000) // Every 5 minutes
@@ -709,6 +775,9 @@ function mainLoop () {
         canbus.candevice.n2kMessage(msg.pgn);
       }
       switch (emulate) {
+        case 'op10keypad':
+          
+          break;
         case 'AC12':
           if (msg.pgn.pgn == 130850) { // Simnet Event, requires reply
             pgn130850 = pgn130850.concat(buf2hex(msg.data).slice(1)); // Skip multipart byte
@@ -734,7 +803,7 @@ function mainLoop () {
               } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,1a,00,03,d1,06/)) { // +10
                 key_button = "+10";
                 debug('B&G button press +10');
-              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,1a,00,03,d1,06/)) { // Tack Starboard
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,1a,00,02,5b,3d/)) { // Tack Starboard
                 key_button = "+1+10";
                 debug('B&G button press tack > starboard');
               } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,1a,00,03,5b,3d/)) { // Tack Port
