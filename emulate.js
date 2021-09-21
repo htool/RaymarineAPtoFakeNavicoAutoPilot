@@ -112,6 +112,34 @@ const commission_reply = {
   'ffffff18020000ffffffff': 'ff,ff,ff,18,02,00,02,00,00,ff,ff',
   'ffffff1a110000ffffffff': 'ff,ff,ff,1a,11,00,02,08,ff,ff,ff',
   'ffffff19110000ffffffff': 'ff,ff,ff,19,11,00,02,04,ff,ff,ff',
+  'ffffff1c110000ffffffff': 'ff,ff,ff,1c,11,00,02,04,ff,ff,ff',
+  'ffffff18060000ffffffff': 'ff,ff,ff,18,06,00,02,00,ff,ff,ff',
+  'ffffff14060000ffffffff': 'ff,ff,ff,14,06,00,02,00,00,ff,ff',
+  'ffffff14010000ffffffff': 'ff,ff,ff,14,01,00,02,27,ff,ff,ff',
+  'ffffff141d0000ffffffff': 'ff,ff,ff,14,1d,00,02,b0,04,ff,ff',
+  'ffffff1c010000ffffffff': 'ff,ff,ff,1c,01,00,02,74,14,ff,ff',
+  'ffffff1c020000ffffffff': 'ff,ff,ff,1c,02,00,02,74,14,ff,ff',
+  'ffffff1c080000ffffffff': 'ff,ff,ff,1c,08,00,02,78,00,ff,ff',
+  'ffffff180b0000ffffffff': 'ff,ff,ff,18,0b,00,02,1c,47,ff,ff',
+  'ffffff1c090000ffffffff': 'ff,ff,ff,1c,09,00,02,04,00,ff,ff',
+  'ffffff1b0c0000ffffffff': 'ff,ff,ff,1b,0c,00,02,d1,06,ff,ff',
+  'ffffff180c0000ffffffff': 'ff,ff,ff,18,0c,00,02,01,01,ff,ff',
+  'ffffff14090000ffffffff': 'ff,ff,ff,14,09,00,02,c1,0a,ff,ff',
+  'ffffff18090000ffffffff': 'ff,ff,ff,18,09,00,02,07,00,ff,ff',
+  'ffffff21090000ffffffff': 'ff,ff,ff,21,09,00,02,aa,c7,ff,ff',
+  'ffffff1f1b0000ffffffff': 'ff,ff,ff,1f,1b,00,02,d0,07,ff,ff',
+  'ffffff1f1a0000ffffffff': 'ff,ff,ff,1f,1a,00,02,d0,07,ff,ff',
+  'ffffff220b0000ffffffff': 'ff,ff,ff,22,b0,00,02,17,13,ff,ff',
+  'ffffff221a0000ffffffff': 'ff,ff,ff,22,1a,00,02,88,13,ff,ff',
+  'ffffff1e1a0000ffffffff': 'ff,ff,ff,1e,1a,00,02,88,13,ff,ff',
+  'fffffff200b000ffffffff': 'ff,ff,ff,20,0b,00,02,88,13,ff,ff',
+  'fffffff201b000ffffffff': 'ff,ff,ff,20,1b,00,02,d0,07,ff,ff',
+  'fffffff230d000ffffffff': 'ff,ff,ff,23,0d,00,02,05,ff,ff,ff',
+  'fffffff230b000ffffffff': 'ff,ff,ff,23,0b,00,02,00,00,ff,ff',
+  'fffffff040d000ffffffff': 'ff,ff,ff,04,0d,00,02,00,00,ff,ff',
+  'fffffff0901000ffffffff': 'ff,ff,ff,09,01,00,02,55,1d,ff,ff',
+  'fffffff0902000ffffffff': 'ff,ff,ff,09,02,00,02,ab,e4,ff,ff',
+  'fffffff0902000ffffffff': 'ff,ff,ff,09,02,00,02,ab,e4,ff,ff'
 
 
   // 'ff64ff042d0000ffffffff': 'ff,64,ff,04,2d,00,02,a3,0d,ff,ff',
@@ -137,7 +165,7 @@ const commission_reply = {
   // 'ffffff180a000100ffffff': 'ff,ff,ff,18,0a,00,01,02,00,ff,ff',
 // --- Sail [x]
 //  'ffffff180b0000ffffffff': 'ff,ff,ff,18,0b,00,02,1c,47,ff,ff',
-  'ffffff180c0000ffffffff': 'ff,ff,ff,18,0c,00,02,2f,01,ff,ff',  // Transition speed 06
+//  'ffffff180c0000ffffffff': 'ff,ff,ff,18,0c,00,02,2f,01,ff,ff',  // Transition speed 06
 //  'ffffff190d0000ffffffff': 'ff,ff,ff,19,0d,00,02,2d,00,ff,ff',
 //   'ffffff190d0000ffffffff': 'ff,ff,ff,19,0d,00,02,46,00,ff,ff',
 //   'ffffff190e0000ffffffff': 'ff,ff,ff,19,0e,00,02,90,01,ff,ff',
@@ -382,7 +410,7 @@ function AC12_PGN128275 (log_pgn_data) {
 
 function AC12_PGN127237 () {
   const heading_track_pgn = {
-      "auto":    "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,%s,00,%s,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,%s",
+      "engaged":    "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,%s,00,%s,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,%s",
       //"auto":    "%s,2,127237,%s,%s,15,ff,7c,ff,ff,7f,%s,00,%s,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s",
       "headinghold":     "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,%s,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s",
       "wind":    "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,%s,00,%s,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,%s",
@@ -393,19 +421,19 @@ function AC12_PGN127237 () {
       // "standby": "%s,2,127237,%s,%s,15,ff,3f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s" // True
   }
 
-  switch (pilot_state) {
-    case 'auto':
+  switch (ac12state) {
+    case 'engaged':
     case 'navigation':
       // var new_value = Math.trunc(degsToRad(heading) * 10000)
       // var msg = util.format(heading_track_pgn[pilot_state], (new Date()).toISOString(), canbus.candevice.address,
       //                      255, padd((new_value & 0xff).toString(16), 2), padd(((new_value >> 8) & 0xff).toString(16), 2))
-      var msg = util.format(heading_track_pgn[pilot_state], (new Date()).toISOString(), canbus.candevice.address,
+      var msg = util.format(heading_track_pgn[ac12state], (new Date()).toISOString(), canbus.candevice.address,
                             255, locked_heading_rad, locked_heading_rad, locked_heading_rad)
       // debug('127237 (auto): %j', msg);
       canbus.sendPGN(msg);
       break;
     case 'standby':
-      var msg = util.format(heading_track_pgn[pilot_state], (new Date()).toISOString(), canbus.candevice.address, 255, heading_rad)
+      var msg = util.format(heading_track_pgn[ac12state], (new Date()).toISOString(), canbus.candevice.address, 255, heading_rad)
       // debug('127237 (standby): %j', msg);
       canbus.sendPGN(msg);
   }
