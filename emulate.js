@@ -33,10 +33,9 @@ function hex2bin(hex){
     return ("00000000" + (parseInt(hex, 16)).toString(2)).substr(-8);
 }
 
-
 switch (emulate) {
   case 'AC12':
-		if (debug) {
+		if (process.stdin.isTTY) {
 		  debug('DEBUG enabled. Using keyboard input for state changes.')
 			const readline = require('readline');
 			readline.emitKeypressEvents(process.stdin);
