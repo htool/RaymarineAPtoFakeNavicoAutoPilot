@@ -25,6 +25,7 @@ const util = require('util')
 
 var pilot_state = 'standby';
 var ac12mode = 'headinghold';
+var lastac12mode = '';
 var ac12state = 'standby';
 var part = 0
 var wind_target_rad
@@ -46,7 +47,7 @@ switch (emulate) {
 			  } else if (key.name === 'n') {
 			    state_button = 'navigation'
 			  } else if (key.name === 'f') {
-			    // ac12mode = 'followup'
+			    ac12mode = 'followup'
 			  } else if (key.name === 'h') {
 			    state_button = 'headinghold'
 			  } else if (key.name === 'u') {
@@ -432,6 +433,7 @@ function AC12_PGN128275 (log_pgn_data) {
 
 function AC12_PGN127237 () {
   const heading_track_pgn = {
+      "navigation" : "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,%s,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s",
       "headinghold": "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,%s,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s",
       "wind":        "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s",
       "standby":     "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s" // Magnetic
@@ -440,17 +442,21 @@ function AC12_PGN127237 () {
 
   if (ac12state == 'engaged') {
     switch (ac12mode) {
+      case 'navigation':
       case 'headinghold':
         var msg = util.format(heading_track_pgn[ac12mode], (new Date()).toISOString(), canbus.candevice.address,255, locked_heading_rad, heading_rad)
+        canbus.sendPGN(msg);
         break;
       case 'wind':
+      case 'windnavigation':
         var msg = util.format(heading_track_pgn[ac12mode], (new Date()).toISOString(), canbus.candevice.address,255, locked_heading_rad, heading_rad)
+        canbus.sendPGN(msg);
         break;
     }
   } else {
-    var msg = util.format(heading_track_pgn[ac12state], (new Date()).toISOString(), canbus.candevice.address, 255, heading_rad)
+    var msg = util.format(heading_track_pgn['standby'], (new Date()).toISOString(), canbus.candevice.address, 255, heading_rad)
+    canbus.sendPGN(msg);
   }
-  canbus.sendPGN(msg);
 }
 
 async function OP10_PGN65305 () {
@@ -678,13 +684,13 @@ async function AC12_PGN65305 () {
     41,9f,00,0[0a] determines state (standby/engaged)
   */
 
-  debug('AC12 mode: %s  state: %s', ac12mode, ac12state);
+  // debug('AC12 mode: %s  state: %s', ac12mode, ac12state);
 
   if (ac12state == 'standby') {
     switch (ac12mode) {
       case 'headinghold':
         messages = [
-          // "%s,7,65305,%s,255,8,41,9f,00,02,02,00,00,00",
+          "%s,7,65305,%s,255,8,41,9f,00,02,02,00,00,00",
           "%s,7,65305,%s,255,8,41,9f,00,0a,0a,00,00,00" ]
         break;
       case 'wind':
@@ -727,7 +733,7 @@ async function AC12_PGN65305 () {
         break;
       case 'followup':
         messages = [
-          // "%s,7,65305,%s,255,8,41,9f,00,02,10,00,00,00",
+          "%s,7,65305,%s,255,8,41,9f,00,02,10,00,00,00",
           "%s,7,65305,%s,255,8,41,9f,00,0a,1e,00,80,00" ]
         break;
       case 'nodrift':
@@ -746,6 +752,13 @@ async function AC12_PGN65305 () {
           "%s,7,65305,%s,255,8,41,9f,00,0a,14,00,80,00" ]
         break;
     }
+  }
+  if (ac12mode != lastac12mode) {
+    debug('ac12mode change detect. Last: %s Now: %s', lastac12mode, ac12mode);
+    messages = [
+      "%s,7,65305,%s,255,8,41,9f,00,1d,81,00,00,00",
+      "%s,7,65305,%s,255,8,41,9f,00,1d,80,00,00,00"].concat[messages]
+    lastac12mode = ac12mode
   }
   for (var message in messages) {
     msg = util.format(messages[message], (new Date()).toISOString(), canbus.candevice.address)
@@ -853,9 +866,11 @@ function mainLoop () {
                 debug('B&G button press tack < port');
               } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,06,00,ff,ff,ff/)) { // Standby
                 state_button = "standby";
-              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,0e,00,ff,ff,ff/)) {
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,0a,00,ff,ff,ff/)) {
                 ac12mode = "navigation";
+                state_button = "navigation";
               } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,0f,00,ff,ff,ff/)) {
+                state_button = "wind";
                 ac12mode = "wind";
                 debug('B&G mode now %s', ac12mode);
               } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,10,00,ff,ff,ff/)) {
@@ -864,9 +879,10 @@ function mainLoop () {
               } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,0c,00,ff,ff,ff/)) {
                 ac12mode = "nodrift";
                 debug('B&G mode now %s', ac12mode);
-              // } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,09,00,ff,ff,ff/)) { // Heading Hold
-                // ac12mode = "headinghold";
-                // debug('B&G mode now %s', ac12mode);
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,09,00,ff,ff,ff/)) { // Heading Hold
+                ac12mode = "headinghold";
+                state_button = "headinghold";
+                debug('B&G mode now %s', ac12mode);
               } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,09,00,ff,ff,ff/)) { // Engage
                 state_button = "engage";
                 debug('B&G engaging mode %s', ac12mode);
@@ -910,6 +926,11 @@ function mainLoop () {
                     canbus.sendPGN(pgn126720);
                   } else if (state_button == 'navigation') {
                     debug('B&G button Navigation pressed. Navigation in mode %s', ac12mode)
+                    if (ac12state == 'standby') {
+                      debug('Going to Heading Hold first')
+                      pgn126720 = util.format(raymarine_state_command, (new Date()).toISOString(), canbus.candevice.address, autopilot_dst, raymarine_state_code['headinghold']);
+                      canbus.sendPGN(pgn126720);
+                    }
                     pgn126720 = util.format(raymarine_state_command, (new Date()).toISOString(), canbus.candevice.address, autopilot_dst, raymarine_state_code['navigation']);
                     debug('Sending Seatalk key state pgn 126720 %j', pgn126720);
                     canbus.sendPGN(pgn126720);
@@ -1059,14 +1080,14 @@ function mainLoop () {
                 PGN130845_1 = PGN130845.replace(/,/g,'').substring(0,8);
                 PGN130845_2 = PGN130845.replace(/,/g,'').substring(8,30);
                 PGN130845 = PGN130845.substring(0,12);
-                debug('PGN130845_1: %s', PGN130845_1);
-                debug('PGN130845_2: %s', PGN130845_2);
+                // debug('PGN130845_1: %s', PGN130845_1);
+                // debug('PGN130845_2: %s', PGN130845_2);
                 PGN130845_2 = commission_reply[PGN130845_2];
                 if (PGN130845_2 === undefined) {
                   debug('PGN130845 reply  : not found');
                 } else {
                   PGN130845 = PGN130845 + PGN130845_2;
-                  debug('PGN130845 reply  : %s', PGN130845);
+                  debug('Commission (130845): %s -> %s', PGN130845_1, PGN130845_2);
                   PGN130845 = "%s,3,130845,%s,255," + PGN130845;
                   PGN130845 = util.format(PGN130845, (new Date()).toISOString(), canbus.candevice.address)
                   // debug('Sending PGN130845: %s', PGN130845)
