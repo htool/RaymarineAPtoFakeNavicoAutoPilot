@@ -23,6 +23,12 @@ const canDevice = require('./canboatjs/lib/canbus').canDevice
 const canbus = new (require('./canboatjs').canbus)({})
 const util = require('util')
 
+var pilot_state = 'standby';
+var ac12mode = 'headinghold';
+var ac12state = 'standby';
+var part = 0
+var wind_target_rad
+
 function hex2bin(hex){
     return ("00000000" + (parseInt(hex, 16)).toString(2)).substr(-8);
 }
@@ -39,7 +45,7 @@ switch (emulate) {
 			  if (key.ctrl && key.name === 'c') {
 			    process.exit();
 			  } else if (key.name === 'n') {
-			    // ac12mode = 'navigation'
+			    state_button = 'navigation'
 			  } else if (key.name === 'f') {
 			    // ac12mode = 'followup'
 			  } else if (key.name === 'h') {
@@ -50,7 +56,7 @@ switch (emulate) {
 			    // ac12mode = 'wind'
           state_button = 'wind'
 			  } else if (key.name === 'd') {
-			    ac12mode = 'nodrift'
+			    state_button= 'nodrift'
 			  } else if (key.name === 'u') {
 			    key_button = '-10'
 			  } else if (key.name === 'i') {
@@ -67,6 +73,8 @@ switch (emulate) {
 			    state_button = 'standby'
 			  } else if (key.name === 'return') {
 			    console.log('')
+			  } else if (key.name === '1') {
+          part = part + 3
 			  } else {
 		      debug('Key %s not mapped.\n', key.name)
 		    }
@@ -100,7 +108,7 @@ switch (emulate) {
       }
       if (typeof button != 'undefined') {
         msg = util.format(op10msg, (new Date()).toISOString(), canbus.candevice.address, hexByte(canbus.candevice.address), op10_key_code[button]);
-        debug('Sending pgn: %s', msg);
+        // debug('Sending pgn: %s', msg);
         canbus.sendPGN(msg)
       }
       delete button
@@ -220,9 +228,6 @@ const commission_reply = {
 //    // ffffff180a000103ffffff Planing
 }
 
-var pilot_state = 'standby';
-var ac12mode = '';
-var ac12state = '';
 var heading;
 var heading_rad = 'ff,ff';
 var locked_heading;
@@ -404,6 +409,13 @@ function AC12_PGN127250 () {
   // debug ("heading_true_rad: %s  variation: %s", true_heading, mag_variation);
   heading_hex = padd((magnetic_heading & 0xff).toString(16), 2) + "," + padd(((magnetic_heading >> 8) & 0xff).toString(16), 2)
   msg = util.format(message, (new Date()).toISOString(), canbus.candevice.address, heading_hex)
+  canbus.sendPGN(msg)
+}
+
+function AC12_PGN65341 () {
+  // B&G Wind target PGN
+  const message = "%s,6,65341,0,255,8,41,9f,ff,ff,03,ff,%s"
+  msg = util.format(message, (new Date()).toISOString(), canbus.candevice.address, wind_target_rad)
   canbus.sendPGN(msg)
 }
 
@@ -727,7 +739,7 @@ async function AC12_PGN65305 () {
       case 'navigation': // unknown
         messages = [
           // "%s,7,65305,%s,255,8,41,9f,00,02,10,00,00,00",
-          "%s,7,65305,%s,255,8,41,9f,00,0a,14,06,60,00" ]
+          "%s,7,65305,%s,255,8,41,9f,00,0a,10,00,00,00" ]
         break;
       case 'nonfollowup':  // unknown
         messages = [
@@ -744,7 +756,7 @@ async function AC12_PGN65305 () {
     msg.split(",").forEach(str => {
       msgbin += hex2bin(str) + " "
     });
-    debug('Sending PGN 65305: %s %s', msg, msgbin);
+    // debug('Sending PGN 65305: %s %s', msg, msgbin);
     await sleep(25)
   }
 }
@@ -892,6 +904,11 @@ function mainLoop () {
                     pgn126720 = util.format(raymarine_state_command, (new Date()).toISOString(), canbus.candevice.address, autopilot_dst, raymarine_state_code['wind']);
                     debug('Sending Seatalk key state pgn 126720 %j', pgn126720);
                     canbus.sendPGN(pgn126720);
+                  } else if (state_button == 'nodrift') {
+                    debug('B&G button NoDrift pressed.', ac12mode)
+                    pgn126720 = util.format(raymarine_state_command, (new Date()).toISOString(), canbus.candevice.address, autopilot_dst, raymarine_state_code['headinghold']);
+                    debug('Sending Seatalk key state pgn 126720 %j', pgn126720);
+                    canbus.sendPGN(pgn126720);
                   } else if (state_button == 'navigation') {
                     debug('B&G button Navigation pressed. Navigation in mode %s', ac12mode)
                     pgn126720 = util.format(raymarine_state_command, (new Date()).toISOString(), canbus.candevice.address, autopilot_dst, raymarine_state_code['navigation']);
@@ -921,11 +938,11 @@ function mainLoop () {
             // 16,3b,9f,f0,81
             pilotmode126720 = pilotmode126720.concat(buf2hex(msg.data).slice(1)); // Skip multipart byte
             Seatalkmode = pilotmode126720.join(',');
-            if (!Seatalkmode.match(/^16,3b,9f,f0,81,84/)) {
+            if (!Seatalkmode.match(/^16,3b,9f,f0,81/)) {
               pilotmode126720 = [];
             }
             if (pilotmode126720.length > 24) { // We have 4 parts now
-              debug('Seatalk pilot mode: %s', Seatalkmode)
+              // debug('Seatalk pilot mode: %s', Seatalkmode)
               if (Seatalkmode.match(/16,3b,9f,f0,81,84,..,..,..,42,/)) {
                 if (pilot_state != 'auto') {
                   debug('Following Seatalk1 pilot mode heading hold engaged: %s', Seatalkmode);
@@ -944,6 +961,18 @@ function mainLoop () {
                   AC12_PGN65341_02();
                   debug('Raymarine mode: %s  AC12 mode: %s  state: %s', pilot_state, ac12mode, ac12state);
                 }
+              } else if (Seatalkmode.match(/16,3b,9f,f0,81,7f/)) {
+                // Get wind target from Seatalk1 packet
+                // debug ('Seatalk1 Pilot wind target info: %j', Seatalkmode);
+                wind_target_rad = Seatalkmode.substr(part,5);
+                var wind_target_rad_1 = wind_target_rad.substr(0,2);
+                var wind_target_rad_2 = wind_target_rad.substr(3,2);
+               
+                if (part > 100) { part = 0 }
+                wind_target_deg = radsToDeg(parseInt('0x' + wind_target_rad_2 + wind_target_rad_1))/10000;
+                // debug('pos: %s wind_target_rad: %s,%s  wind_target_deg: %s', part, wind_target_rad_1, wind_target_rad_2, wind_target_deg)
+                debug ('wind target: %j %s %s', Seatalkmode, wind_target_rad, wind_target_deg);
+                // AC12_PGN65341();
               } else if (Seatalkmode.match(/16,3b,9f,f0,81,84,..,..,..,4[08],/) || Seatalkmode.match(/16,3b,9f,f0,81,84,..,..,..,44,/) ) {
                 if (pilot_state != 'standby') {
                   debug('Following Seatalk1 pilot mode standby: %s', Seatalkmode);
@@ -978,9 +1007,10 @@ function mainLoop () {
             }
             heading = radsToDeg(parseInt('0x' + heading_rad[1] + heading_rad[0]))/10000
             // debug('heading: %s', heading)
+
           } else if (msg.pgn.pgn == 65360) {
           // Get locked heading from Seatalk1 packet
-            debug ('Seatalk1 Pilot locked heading info: %j %j', msg.pgn, msg.data);
+            // debug ('Seatalk1 Pilot locked heading info: %j %j', msg.pgn, msg.data);
             var locked_heading_true_rad = buf2hex(msg.data).slice(3,5);
             var locked_heading_mag_rad = buf2hex(msg.data).slice(5,7);
             // debug ("heading_true_rad: %s heading_mag_rad: %s", heading_true_rad, heading_mag_rad);
@@ -990,8 +1020,7 @@ function mainLoop () {
               locked_heading_rad = locked_heading_mag_rad
             }
             locked_heading = radsToDeg(parseInt('0x' + locked_heading_rad[1] + locked_heading_rad[0]))/10000;
-            debug('locked heading: %s', locked_heading)
-
+            // debug('locked heading: %s', locked_heading)
 
           } else if (msg.pgn.pgn == 127245 && msg.pgn.src == 115) {
           // Get rudder angle info from Seatalk1 packet
@@ -1041,7 +1070,7 @@ function mainLoop () {
                   debug('PGN130845 reply  : %s', PGN130845);
                   PGN130845 = "%s,3,130845,%s,255," + PGN130845;
                   PGN130845 = util.format(PGN130845, (new Date()).toISOString(), canbus.candevice.address)
-                  debug('Sending PGN130845: %s', PGN130845)
+                  // debug('Sending PGN130845: %s', PGN130845)
                   canbus.sendPGN(PGN130845)
                 }
                 pgn130845 = [];
