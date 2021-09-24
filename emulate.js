@@ -24,6 +24,210 @@ const canbus = new (require('./canboatjs').canbus)({})
 const util = require('util')
 
 var pilot_state = 'standby';
+var ac12mode = 'headinghold';
+var ac12state = 'standby';
+var part = 0
+var wind_target_rad
+
+function hex2bin(hex){
+    return ("00000000" + (parseInt(hex, 16)).toString(2)).substr(-8);
+}
+
+
+switch (emulate) {
+  case 'AC12':
+		if (debug) {
+		  debug('DEBUG enabled. Using keyboard input for state changes.')
+			const readline = require('readline');
+			readline.emitKeypressEvents(process.stdin);
+			process.stdin.setRawMode(true);
+			process.stdin.on('keypress', (str, key) => {
+			  if (key.ctrl && key.name === 'c') {
+			    process.exit();
+			  } else if (key.name === 'n') {
+			    state_button = 'navigation'
+			  } else if (key.name === 'f') {
+			    // ac12mode = 'followup'
+			  } else if (key.name === 'h') {
+			    state_button = 'headinghold'
+			  } else if (key.name === 'u') {
+			    // ac12mode = 'nonfollowup'
+			  } else if (key.name === 'w') {
+			    // ac12mode = 'wind'
+          state_button = 'wind'
+			  } else if (key.name === 'd') {
+			    state_button= 'nodrift'
+			  } else if (key.name === 'u') {
+			    key_button = '-10'
+			  } else if (key.name === 'i') {
+			    key_button = '-1'
+			  } else if (key.name === 'o') {
+			    key_button = '+1'
+			  } else if (key.name === 'p') {
+			    key_button = '+10'
+			  } else if (key.name === 'e') {
+			    // ac12state = 'engaged'
+          state_button = 'engage'
+			  } else if (key.name === 's') {
+			    // ac12state = 'standby'
+			    state_button = 'standby'
+			  } else if (key.name === 'return') {
+			    console.log('')
+			  } else if (key.name === '1') {
+          part = part + 3
+			  } else {
+		      debug('Key %s not mapped.\n', key.name)
+		    }
+			});
+		}
+  break;
+  case 'OP10keypad':
+    console.log('OP10 keypad emulator\nButtons: a=auto s=standby m=mode u=-10 i=-1 o=+1 p=+10')
+	  const readline = require('readline');
+		readline.emitKeypressEvents(process.stdin);
+		process.stdin.setRawMode(true);
+		process.stdin.on('keypress', (str, key) => {
+		  if (key.ctrl && key.name === 'c') {
+			  process.exit();
+			} else if (key.name === 'a') {
+			    button='auto'
+			} else if (key.name === 's') {
+			    button='standby'
+			} else if (key.name === 'm') {
+			    button='mode'
+			} else if (key.name === 'u') {
+			    button='-1'
+			} else if (key.name === 'i') {
+			    button='+1'
+			} else if (key.name === 'o') {
+			    button='-10'
+			} else if (key.name === 'p') {
+			    button='+10'
+      } else {
+        debug('Key not mapped: %s', key.name);
+      }
+      if (typeof button != 'undefined') {
+        msg = util.format(op10msg, (new Date()).toISOString(), canbus.candevice.address, hexByte(canbus.candevice.address), op10_key_code[button]);
+        // debug('Sending pgn: %s', msg);
+        canbus.sendPGN(msg)
+      }
+      delete button
+    });
+  break;
+}
+
+const commission_reply = {
+  'ffffff09010000ffffffff': 'ff,ff,ff,09,01,00,02,55,1b,ff,ff',
+  'ffffff09020000ffffffff': 'ff,ff,ff,09,02,00,02,ab,e4,ff,ff',
+  'ffffff180a0000ffffffff': 'ff,ff,ff,18,0a,00,02,00,ff,ff,ff',
+  'ffffff1a0d0000ffffffff': 'ff,ff,ff,1a,0d,00,02,69,00,ff,ff',
+  'ffffff190d0000ffffffff': 'ff,ff,ff,19,0d,00,02,45,00,ff,ff',
+  'ffffff1a0f0000ffffffff': 'ff,ff,ff,1a,0f,00,02,6f,00,ff,ff',
+  'ffffff190f0000ffffffff': 'ff,ff,ff,19,0f,00,02,49,00,ff,ff',
+  'ffffff1a0e0000ffffffff': 'ff,ff,ff,1a,0e,00,02,90,01,ff,ff',
+  'ffffff190e0000ffffffff': 'ff,ff,ff,19,0e,00,02,90,01,ff,ff',
+  'ffffff1a100000ffffffff': 'ff,ff,ff,1a,10,00,02,af,12,33,00',
+  'ffffff19100000ffffffff': 'ff,ff,ff,19,10,00,02,ad,cc,7f,00',
+  'ffffff18020000ffffffff': 'ff,ff,ff,18,02,00,02,00,00,ff,ff',
+  'ffffff1a110000ffffffff': 'ff,ff,ff,1a,11,00,02,08,ff,ff,ff',
+  'ffffff19110000ffffffff': 'ff,ff,ff,19,11,00,02,04,ff,ff,ff',
+  'ffffff1c110000ffffffff': 'ff,ff,ff,1c,11,00,02,04,ff,ff,ff',
+  'ffffff18060000ffffffff': 'ff,ff,ff,18,06,00,02,00,ff,ff,ff',
+  'ffffff14060000ffffffff': 'ff,ff,ff,14,06,00,02,00,00,ff,ff',
+  'ffffff14010000ffffffff': 'ff,ff,ff,14,01,00,02,27,ff,ff,ff',
+  'ffffff141d0000ffffffff': 'ff,ff,ff,14,1d,00,02,b0,04,ff,ff',
+  'ffffff1c010000ffffffff': 'ff,ff,ff,1c,01,00,02,74,14,ff,ff',
+  'ffffff1c020000ffffffff': 'ff,ff,ff,1c,02,00,02,74,14,ff,ff',
+  'ffffff1c080000ffffffff': 'ff,ff,ff,1c,08,00,02,78,00,ff,ff',
+  'ffffff180b0000ffffffff': 'ff,ff,ff,18,0b,00,02,1c,47,ff,ff',
+  'ffffff1c090000ffffffff': 'ff,ff,ff,1c,09,00,02,04,00,ff,ff',
+  'ffffff1b0c0000ffffffff': 'ff,ff,ff,1b,0c,00,02,d1,06,ff,ff',
+  'ffffff180c0000ffffffff': 'ff,ff,ff,18,0c,00,02,01,01,ff,ff',
+  'ffffff14090000ffffffff': 'ff,ff,ff,14,09,00,02,c1,0a,ff,ff',
+  'ffffff18090000ffffffff': 'ff,ff,ff,18,09,00,02,07,00,ff,ff',
+  'ffffff21090000ffffffff': 'ff,ff,ff,21,09,00,02,aa,c7,ff,ff',
+  'ffffff1f1b0000ffffffff': 'ff,ff,ff,1f,1b,00,02,d0,07,ff,ff',
+  'ffffff1f1a0000ffffffff': 'ff,ff,ff,1f,1a,00,02,d0,07,ff,ff',
+  'ffffff220b0000ffffffff': 'ff,ff,ff,22,b0,00,02,17,13,ff,ff',
+  'ffffff221a0000ffffffff': 'ff,ff,ff,22,1a,00,02,88,13,ff,ff',
+  'ffffff1e1a0000ffffffff': 'ff,ff,ff,1e,1a,00,02,88,13,ff,ff',
+  'fffffff200b000ffffffff': 'ff,ff,ff,20,0b,00,02,88,13,ff,ff',
+  'fffffff201b000ffffffff': 'ff,ff,ff,20,1b,00,02,d0,07,ff,ff',
+  'fffffff230d000ffffffff': 'ff,ff,ff,23,0d,00,02,05,ff,ff,ff',
+  'fffffff230b000ffffffff': 'ff,ff,ff,23,0b,00,02,00,00,ff,ff',
+  'fffffff040d000ffffffff': 'ff,ff,ff,04,0d,00,02,00,00,ff,ff',
+  'fffffff0901000ffffffff': 'ff,ff,ff,09,01,00,02,55,1d,ff,ff',
+  'fffffff0902000ffffffff': 'ff,ff,ff,09,02,00,02,ab,e4,ff,ff',
+  'fffffff0902000ffffffff': 'ff,ff,ff,09,02,00,02,ab,e4,ff,ff'
+
+
+  // 'ff64ff042d0000ffffffff': 'ff,64,ff,04,2d,00,02,a3,0d,ff,ff',
+  // 'ffffff06000000ffffffff': 'ff,ff,ff,06,00,00,02,00,00,ff,ff',
+  // 'ffffff100000ffffffffff': 'ff,ff,ff,10,00,02,ad,ac,7f,00,ff',
+  // 'ffffff14010000ffffffff': 'ff,ff,ff,14,01,00,02,27,ff,ff,ff',
+  // 'ffffff14010000ffffffff': 'ff,ff,ff,14,01,00,02,43,ff,ff,ff',
+  // 'ffffff140100011a000000': 'ff,ff,ff,14,01,00,02,1a,ff,ff,ff',
+  // 'ffffff14060000ffffffff': 'ff,ff,ff,14,06,00,02,57,00,ff,ff',
+  // 'ffffff14060000ffffffff': 'ff,ff,ff,14,06,00,02,ae,00,ff,ff',
+  // 'ffffff1406000100000000': 'ff,ff,ff,14,06,00,02,00,00,ff,ff',
+  // 'ffffff14090000ffffffff': 'ff,ff,ff,14,09,00,02,50,0a,00,00',
+  // 'ffffff14090001d00a0000': 'ff,ff,ff,14,09,00,02,d0,0a,00,00',
+  // 'ffffff141d0000ffffffff': 'ff,ff,ff,14,1d,00,02,b0,04,ff,ff',   // VRF
+  // 'ffffff141d000160090000': 'ff,ff,ff,14,1d,00,02,b0,04,ff,ff',   // VRF
+  // 'ffffff141d0001b0040000': 'ff,ff,ff,14,1d,00,02,b0,04,ff,ff',
+  // 'ffffff18020000ffffffff': 'ff,ff,ff,18,02,00,02,00,00,ff,ff',
+  // 'ffffff18060000ffffffff': 'ff,ff,ff,18,06,00,02,00,ff,ff,ff',
+  // 'ffffff18090000ffffffff': 'ff,ff,ff,18,09,00,02,01,00,ff,ff',
+  // 'ffffff18090000ffffffff': 'ff,ff,ff,18,09,00,02,07,00,ff,ff',
+  // 'ffffff180a0000ffffffff': 'ff,ff,ff,18,0a,00,02,00,ff,ff,ff',
+  // 'ffffff180a000100000000': 'ff,ff,ff,18,0a,00,02,00,ff,ff,ff',
+  // 'ffffff180a000100ffffff': 'ff,ff,ff,18,0a,00,01,02,00,ff,ff',
+// --- Sail [x]
+//  'ffffff180b0000ffffffff': 'ff,ff,ff,18,0b,00,02,1c,47,ff,ff',
+//  'ffffff180c0000ffffffff': 'ff,ff,ff,18,0c,00,02,2f,01,ff,ff',  // Transition speed 06
+//  'ffffff190d0000ffffffff': 'ff,ff,ff,19,0d,00,02,2d,00,ff,ff',
+//   'ffffff190d0000ffffffff': 'ff,ff,ff,19,0d,00,02,46,00,ff,ff',
+//   'ffffff190e0000ffffffff': 'ff,ff,ff,19,0e,00,02,90,01,ff,ff',
+//   'ffffff190e0000ffffffff': 'ff,ff,ff,19,0e,00,02,c8,00,ff,ff',
+//   'ffffff190f0000ffffffff': 'ff,ff,ff,19,0f,00,02,46,00,ff,ff',
+//   'ffffff190f0000ffffffff': 'ff,ff,ff,19,0f,00,02,64,00,ff,ff',
+//   'ffffff19100000ffffffff': 'ff,ff,ff,19,10,00,02,1e,33,55,00',
+//   'ffffff19100000ffffffff': 'ff,ff,ff,19,10,00,02,ab,1e,33,00',
+//   'ffffff19110000ffffffff': 'ff,ff,ff,19,11,00,02,01,ff,ff,ff',
+//   'ffffff19110000ffffffff': 'ff,ff,ff,19,11,00,02,04,ff,ff,ff',
+//   'ffffff1a0d0000ffffffff': 'ff,ff,ff,1a,0d,00,02,46,00,ff,ff',
+//   'ffffff1a0d0000ffffffff': 'ff,ff,ff,1a,0d,00,02,d7,00,ff,ff',
+//   'ffffff1a0e0000ffffffff': 'ff,ff,ff,1a,0e,00,02,90,01,ff,ff',
+//   'ffffff1a0e0000ffffffff': 'ff,ff,ff,1a,0e,00,02,c8,00,ff,ff',
+//   'ffffff1a0f0000ffffffff': 'ff,ff,ff,1a,0f,00,02,8c,00,ff,ff',
+//   'ffffff1a0f0000ffffffff': 'ff,ff,ff,1a,0f,00,02,de,00,ff,ff',
+//   'ffffff1a100000ffffffff': 'ff,ff,ff,1a,10,00,02,ab,1e,33,ff',
+//   'ffffff1a110000ffffffff': 'ff,ff,ff,1a,11,00,02,03,ff,ff,ff',
+//   'ffffff1a110000ffffffff': 'ff,ff,ff,1a,11,00,02,04,ff,ff,ff',
+//   'ffffff1b0c0000ffffffff': 'ff,ff,ff,1b,0c,00,02,d1,06,ff,ff',
+//   'ffffff1c010000ffffffff': 'ff,ff,ff,1c,01,00,02,74,14,ff,ff',
+//   'ffffff1c020000ffffffff': 'ff,ff,ff,1c,02,00,02,74,14,ff,ff',
+//   'ffffff1c080000ffffffff': 'ff,ff,ff,1c,08,00,02,78,00,ff,ff',
+//   'ffffff1c090000ffffffff': 'ff,ff,ff,1c,09,00,02,14,00,ff,ff',
+//   'ffffff1c110000ffffffff': 'ff,ff,ff,1c,11,00,02,01,ff,ff,ff',
+//   'ffffff1c110000ffffffff': 'ff,ff,ff,1c,11,00,02,04,ff,ff,ff',
+//   'ffffff1e1a0000ffffffff': 'ff,ff,ff,1e,1a,00,02,88,13,ff,ff',
+//   'ffffff1f1a0000ffffffff': 'ff,ff,ff,1f,1a,00,02,d0,07,ff,ff',
+//   'ffffff1f1b0000ffffffff': 'ff,ff,ff,1f,1b,00,02,d0,07,ff,ff',
+//   'ffffff200b0000ffffffff': 'ff,ff,ff,20,0b,00,02,17,13,ff,ff',
+//   'ffffff201b0000ffffffff': 'ff,ff,ff,20,1b,00,02,d0,07,ff,ff',
+//   'ffffff21190000ffffffff': 'ff,ff,ff,21,19,00,02,aa,c7,0c,00',
+//   'ffffff220b0000ffffffff': 'ff,ff,ff,22,0b,00,02,17,13,ff,ff',
+//   'ffffff221a0000ffffffff': 'ff,ff,ff,22,1a,00,02,88,13,ff,ff',
+//   'ffffff230b0000ffffffff': 'ff,ff,ff,23,0b,00,02,00,00,ff,ff',
+//   'ffffff230d0000ffffffff': 'ff,ff,ff,23,0d,00,02,05,ff,ff,ff',
+//   'ffffff3a000000ffffffff': 'ff,ff,ff,3a,00,00,02,00,00,ff,ff'
+//    // ffffff180a000100ffffff Sail
+//    // ffffff180a000101ffffff Outboard
+//    // ffffff180a000102ffffff Displacement
+//    // ffffff180a000103ffffff Planing
+}
+
 var heading;
 var heading_rad = 'ff,ff';
 var locked_heading;
@@ -35,12 +239,27 @@ var pgn130850 = [];
 var pilotmode126720 = [];
 var pgn129284 = [];
 var pgn130845 = [];
+var rudder_pgn_data = 'ff,f8,ff,ff,00,00,ff,ff';
+
+const op10msg = '%s,2,130850,%s,255,0c,41,9f,%s,ff,ff,%s,00,00,00,ff';
+
+const op10_key_code = {
+    "+1":      "02,ff,ff,02,0d,00,04",
+    "+10":     "02,ff,ff,02,0d,00,05",
+    "-1":      "02,ff,ff,02,0d,00,ff",
+    "-10":     "02,ff,ff,0a,06,00,00",
+    "auto":    "02,ff,ff,0a,09,00,00",
+    "mode":    "02,ff,ff,0a,0f,00,00",
+    "standby": "02,ff,ff,0a,1c,00,00",
+    "-1-10":   "",
+    "+1+10":   ""
+}
 
 // Raymarine setup
 const raymarine_state_command = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,%s,00,00,00,00,ff,ff,ff,ff,ff";
 const raymarine_state_code = {
     "standby":      "02,fd,00,00,00",
-    "auto":         "01,fe,00,00,00",
+    "headinghold":  "01,fe,00,00,00",  // Heading Hold
     "wind":         "23,dc,00,00,00",  // Windvane mode
     "navigation":   "03,fc,3c,42,00"   // Track mode
 }
@@ -50,9 +269,9 @@ const raymarine_key_code = {
     "+1":      "07,f8",
     "+10":     "08,f7",
     "-1":      "05,fa",
-    "-10":     "06,f9"
-    // "-1-10":   "21,de",
-    // "+1+10":   "22,dd"
+    "-10":     "06,f9",
+    "-1-10":   "21,de",
+    "+1+10":   "22,dd"
 }
 
 key_command     = "%s,7,126720,%s,%s,16,3b,9f,f0,81,86,21,%s,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff,ff,ff" // ok
@@ -96,7 +315,7 @@ function changeHeading(app, deviceid, command_json)
       new_value = new_value - 360
 
     debug(`current wind angle: ${radsToDeg(current)} new value: ${new_value}`)
-    command_format = wind_direction_command
+    command_format = wind_command
   }
   else
   {
@@ -162,7 +381,6 @@ async function PGN130822 () {
     "%s,3,130822,%s,255,0f,13,99,ff,01,00,0c,00,00,fc,13,6f,00,00,03,bb",
     "%s,3,130822,%s,255,0f,13,99,ff,01,00,0d,00,00,fc,13,25,00,00,74,be",
     "%s,3,130822,%s,255,0f,13,99,ff,01,00,0e,00,00,fc,13,25,00,00,74,be" ]
-
   for (var nr in messages) {
     msg = util.format(messages[nr], (new Date()).toISOString(), canbus.candevice.address)
     canbus.sendPGN(msg)
@@ -194,7 +412,14 @@ function AC12_PGN127250 () {
   canbus.sendPGN(msg)
 }
 
-function AC12_PGN127245 (rudder_pgn_data) {
+function AC12_PGN65341 () {
+  // B&G Wind target PGN
+  const message = "%s,6,65341,0,255,8,41,9f,ff,ff,03,ff,%s"
+  msg = util.format(message, (new Date()).toISOString(), canbus.candevice.address, wind_target_rad)
+  canbus.sendPGN(msg)
+}
+
+function AC12_PGN127245 () {
   const message = "%s,2,127245,%s,255,8,%s"
   msg = util.format(message, (new Date()).toISOString(), canbus.candevice.address, rudder_pgn_data)
   canbus.sendPGN(msg)
@@ -208,31 +433,35 @@ function AC12_PGN128275 (log_pgn_data) {
 
 function AC12_PGN127237 () {
   const heading_track_pgn = {
-      "auto":    "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,%s,00,%s,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,%s",
-      //"auto":    "%s,2,127237,%s,%s,15,ff,7c,ff,ff,7f,%s,00,%s,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s",
-      "NFU":     "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,%s,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s",
-      "wind":    "",
-      "route":   "",
-      //"standby": "%s,2,127237,%s,%s,15,ff,78,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,ff" // Magnetic
-      "standby": "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,ff,ff" // Magnetic
-      // "standby": "%s,2,127237,%s,%s,15,ff,3f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s" // True
+      "headinghold": "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,%s,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s",
+      "wind":        "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s",
+      "standby":     "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s" // Magnetic
+      // "standby":  "%s,2,127237,%s,%s,15,ff,3f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s" // True
   }
 
-  switch (pilot_state) {
-    case 'auto':
-    case 'NFU':
-      // var new_value = Math.trunc(degsToRad(heading) * 10000)
-      // var msg = util.format(heading_track_pgn[pilot_state], (new Date()).toISOString(), canbus.candevice.address,
-      //                      255, padd((new_value & 0xff).toString(16), 2), padd(((new_value >> 8) & 0xff).toString(16), 2))
-      var msg = util.format(heading_track_pgn[pilot_state], (new Date()).toISOString(), canbus.candevice.address,
-                            255, locked_heading_rad, locked_heading_rad, locked_heading_rad)
-      // debug('127237 (auto): %j', msg);
-      canbus.sendPGN(msg);
-      break;
-    case 'standby':
-      var msg = util.format(heading_track_pgn[pilot_state], (new Date()).toISOString(), canbus.candevice.address, 255, heading_rad)
-      // debug('127237 (standby): %j', msg);
-      canbus.sendPGN(msg);
+  if (ac12state == 'engaged') {
+    switch (ac12mode) {
+      case 'headinghold':
+        var msg = util.format(heading_track_pgn[ac12mode], (new Date()).toISOString(), canbus.candevice.address,255, locked_heading_rad, heading_rad)
+        break;
+      case 'wind':
+        var msg = util.format(heading_track_pgn[ac12mode], (new Date()).toISOString(), canbus.candevice.address,255, locked_heading_rad, heading_rad)
+        break;
+    }
+  } else {
+    var msg = util.format(heading_track_pgn[ac12state], (new Date()).toISOString(), canbus.candevice.address, 255, heading_rad)
+  }
+  canbus.sendPGN(msg);
+}
+
+async function OP10_PGN65305 () {
+  const messages = [
+    "%s,7,65305,%s,255,8,41,9f,01,0b,00,00,00,00",
+    "%s,7,65305,%s,255,8,41,9f,01,03,04,00,00,00" ]
+  for (var nr in messages) {
+    msg = util.format(messages[nr], (new Date()).toISOString(), canbus.candevice.address)
+    canbus.sendPGN(msg)
+    await sleep(25)
   }
 }
 
@@ -240,7 +469,6 @@ async function AP44_PGN65305 () {
   const messages = [
     "%s,7,65305,%s,255,8,41,9f,01,03,00,00,00,00",
     "%s,7,65305,%s,255,8,41,9f,01,0b,00,00,00,00" ]
-
   for (var nr in messages) {
     msg = util.format(messages[nr], (new Date()).toISOString(), canbus.candevice.address)
     canbus.sendPGN(msg)
@@ -332,6 +560,11 @@ async function AP44_bootconfig () {
 
 async function AC12_bootconfig () {
   const messages = [
+    "%s,2,130845,%s,%s,0e,41,9f,fe,ff,ff,ff,18,09,00,01,07,00,ff,ff,ff",
+    "%s,2,130845,%s,%s,0e,41,9f,ff,ff,01,ff,07,45,00,01,36,08,2b,01,ff",
+    "%s,2,130845,%s,%s,0e,41,9f,ff,00,01,ff,07,44,00,01,8b,b5,0a,00,ff",
+    "%s,2,130845,%s,%s,0e,41,9f,ff,00,01,ff,07,43,00,01,71,44,54,00,ff"
+/*
     "%s,3,130840,%s,%s,11,41,9f,ff,00,01,02,ff,09,3f,04,34,e8,00,a0,50,c0,ff",
     "%s,3,130840,%s,%s,11,41,9f,ff,05,01,fe,ff,03,ac,fb,e3,10,00,82,78,c0,ff",
     "%s,3,130840,%s,%s,11,41,9f,ff,02,01,7f,ff,03,d1,15,80,11,00,91,78,c0,ff",
@@ -351,7 +584,9 @@ async function AC12_bootconfig () {
     "%s,3,130840,%s,%s,11,41,9f,ff,38,64,01,ff,32,e1,b9,3a,e8,00,96,50,c0,ff",
     "%s,3,130840,%s,%s,11,41,9f,ff,38,64,01,ff,32,e1,b9,3a,e8,00,96,50,c0,ff",
     "%s,3,130840,%s,%s,11,41,9f,ff,6a,64,fe,ff,ff,6c,5f,b3,2f,00,8c,50,c0,ff",
-    "%s,3,130840,%s,%s,11,41,9f,ff,6a,64,fe,ff,ff,6c,5f,b3,2f,00,8c,50,c0,ff" ]
+    "%s,3,130840,%s,%s,11,41,9f,ff,6a,64,fe,ff,ff,6c,5f,b3,2f,00,8c,50,c0,ff"
+  */
+  ]
   for (var nr in messages) {
     msg = util.format(messages[nr], (new Date()).toISOString(), canbus.candevice.address)
     canbus.sendPGN(msg)
@@ -360,25 +595,43 @@ async function AC12_bootconfig () {
 }
 
 async function AC12_PGN65340 () {
+  // Valid options:
+
+  // Standby
+  // 3,65340,2,255,8,41,9f,00,00,fe,f8,00,80
+  // 7,65302,2,255,8,41,9f,0a,6b,00,00,00,ff
+
+  // headinghold
+  // 3,65340,2,255,8,41,9f,10,01,fe,fa,00,80
+  // 7,65302,2,255,8,41,9f,0a,69,00,00,28,ff
+
+  // 3,65340,2,255,8,41,9f,10,03,fe,fa,00,80
+  // 7,65302,2,255,8,41,9f,0a,69,00,00,30,ff
+  //
+/*
+3,65340,2,255,8,41,9f,00,00,fe,f8,00,80
+3,65340,2,255,8,41,9f,00,00,fe,f9,00,80
+3,65340,2,255,8,41,9f,10,01,fe,fa,00,80
+3,65340,2,255,8,41,9f,10,03,fe,fa,00,80
+*/
+
   const pgn65340 = {
       "standby":     "%s,3,65340,%s,255,8,41,9f,00,00,fe,f8,00,80",
-      "auto":        "%s,3,65340,%s,255,8,41,9f,10,01,fe,fa,00,80",
-      "NFU":         "%s,3,65340,%s,255,8,41,9f,10,02,fe,fa,00,80",
+      "headinghold": "%s,3,65340,%s,255,8,41,9f,10,01,fe,fa,00,80", // Heading Hold
+      "followup":    "%s,3,65340,%s,255,8,41,9f,10,03,fe,fa,00,80", // Follow up
       "wind":        "%s,3,65340,%s,255,8,41,9f,10,03,fe,fa,00,80",
-      "navigation":  "%s,3,65340,%s,255,8,41,9f,10,06,fe,fa,00,80",
-      "followup":    "%s,3,65340,%s,255,8,41,9f,10,04,fe,fa,00,80"
+      "navigation":  "%s,3,65340,%s,255,8,41,9f,10,06,fe,f8,00,80"
   }
   const pgn65302 = {
       "standby":    "%s,7,65302,%s,255,8,41,9f,0a,6b,00,00,00,ff",
-      "auto":       "%s,7,65302,%s,255,8,41,9f,0a,4b,00,00,00,ff",
-      "NFU":        "%s,7,65302,%s,255,8,41,9f,0a,69,00,00,28,ff",
-      "wind":       "%s,7,65302,%s,255,8,41,9f,0a,69,00,00,00,ff", // guessing
-      "followup":   "%s,7,65302,%s,255,8,41,9f,0a,0b,00,00,00,ff", // guessing
-      "navigation": "%s,7,65302,%s,255,8,41,9f,0a,2b,00,00,00,ff"  // guessing
+      "headinghold":"%s,7,65302,%s,255,8,41,9f,0a,69,00,00,28,ff", // Heading Hold
+      "followup":   "%s,7,65302,%s,255,8,41,9f,0a,69,00,00,30,ff", // Follow up
+      "wind":       "%s,7,65302,%s,255,8,41,9f,0a,69,00,00,30,ff",
+      "navigation": "%s,7,65302,%s,255,8,41,9f,0a,6b,00,00,28,ff"  // guessing
   }
   const messages = [
-    pgn65340[pilot_state],
-    pgn65302[pilot_state] ]
+    pgn65340[ac12mode],
+    pgn65302[ac12mode] ]
 
   for (var nr in messages) {
     msg = util.format(messages[nr], (new Date()).toISOString(), canbus.candevice.address)
@@ -409,52 +662,101 @@ async function AC12_PGN65341_5s () {
 function AC12_PGN65341_02 () {
   const pgn65341_02 = {
       "auto":       "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,15,9a",
-      "NFU":        "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,00,00",
+      "headinghold":"%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,00,00",
       "wind":       "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,00,00",
-      "navigation": "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,12,9a", // guess
+      "navigation": "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,12,00", // guess
       "followup":   "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,14,9a", // guess
       "standby":    "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,ff,ff"
   }
-  msg = util.format(pgn65341_02[pilot_state], (new Date()).toISOString(), canbus.candevice.address)
+  msg = util.format(pgn65341_02[ac12mode], (new Date()).toISOString(), canbus.candevice.address)
   canbus.sendPGN(msg)
 }
 
 async function AC12_PGN65305 () {
-  switch (pilot_state) {
-    case 'standby':
+  /*
+    Determines what's shown as mode on B&G plotter.
+    41,9f,00,1d determines mode
+    41,9f,00,0[0a] determines state (standby/engaged)
+  */
+
+  debug('AC12 mode: %s  state: %s', ac12mode, ac12state);
+
+  if (ac12state == 'standby') {
+    switch (ac12mode) {
+      case 'headinghold':
         messages = [
-          "%s,7,65305,%s,255,8,41,9f,00,02,02,00,00,00",
-          "%s,7,65305,%s,255,8,41,9f,00,0a,0a,00,80,00" ];
+          // "%s,7,65305,%s,255,8,41,9f,00,02,02,00,00,00",
+          "%s,7,65305,%s,255,8,41,9f,00,0a,0a,00,00,00" ]
         break;
-    case 'auto':
+      case 'wind':
+          messages = [
+          // "%s,7,65305,%s,255,8,41,9f,00,02,02,00,00,00",
+          "%s,7,65305,%s,255,8,41,9f,00,0a,1e,00,00,00" ]
+        break;
+      case 'followup': // unknown
         messages = [
-          "%s,7,65305,%s,255,8,41,9f,00,1d,01,00,00,00",
-          "%s,7,65305,%s,255,8,41,9f,00,1d,81,00,00,00",
-          "%s,7,65305,%s,255,8,41,9f,00,0a,14,00,80,00",
-          "%s,7,65305,%s,255,8,41,9f,00,02,10,00,00,00" ];
+          // "%s,7,65305,%s,255,8,41,9f,00,02,02,00,00,00",
+          "%s,7,65305,%s,255,8,41,9f,00,0a,0e,00,80,00" ]
         break;
-    case 'navigation': // unknown
-      messages = [
-        "%s,7,65305,%s,255,8,41,9f,00,1d,80,00,00,00",
-        "%s,7,65305,%s,255,8,41,9f,00,05,10,00,00,00",
-        "%s,7,65305,%s,255,8,41,9f,00,0a,0c,00,80,00" ];
-        break;
-    case 'wind': // unknown
-      messages = [
-        "%s,7,65305,%s,255,8,41,9f,00,1d,80,00,00,00",
-        "%s,7,65305,%s,255,8,41,9f,00,03,10,00,00,00",
-        "%s,7,65305,%s,255,8,41,9f,00,0a,0c,00,80,00" ];
-        break;
-    case 'NFU':
+      case 'navigation': // unknown
         messages = [
-          "%s,7,65305,%s,255,8,41,9f,00,1d,80,00,00,00",
-          "%s,7,65305,%s,255,8,41,9f,00,02,10,00,00,00",
-          "%s,7,65305,%s,255,8,41,9f,00,0a,0c,00,80,00" ];
+          // "%s,7,65305,%s,255,8,41,9f,00,02,02,00,00,00",
+          "%s,7,65305,%s,255,8,41,9f,00,0a,0a,00,80,00" ]
         break;
+      case 'nodrift': 
+        messages = [
+          // "%s,7,65305,%s,255,8,41,9f,00,02,02,00,00,00",
+          "%s,7,65305,%s,255,8,41,9f,00,0a,0c,00,80,00" ]
+        break;
+      case 'nonfollowup': // unknown
+        messages = [
+          // "%s,7,65305,%s,255,8,41,9f,00,02,02,00,00,00",
+          "%s,7,65305,%s,255,8,41,9f,00,0a,14,00,80,00" ]
+        break;
+    }
+  } else if (ac12state == 'engaged') {
+    switch (ac12mode) {
+      case 'headinghold':
+        messages = [
+          // "%s,7,65305,%s,255,8,41,9f,00,02,10,00,00,00",
+          "%s,7,65305,%s,255,8,41,9f,00,0a,16,00,00,00" ]
+        break;
+      case 'wind':
+        messages = [
+          // "%s,7,65305,%s,255,8,41,9f,00,02,10,00,00,00",
+          "%s,7,65305,%s,255,8,41,9f,00,0a,06,04,00,00" ]
+        break;
+      case 'followup':
+        messages = [
+          // "%s,7,65305,%s,255,8,41,9f,00,02,10,00,00,00",
+          "%s,7,65305,%s,255,8,41,9f,00,0a,1e,00,80,00" ]
+        break;
+      case 'nodrift':
+        messages = [
+          // "%s,7,65305,%s,255,8,41,9f,00,02,10,00,00,00",
+          "%s,7,65305,%s,255,8,41,9f,00,0a,16,01,00,00" ]
+        break;
+      case 'navigation': // unknown
+        messages = [
+          // "%s,7,65305,%s,255,8,41,9f,00,02,10,00,00,00",
+          "%s,7,65305,%s,255,8,41,9f,00,0a,10,00,00,00" ]
+        break;
+      case 'nonfollowup':  // unknown
+        messages = [
+          // "%s,7,65305,%s,255,8,41,9f,00,02,10,00,00,00",
+          "%s,7,65305,%s,255,8,41,9f,00,0a,14,00,80,00" ]
+        break;
+    }
   }
-  for (var nr in messages) {
-    msg = util.format(messages[nr], (new Date()).toISOString(), canbus.candevice.address)
+  for (var message in messages) {
+    msg = util.format(messages[message], (new Date()).toISOString(), canbus.candevice.address)
     canbus.sendPGN(msg)
+    msg = msg.replace(/.*255,8,41,9f,00,/, '');
+    msgbin = "";
+    msg.split(",").forEach(str => {
+      msgbin += hex2bin(str) + " "
+    });
+    // debug('Sending PGN 65305: %s %s', msg, msgbin);
     await sleep(25)
   }
 }
@@ -464,6 +766,12 @@ async function AC12_PGN65305 () {
 switch (emulate) {
   case 'default':
       setTimeout(PGN130822, 5000) // Once at startup
+  case 'OP10keypad':
+      debug('Emulate: B&G OP10 Keypad')
+      setInterval(PGN130822, 300000) // Every 5 minutes
+      setInterval(OP10_PGN65305, 1000) // unsure
+      setInterval(heartbeat, 60000) // Heart beat PGN
+      break;
   case 'keypad':
       debug('Emulate: B&G Triton2 Keypad')
       setInterval(PGN130822, 300000) // Every 5 minutes
@@ -471,21 +779,22 @@ switch (emulate) {
       break;
 	case 'AP44':
 	    debug('Emulate: Simrad AP44 Autopilot controller')
-      setTimeout(AP44_bootconfig, 5000) // Once at startup
+      // setTimeout(AP44_bootconfig, 5000) // Once at startup
       setInterval(PGN130822, 300000) // Every 5 minutes
       setInterval(AP44_PGN65305, 1000) // Every 1 minute
       setInterval(heartbeat, 60000) // Heart beat PGN
 	    break;
 	case 'AC12':
 	    debug('Emulate: Simrad AC12 Autopilot')
-      // setTimeout(AC12_bootconfig, 5000) // Once at startup
+      setTimeout(AC12_bootconfig, 5000) // Once at startup
       setInterval(PGN130822, 300000) // Every 5 minutes
-      setInterval(AC12_PGN65340, 1000) // Every second
+      // setInterval(AC12_PGN65340, 1000) // Every second
       setInterval(AC12_PGN65341_02, 5000) // Every 5 second
-      setInterval(AC12_PGN65341_1s, 1000) // Every second
+      // setInterval(AC12_PGN65341_1s, 1000) // Every second
       setInterval(AC12_PGN65341_5s, 5000) // Every 5 seconds
       setInterval(AC12_PGN65305, 1000)
-      setInterval(AC12_PGN130860, 1000) // Every second
+      setInterval(AC12_PGN127245, 200); // Every 200ms
+      // setInterval(AC12_PGN130860, 1000) // Every second
       setInterval(heartbeat, 60000) // Heart beat PGN
       setInterval(AC12_PGN127237, 500) // Heading/track PGN
       setInterval(AC12_PGN127250, 500) // True heading
@@ -509,15 +818,18 @@ function mainLoop () {
         canbus.candevice.n2kMessage(msg.pgn);
       }
       switch (emulate) {
+        case 'op10keypad':
+          
+          break;
         case 'AC12':
-          if (msg.pgn.pgn == 130850) { // Simnet Event, requires reply
+          if (msg.pgn.pgn == 130850 || typeof key_button !== 'undefined' || typeof state_button !== 'undefined') { // Button or Simnet Event, requires reply
             pgn130850 = pgn130850.concat(buf2hex(msg.data).slice(1)); // Skip multipart byte
             PGN130850 = pgn130850.join(',');
             if (!PGN130850.match(/^..,41,9f,..,ff,ff,/)) {
               pgn130850 = [];
             }
 
-            if (pgn130850.length > 8) { // We have 2 parts now
+            if (pgn130850.length > 8 || typeof key_button !== 'undefined' || typeof state_button !== 'undefined') { // We have 2 parts now or a button
               debug ('Event AP command: %j %s', msg.pgn, PGN130850);
 
               // B&G autopilot button matching
@@ -534,19 +846,38 @@ function mainLoop () {
               } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,1a,00,03,d1,06/)) { // +10
                 key_button = "+10";
                 debug('B&G button press +10');
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,1a,00,02,5b,3d/)) { // Tack Starboard
+                key_button = "+1+10";
+                debug('B&G button press tack > starboard');
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,1a,00,03,5b,3d/)) { // Tack Port
+                key_button = "-1-10";
+                debug('B&G button press tack < port');
               } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,06,00,ff,ff,ff/)) { // Standby
                 state_button = "standby";
-              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,0e,00,ff,ff,ff/)) { // Wind
-                state_button = "wind";
-              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,0a,00,ff,ff,ff/)) { // Route/navigation
-                state_button = "navigation";
-              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,09,00,ff,ff,ff/)) { // Auto
-                state_button = "auto";
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,0e,00,ff,ff,ff/)) {
+                ac12mode = "navigation";
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,0f,00,ff,ff,ff/)) {
+                ac12mode = "wind";
+                debug('B&G mode now %s', ac12mode);
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,10,00,ff,ff,ff/)) {
+                ac12mode = "windnavigation";
+                debug('B&G mode now %s', ac12mode);
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,0c,00,ff,ff,ff/)) {
+                ac12mode = "nodrift";
+                debug('B&G mode now %s', ac12mode);
+              // } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,09,00,ff,ff,ff/)) { // Heading Hold
+                // ac12mode = "headinghold";
+                // debug('B&G mode now %s', ac12mode);
+              } else if (PGN130850.match(/^0c,41,9f,..,ff,ff,..,09,00,ff,ff,ff/)) { // Engage
+                state_button = "engage";
+                debug('B&G engaging mode %s', ac12mode);
 
               // Clear 'No Autopilot' alarm?
               } else if (PGN130850.match(/41,9f,ff,ff,ff,1f,51,00,c4,49,29/)) {
                 pgn130851.replace(',51,', ',52,');
               }
+
+              debug('AC12 mode: %s  state: %s', ac12mode, ac12state);
 
               // Send Seatalk Button
               if (typeof key_button != 'undefined' && key_button) {
@@ -558,12 +889,40 @@ function mainLoop () {
               }
               // Send Seatalk State button
               if (typeof state_button != 'undefined' && state_button) {
-                  debug('B&G button press %s', state_button);
-                  pgn126720 = util.format(raymarine_state_command, (new Date()).toISOString(), canbus.candevice.address, autopilot_dst, raymarine_state_code[state_button]);
-                  debug('Sending Seatalk key state pgn 126720 %j', pgn126720);
-                  canbus.sendPGN(pgn126720);
-                  delete state_button;
+                  if (state_button == 'engage') {
+                    debug('B&G button Engage pressed. Engaging mode %s', ac12mode)
+                    pgn126720 = util.format(raymarine_state_command, (new Date()).toISOString(), canbus.candevice.address, autopilot_dst, raymarine_state_code[ac12mode]);
+                    debug('Sending Seatalk key state pgn 126720 %j', pgn126720);
+                    canbus.sendPGN(pgn126720);
+                  } else if (state_button == 'headinghold') {
+                    debug('B&G button Engage pressed. Engaging mode %s', ac12mode)
+                    pgn126720 = util.format(raymarine_state_command, (new Date()).toISOString(), canbus.candevice.address, autopilot_dst, raymarine_state_code['headinghold']);
+                    debug('Sending Seatalk key state pgn 126720 %j', pgn126720);
+                    canbus.sendPGN(pgn126720);
+                  } else if (state_button == 'wind') {
+                    debug('B&G button Standby pressed. Wind in mode %s', ac12mode)
+                    pgn126720 = util.format(raymarine_state_command, (new Date()).toISOString(), canbus.candevice.address, autopilot_dst, raymarine_state_code['wind']);
+                    debug('Sending Seatalk key state pgn 126720 %j', pgn126720);
+                    canbus.sendPGN(pgn126720);
+                  } else if (state_button == 'nodrift') {
+                    debug('B&G button NoDrift pressed.', ac12mode)
+                    pgn126720 = util.format(raymarine_state_command, (new Date()).toISOString(), canbus.candevice.address, autopilot_dst, raymarine_state_code['headinghold']);
+                    debug('Sending Seatalk key state pgn 126720 %j', pgn126720);
+                    canbus.sendPGN(pgn126720);
+                  } else if (state_button == 'navigation') {
+                    debug('B&G button Navigation pressed. Navigation in mode %s', ac12mode)
+                    pgn126720 = util.format(raymarine_state_command, (new Date()).toISOString(), canbus.candevice.address, autopilot_dst, raymarine_state_code['navigation']);
+                    debug('Sending Seatalk key state pgn 126720 %j', pgn126720);
+                    canbus.sendPGN(pgn126720);
+                  } else if (state_button == 'standby') {
+                    debug('B&G button Standby pressed. Standby in mode %s', ac12mode)
+                    pgn126720 = util.format(raymarine_state_command, (new Date()).toISOString(), canbus.candevice.address, autopilot_dst, raymarine_state_code['standby']);
+                    debug('Sending Seatalk key state pgn 126720 %j', pgn126720);
+                    canbus.sendPGN(pgn126720);
+                  }
               }
+              delete state_button;
+              delete key_button;
 
               // Send 130851 reply packet
               pgn130851_size = pgn130850[0];
@@ -579,36 +938,60 @@ function mainLoop () {
             // 16,3b,9f,f0,81
             pilotmode126720 = pilotmode126720.concat(buf2hex(msg.data).slice(1)); // Skip multipart byte
             Seatalkmode = pilotmode126720.join(',');
-            if (!Seatalkmode.match(/^16,3b,9f,f0,81,84/)) {
+            if (!Seatalkmode.match(/^16,3b,9f,f0,81/)) {
               pilotmode126720 = [];
             }
             if (pilotmode126720.length > 24) { // We have 4 parts now
+              // debug('Seatalk pilot mode: %s', Seatalkmode)
               if (Seatalkmode.match(/16,3b,9f,f0,81,84,..,..,..,42,/)) {
                 if (pilot_state != 'auto') {
-                  debug('Following Seatalk1 pilot mode auto: %s', Seatalkmode);
+                  debug('Following Seatalk1 pilot mode heading hold engaged: %s', Seatalkmode);
                   pilot_state = 'auto';
+                  ac12mode = 'headinghold';
+                  ac12state = 'engaged';
                   AC12_PGN65341_02();
+                  debug('Raymarine mode: %s  AC12 mode: %s  state: %s', pilot_state, ac12mode, ac12state);
                 }
               } else if (Seatalkmode.match(/16,3b,9f,f0,81,84,..,..,..,46,/)) {
                 if (pilot_state != 'wind') {
                   debug('Following Seatalk1 pilot mode wind: %s', Seatalkmode);
                   pilot_state = 'wind';
+                  ac12mode = 'wind';
+                  ac12state = 'engaged';
                   AC12_PGN65341_02();
+                  debug('Raymarine mode: %s  AC12 mode: %s  state: %s', pilot_state, ac12mode, ac12state);
                 }
+              } else if (Seatalkmode.match(/16,3b,9f,f0,81,7f/)) {
+                // Get wind target from Seatalk1 packet
+                // debug ('Seatalk1 Pilot wind target info: %j', Seatalkmode);
+                wind_target_rad = Seatalkmode.substr(part,5);
+                var wind_target_rad_1 = wind_target_rad.substr(0,2);
+                var wind_target_rad_2 = wind_target_rad.substr(3,2);
+               
+                if (part > 100) { part = 0 }
+                wind_target_deg = radsToDeg(parseInt('0x' + wind_target_rad_2 + wind_target_rad_1))/10000;
+                // debug('pos: %s wind_target_rad: %s,%s  wind_target_deg: %s', part, wind_target_rad_1, wind_target_rad_2, wind_target_deg)
+                debug ('wind target: %j %s %s', Seatalkmode, wind_target_rad, wind_target_deg);
+                // AC12_PGN65341();
               } else if (Seatalkmode.match(/16,3b,9f,f0,81,84,..,..,..,4[08],/) || Seatalkmode.match(/16,3b,9f,f0,81,84,..,..,..,44,/) ) {
                 if (pilot_state != 'standby') {
                   debug('Following Seatalk1 pilot mode standby: %s', Seatalkmode);
                   pilot_state = 'standby'
+                  ac12state = 'standby';
                   AC12_PGN65341_02();
+                  debug('Raymarine mode: %s  AC12 mode: %s  state: %s', pilot_state, ac12mode, ac12state);
                 }
               } else if (Seatalkmode.match(/16,3b,9f,f0,81,84,..,..,..,4a,/) || Seatalkmode.match(/16,3b,9f,f0,81,84,..,..,..,44,/) ) {
                 if (pilot_state != 'navigation') {
                   debug('Following Seatalk1 pilot mode route (navigation): %s', Seatalkmode);
                   pilot_state = 'navigation'
+                  ac12mode = 'navigation';
+                  ac12state = 'engaged';
                   AC12_PGN65341_02();
+                  debug('Raymarine mode: %s  AC12 mode: %s  state: %s', pilot_state, ac12mode, ac12state);
                 }
               }
-              pilotmode126720=[];
+              pilotmode126720=[]
             }
 
           } else if (msg.pgn.pgn == 65359) {
@@ -624,9 +1007,10 @@ function mainLoop () {
             }
             heading = radsToDeg(parseInt('0x' + heading_rad[1] + heading_rad[0]))/10000
             // debug('heading: %s', heading)
+
           } else if (msg.pgn.pgn == 65360) {
           // Get locked heading from Seatalk1 packet
-            debug ('Seatalk1 Pilot locked heading info: %j %j', msg.pgn, msg.data);
+            // debug ('Seatalk1 Pilot locked heading info: %j %j', msg.pgn, msg.data);
             var locked_heading_true_rad = buf2hex(msg.data).slice(3,5);
             var locked_heading_mag_rad = buf2hex(msg.data).slice(5,7);
             // debug ("heading_true_rad: %s heading_mag_rad: %s", heading_true_rad, heading_mag_rad);
@@ -636,13 +1020,17 @@ function mainLoop () {
               locked_heading_rad = locked_heading_mag_rad
             }
             locked_heading = radsToDeg(parseInt('0x' + locked_heading_rad[1] + locked_heading_rad[0]))/10000;
-            debug('locked heading: %s', locked_heading)
-
+            // debug('locked heading: %s', locked_heading)
 
           } else if (msg.pgn.pgn == 127245 && msg.pgn.src == 115) {
           // Get rudder angle info from Seatalk1 packet
             rudder_pgn_data = buf2hex(msg.data);
-            AC12_PGN127245(rudder_pgn_data);
+            rudder_pgn_data[1] = 'ff';
+            rudder_pgn_data[3] = rudder_pgn_data[5];
+            rudder_pgn_data[4] = rudder_pgn_data[4];
+            // rudder_pgn_data[5] = '0a';
+            // 2,127245,2,255,8,ff,ff,ff,7f,ff,7f,ff,ff
+            // rudder_pgn_data =  'ff,ff,90,f8,90,f8,ff,ff';
           } else if (msg.pgn.pgn == 128275 && msg.pgn.src == 115) {
           // Get distance log info from Seatalk1 packet
             AC12_PGN128275(buf2hex(msg.data));
@@ -663,14 +1051,28 @@ function mainLoop () {
               pgn130845 = pgn130845.concat(buf2hex(msg.data).slice(1)); // Skip multipart byte
               PGN130845 = pgn130845.join(',');
               if (!PGN130845.match(/^0e,41,9f/)) {
+                debug('PGN130845 not ok: %s', PGN130845);
                 pgn130845 = [];
               }
-              if (pgn130845.length > 16) { // We have 3 parts now
-                // debug('PGN130845: %s', PGN130845)
-                PGN130845 = "%s,3,130845,%s,255," + PGN130845;
-                PGN130845 = util.format(PGN130845, (new Date()).toISOString(), canbus.candevice.address)
-                debug('Sending PGN130845: %s', PGN130845)
-                canbus.sendPGN(PGN130845)
+              if (pgn130845.length > 14) { // We have 3 parts now
+                debug('PGN130845 request: %s', PGN130845);
+                // PGN130845 = PGN130845.replace(/,/g,'').substring(0,30);
+                PGN130845_1 = PGN130845.replace(/,/g,'').substring(0,8);
+                PGN130845_2 = PGN130845.replace(/,/g,'').substring(8,30);
+                PGN130845 = PGN130845.substring(0,12);
+                debug('PGN130845_1: %s', PGN130845_1);
+                debug('PGN130845_2: %s', PGN130845_2);
+                PGN130845_2 = commission_reply[PGN130845_2];
+                if (PGN130845_2 === undefined) {
+                  debug('PGN130845 reply  : not found');
+                } else {
+                  PGN130845 = PGN130845 + PGN130845_2;
+                  debug('PGN130845 reply  : %s', PGN130845);
+                  PGN130845 = "%s,3,130845,%s,255," + PGN130845;
+                  PGN130845 = util.format(PGN130845, (new Date()).toISOString(), canbus.candevice.address)
+                  // debug('Sending PGN130845: %s', PGN130845)
+                  canbus.sendPGN(PGN130845)
+                }
                 pgn130845 = [];
               }
             }
