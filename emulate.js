@@ -116,10 +116,15 @@ switch (emulate) {
   break;
 }
 
-const commission_reply = {
+var commission_reply = {
+  'ffffff180a0000ffffffff': 'ff,ff,ff,18,0a,00,02,00,ff,ff,ff', // <- Boat type: (00=Sail, 01=Outboard, 02=Displacement, 03=Planing)
+  'ff64ff042d0000ffffffff': 'ff,64,ff,04,2d,00,02,a3,0d,ff,ff',
+  'ffffff042d0000ffffffff': 'ff,ff,ff,04,2d,00,02,a3,0d,ff,ff',
+  'ffffff3a000000ffffffff': 'ff,ff,ff,3a,00,00,02,00,00,ff,ff', // <- added
+  'ffffff06000000ffffffff': 'ff,ff,ff,06,00,00,02,00,00,ff,ff', // <- added
+  'ffffff100000ffffffffff': 'ff,ff,ff,10,00,02,ad,ac,7f,00,ff', // <- added
   'ffffff09010000ffffffff': 'ff,ff,ff,09,01,00,02,55,1b,ff,ff',
   'ffffff09020000ffffffff': 'ff,ff,ff,09,02,00,02,ab,e4,ff,ff',
-  'ffffff180a0000ffffffff': 'ff,ff,ff,18,0a,00,02,00,ff,ff,ff',
   'ffffff1a0d0000ffffffff': 'ff,ff,ff,1a,0d,00,02,69,00,ff,ff',
   'ffffff190d0000ffffffff': 'ff,ff,ff,19,0d,00,02,45,00,ff,ff',
   'ffffff1a0f0000ffffffff': 'ff,ff,ff,1a,0f,00,02,6f,00,ff,ff',
@@ -133,14 +138,31 @@ const commission_reply = {
   'ffffff19110000ffffffff': 'ff,ff,ff,19,11,00,02,04,ff,ff,ff',
   'ffffff1c110000ffffffff': 'ff,ff,ff,1c,11,00,02,04,ff,ff,ff',
   'ffffff18060000ffffffff': 'ff,ff,ff,18,06,00,02,00,ff,ff,ff',
+  'ffffff09020000ffffffff': 'ff,ff,ff,09,02,00,02,ab,e4,ff,ff', // only in Aurora
+  // 'ffffff180a0000ffffffff': 'ff,ff,ff,18,0a,00,02,01,ff,ff,ff',  
+  'ffffff190d0000ffffffff': 'ff,ff,ff,19,0d,00,02,45,00,ff,ff',  // AutoSteer Low Rudder
+  'ffffff190f0000ffffffff': 'ff,ff,ff,19,0f,00,02,49,00,ff,ff',  // AutoSteer Low Counter rudder
+  'ffffff190e0000ffffffff': 'ff,ff,ff,19,0e,00,02,90,01,ff,ff',  // AutoSteer Low Auto trim
+  'ffffff19100000ffffffff': 'ff,ff,ff,19,10,00,02,ad,cc,7f,00',  // AutoSteer Low Rate limit
+  'ffffff1a0d0000ffffffff': 'ff,ff,ff,1a,0d,00,02,69,00,ff,ff',  // AutoSteer High Rudder
+  'ffffff1a0f0000ffffffff': 'ff,ff,ff,1a,0f,00,02,6f,00,ff,ff',  // AutoSteer High Counter rudder
+  'ffffff1a0e0000ffffffff': 'ff,ff,ff,1a,0e,00,02,90,01,ff,ff',  // AutoSteer High Auto trim
+  'ffffff1a100000ffffffff': 'ff,ff,ff,1a,10,00,02,af,12,33,00',  // AutoSteer High Rate limit
+  'ffffff18020000ffffffff': 'ff,ff,ff,18,02,00,02,00,00,ff,ff',
+  'ffffff19110000ffffffff': 'ff,ff,ff,19,11,00,02,04,ff,ff,ff', // Mode High  -> Low
+  'ffffff1a110000ffffffff': 'ff,ff,ff,1a,11,00,02,08,ff,ff,ff', // Mode High  -> High
+  'ffffff1c110000ffffffff': 'ff,ff,ff,1c,11,00,02,04,ff,ff,ff', // Mode High  -> Wind
+  'ffffff18060000ffffffff': 'ff,ff,ff,18,06,00,02,01,ff,ff,ff', // Sea state filter (00 = off, 01 = auto, 02 manual)
+  'ffffff180c0000ffffffff': 'ff,ff,ff,18,0c,00,02,01,01,ff,ff', // Transition speed automatic steering 18,0c,00,01,01,01
+  'ffffff14000000ffffffff': 'ff,ff,ff,14,00,00,02,00,00,ff,ff', // Rudder drive -> High Voltage
   'ffffff14060000ffffffff': 'ff,ff,ff,14,06,00,02,00,00,ff,ff',
-  'ffffff14010000ffffffff': 'ff,ff,ff,14,01,00,02,27,ff,ff,ff',
-  'ffffff141d0000ffffffff': 'ff,ff,ff,14,1d,00,02,b0,04,ff,ff',
+  'ffffff14010000ffffffff': 'ff,ff,ff,14,01,00,02,27,ff,ff,ff', // Rudder drive ->
+  'ffffff141d0000ffffffff': 'ff,ff,ff,14,1d,00,02,b0,04,ff,ff', // Rudder drive -> Voltage (12=60,09 24=b0,04)
   'ffffff1c010000ffffffff': 'ff,ff,ff,1c,01,00,02,74,14,ff,ff',
   'ffffff1c020000ffffffff': 'ff,ff,ff,1c,02,00,02,74,14,ff,ff',
-  'ffffff1c080000ffffffff': 'ff,ff,ff,1c,08,00,02,78,00,ff,ff',
-  'ffffff180b0000ffffffff': 'ff,ff,ff,18,0b,00,02,1c,47,ff,ff',
-  'ffffff1c090000ffffffff': 'ff,ff,ff,1c,09,00,02,04,00,ff,ff',
+  'ffffff1c080000ffffffff': 'ff,ff,ff,1c,08,00,02,78,00,ff,ff',  // Sailing -> Tack time
+  'ffffff180b0000ffffffff': 'ff,ff,ff,18,0b,00,02,1c,47,ff,ff',  // Sailing -> Tack angle
+  'ffffff1c090000ffffffff': 'ff,ff,ff,1c,09,00,02,11,00,ff,ff',  // Sailing -> Wind function LAYLINE,VGM,AUTO,TRUE,APPARENT
   'ffffff1b0c0000ffffffff': 'ff,ff,ff,1b,0c,00,02,d1,06,ff,ff',
   'ffffff180c0000ffffffff': 'ff,ff,ff,18,0c,00,02,01,01,ff,ff',
   'ffffff14090000ffffffff': 'ff,ff,ff,14,09,00,02,c1,0a,ff,ff',
@@ -148,8 +170,10 @@ const commission_reply = {
   'ffffff21090000ffffffff': 'ff,ff,ff,21,09,00,02,aa,c7,ff,ff',
   'ffffff1f1b0000ffffffff': 'ff,ff,ff,1f,1b,00,02,d0,07,ff,ff',
   'ffffff1f1a0000ffffffff': 'ff,ff,ff,1f,1a,00,02,d0,07,ff,ff',
+  'ffffff21190000ffffffff': 'ff,ff,ff,21,19,00,02,aa,c7,0c,ff',
   'ffffff220b0000ffffffff': 'ff,ff,ff,22,b0,00,02,17,13,ff,ff',
   'ffffff221a0000ffffffff': 'ff,ff,ff,22,1a,00,02,88,13,ff,ff',
+  'ffffff230d0000ffffffff': 'ff,ff,ff,23,0d,00,02,05,ff,ff,ff', // <- single setting?
   'ffffff1e1a0000ffffffff': 'ff,ff,ff,1e,1a,00,02,88,13,ff,ff',
   'fffffff200b000ffffffff': 'ff,ff,ff,20,0b,00,02,88,13,ff,ff',
   'fffffff201b000ffffffff': 'ff,ff,ff,20,1b,00,02,d0,07,ff,ff',
@@ -157,75 +181,7 @@ const commission_reply = {
   'fffffff230b000ffffffff': 'ff,ff,ff,23,0b,00,02,00,00,ff,ff',
   'fffffff040d000ffffffff': 'ff,ff,ff,04,0d,00,02,00,00,ff,ff',
   'fffffff0901000ffffffff': 'ff,ff,ff,09,01,00,02,55,1d,ff,ff',
-  'fffffff0902000ffffffff': 'ff,ff,ff,09,02,00,02,ab,e4,ff,ff',
   'fffffff0902000ffffffff': 'ff,ff,ff,09,02,00,02,ab,e4,ff,ff'
-
-
-  // 'ff64ff042d0000ffffffff': 'ff,64,ff,04,2d,00,02,a3,0d,ff,ff',
-  // 'ffffff06000000ffffffff': 'ff,ff,ff,06,00,00,02,00,00,ff,ff',
-  // 'ffffff100000ffffffffff': 'ff,ff,ff,10,00,02,ad,ac,7f,00,ff',
-  // 'ffffff14010000ffffffff': 'ff,ff,ff,14,01,00,02,27,ff,ff,ff',
-  // 'ffffff14010000ffffffff': 'ff,ff,ff,14,01,00,02,43,ff,ff,ff',
-  // 'ffffff140100011a000000': 'ff,ff,ff,14,01,00,02,1a,ff,ff,ff',
-  // 'ffffff14060000ffffffff': 'ff,ff,ff,14,06,00,02,57,00,ff,ff',
-  // 'ffffff14060000ffffffff': 'ff,ff,ff,14,06,00,02,ae,00,ff,ff',
-  // 'ffffff1406000100000000': 'ff,ff,ff,14,06,00,02,00,00,ff,ff',
-  // 'ffffff14090000ffffffff': 'ff,ff,ff,14,09,00,02,50,0a,00,00',
-  // 'ffffff14090001d00a0000': 'ff,ff,ff,14,09,00,02,d0,0a,00,00',
-  // 'ffffff141d0000ffffffff': 'ff,ff,ff,14,1d,00,02,b0,04,ff,ff',   // VRF
-  // 'ffffff141d000160090000': 'ff,ff,ff,14,1d,00,02,b0,04,ff,ff',   // VRF
-  // 'ffffff141d0001b0040000': 'ff,ff,ff,14,1d,00,02,b0,04,ff,ff',
-  // 'ffffff18020000ffffffff': 'ff,ff,ff,18,02,00,02,00,00,ff,ff',
-  // 'ffffff18060000ffffffff': 'ff,ff,ff,18,06,00,02,00,ff,ff,ff',
-  // 'ffffff18090000ffffffff': 'ff,ff,ff,18,09,00,02,01,00,ff,ff',
-  // 'ffffff18090000ffffffff': 'ff,ff,ff,18,09,00,02,07,00,ff,ff',
-  // 'ffffff180a0000ffffffff': 'ff,ff,ff,18,0a,00,02,00,ff,ff,ff',
-  // 'ffffff180a000100000000': 'ff,ff,ff,18,0a,00,02,00,ff,ff,ff',
-  // 'ffffff180a000100ffffff': 'ff,ff,ff,18,0a,00,01,02,00,ff,ff',
-// --- Sail [x]
-//  'ffffff180b0000ffffffff': 'ff,ff,ff,18,0b,00,02,1c,47,ff,ff',
-//  'ffffff180c0000ffffffff': 'ff,ff,ff,18,0c,00,02,2f,01,ff,ff',  // Transition speed 06
-//  'ffffff190d0000ffffffff': 'ff,ff,ff,19,0d,00,02,2d,00,ff,ff',
-//   'ffffff190d0000ffffffff': 'ff,ff,ff,19,0d,00,02,46,00,ff,ff',
-//   'ffffff190e0000ffffffff': 'ff,ff,ff,19,0e,00,02,90,01,ff,ff',
-//   'ffffff190e0000ffffffff': 'ff,ff,ff,19,0e,00,02,c8,00,ff,ff',
-//   'ffffff190f0000ffffffff': 'ff,ff,ff,19,0f,00,02,46,00,ff,ff',
-//   'ffffff190f0000ffffffff': 'ff,ff,ff,19,0f,00,02,64,00,ff,ff',
-//   'ffffff19100000ffffffff': 'ff,ff,ff,19,10,00,02,1e,33,55,00',
-//   'ffffff19100000ffffffff': 'ff,ff,ff,19,10,00,02,ab,1e,33,00',
-//   'ffffff19110000ffffffff': 'ff,ff,ff,19,11,00,02,01,ff,ff,ff',
-//   'ffffff19110000ffffffff': 'ff,ff,ff,19,11,00,02,04,ff,ff,ff',
-//   'ffffff1a0d0000ffffffff': 'ff,ff,ff,1a,0d,00,02,46,00,ff,ff',
-//   'ffffff1a0d0000ffffffff': 'ff,ff,ff,1a,0d,00,02,d7,00,ff,ff',
-//   'ffffff1a0e0000ffffffff': 'ff,ff,ff,1a,0e,00,02,90,01,ff,ff',
-//   'ffffff1a0e0000ffffffff': 'ff,ff,ff,1a,0e,00,02,c8,00,ff,ff',
-//   'ffffff1a0f0000ffffffff': 'ff,ff,ff,1a,0f,00,02,8c,00,ff,ff',
-//   'ffffff1a0f0000ffffffff': 'ff,ff,ff,1a,0f,00,02,de,00,ff,ff',
-//   'ffffff1a100000ffffffff': 'ff,ff,ff,1a,10,00,02,ab,1e,33,ff',
-//   'ffffff1a110000ffffffff': 'ff,ff,ff,1a,11,00,02,03,ff,ff,ff',
-//   'ffffff1a110000ffffffff': 'ff,ff,ff,1a,11,00,02,04,ff,ff,ff',
-//   'ffffff1b0c0000ffffffff': 'ff,ff,ff,1b,0c,00,02,d1,06,ff,ff',
-//   'ffffff1c010000ffffffff': 'ff,ff,ff,1c,01,00,02,74,14,ff,ff',
-//   'ffffff1c020000ffffffff': 'ff,ff,ff,1c,02,00,02,74,14,ff,ff',
-//   'ffffff1c080000ffffffff': 'ff,ff,ff,1c,08,00,02,78,00,ff,ff',
-//   'ffffff1c090000ffffffff': 'ff,ff,ff,1c,09,00,02,14,00,ff,ff',
-//   'ffffff1c110000ffffffff': 'ff,ff,ff,1c,11,00,02,01,ff,ff,ff',
-//   'ffffff1c110000ffffffff': 'ff,ff,ff,1c,11,00,02,04,ff,ff,ff',
-//   'ffffff1e1a0000ffffffff': 'ff,ff,ff,1e,1a,00,02,88,13,ff,ff',
-//   'ffffff1f1a0000ffffffff': 'ff,ff,ff,1f,1a,00,02,d0,07,ff,ff',
-//   'ffffff1f1b0000ffffffff': 'ff,ff,ff,1f,1b,00,02,d0,07,ff,ff',
-//   'ffffff200b0000ffffffff': 'ff,ff,ff,20,0b,00,02,17,13,ff,ff',
-//   'ffffff201b0000ffffffff': 'ff,ff,ff,20,1b,00,02,d0,07,ff,ff',
-//   'ffffff21190000ffffffff': 'ff,ff,ff,21,19,00,02,aa,c7,0c,00',
-//   'ffffff220b0000ffffffff': 'ff,ff,ff,22,0b,00,02,17,13,ff,ff',
-//   'ffffff221a0000ffffffff': 'ff,ff,ff,22,1a,00,02,88,13,ff,ff',
-//   'ffffff230b0000ffffffff': 'ff,ff,ff,23,0b,00,02,00,00,ff,ff',
-//   'ffffff230d0000ffffffff': 'ff,ff,ff,23,0d,00,02,05,ff,ff,ff',
-//   'ffffff3a000000ffffffff': 'ff,ff,ff,3a,00,00,02,00,00,ff,ff'
-//    // ffffff180a000100ffffff Sail
-//    // ffffff180a000101ffffff Outboard
-//    // ffffff180a000102ffffff Displacement
-//    // ffffff180a000103ffffff Planing
 }
 
 var heading;
@@ -481,123 +437,6 @@ async function AP44_PGN65305 () {
   }
 }
 
-async function AP44_bootconfig () {
-  const messages = [
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,18,0a,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,1a,0d,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,19,0d,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,1a,0f,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,19,0f,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,1a,0e,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,19,0e,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,1a,10,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,19,10,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,18,02,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,1a,11,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,19,11,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,1c,11,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,18,06,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,14,06,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,14,01,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,14,1d,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,1c,01,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,1c,02,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,1c,08,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,18,0b,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,1c,09,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,1b,0c,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,18,0c,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,14,09,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,18,09,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,21,19,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,1f,1b,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,1f,1a,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,22,0b,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,22,1a,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,1e,1a,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,20,0b,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,20,1b,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,23,0d,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,23,0b,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,18,0a,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,1a,0d,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,19,0d,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,1a,0f,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,19,0f,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,1a,0e,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,19,0e,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,1a,10,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,19,10,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,18,02,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,1a,11,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,19,11,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,1c,11,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,18,06,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,14,06,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,14,01,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,14,1d,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,1c,01,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,1c,02,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,1c,08,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,18,0b,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,1c,09,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,1b,0c,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,18,0c,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,14,09,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,18,09,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,21,19,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,1f,1b,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,1f,1a,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,22,0b,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,22,1a,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,1e,1a,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,20,0b,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,20,1b,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,23,0d,00,00,ff,ff,ff,ff",
-    "%s,3,130840,%s,%s,14,41,9f,01,ff,ff,ff,23,0b,00,00,ff,ff,ff,ff" ]
-  for (var nr in messages) {
-    msg = util.format(messages[nr], (new Date()).toISOString(), canbus.candevice.address)
-    canbus.sendPGN(msg)
-    await sleep(25)
-  }
-}
-
-
-async function AC12_bootconfig () {
-  const messages = [
-    "%s,2,130845,%s,%s,0e,41,9f,fe,ff,ff,ff,18,09,00,01,07,00,ff,ff,ff",
-    "%s,2,130845,%s,%s,0e,41,9f,ff,ff,01,ff,07,45,00,01,36,08,2b,01,ff",
-    "%s,2,130845,%s,%s,0e,41,9f,ff,00,01,ff,07,44,00,01,8b,b5,0a,00,ff",
-    "%s,2,130845,%s,%s,0e,41,9f,ff,00,01,ff,07,43,00,01,71,44,54,00,ff"
-/*
-    "%s,3,130840,%s,%s,11,41,9f,ff,00,01,02,ff,09,3f,04,34,e8,00,a0,50,c0,ff",
-    "%s,3,130840,%s,%s,11,41,9f,ff,05,01,fe,ff,03,ac,fb,e3,10,00,82,78,c0,ff",
-    "%s,3,130840,%s,%s,11,41,9f,ff,02,01,7f,ff,03,d1,15,80,11,00,91,78,c0,ff",
-    "%s,3,130840,%s,%s,11,41,9f,ff,03,01,0b,ff,04,15,11,77,22,00,be,a0,c0,ff",
-    "%s,3,130840,%s,%s,11,41,9f,ff,08,01,23,ff,00,ac,fb,e3,10,00,82,78,c0,ff",
-    "%s,3,130840,%s,%s,11,41,9f,ff,09,01,01,ff,00,e1,b9,3a,e8,00,96,50,c0,ff",
-    "%s,3,130840,%s,%s,11,41,9f,ff,04,01,01,ff,03,e1,b9,3a,e8,00,96,50,c0,ff",
-    "%s,3,130840,%s,%s,11,41,9f,ff,01,01,fe,ff,03,6c,1f,b8,2f,00,aa,78,c0,ff",
-    "%s,3,130840,%s,%s,11,41,9f,ff,38,64,01,ff,32,e1,b9,3a,e8,00,96,50,c0,ff",
-    "%s,3,130840,%s,%s,11,41,9f,ff,6a,64,fe,ff,ff,6c,5f,b3,2f,00,8c,50,c0,ff",
-    "%s,3,130840,%s,%s,11,41,9f,ff,36,64,01,ff,32,e1,b9,3a,e8,00,96,50,c0,ff",
-    "%s,3,130840,%s,%s,11,41,9f,ff,68,64,fe,ff,ff,6c,5f,b3,2f,00,8c,50,c0,ff",
-    "%s,3,130840,%s,%s,11,41,9f,ff,36,64,01,ff,32,e1,b9,3a,e8,00,96,50,c0,ff",
-    "%s,3,130840,%s,%s,11,41,9f,ff,36,64,01,ff,32,e1,b9,3a,e8,00,96,50,c0,ff",
-    "%s,3,130840,%s,%s,11,41,9f,ff,68,64,fe,ff,ff,6c,5f,b3,2f,00,8c,50,c0,ff",
-    "%s,3,130840,%s,%s,11,41,9f,ff,68,64,fe,ff,ff,6c,5f,b3,2f,00,8c,50,c0,ff",
-    "%s,3,130840,%s,%s,11,41,9f,ff,38,64,01,ff,32,e1,b9,3a,e8,00,96,50,c0,ff",
-    "%s,3,130840,%s,%s,11,41,9f,ff,38,64,01,ff,32,e1,b9,3a,e8,00,96,50,c0,ff",
-    "%s,3,130840,%s,%s,11,41,9f,ff,6a,64,fe,ff,ff,6c,5f,b3,2f,00,8c,50,c0,ff",
-    "%s,3,130840,%s,%s,11,41,9f,ff,6a,64,fe,ff,ff,6c,5f,b3,2f,00,8c,50,c0,ff"
-  */
-  ]
-  for (var nr in messages) {
-    msg = util.format(messages[nr], (new Date()).toISOString(), canbus.candevice.address)
-    canbus.sendPGN(msg)
-    await sleep(25)
-  }
-}
 
 async function AC12_PGN65340 () {
   // Valid options:
@@ -791,22 +630,20 @@ switch (emulate) {
       break;
 	case 'AP44':
 	    debug('Emulate: Simrad AP44 Autopilot controller')
-      // setTimeout(AP44_bootconfig, 5000) // Once at startup
       setInterval(PGN130822, 300000) // Every 5 minutes
       setInterval(AP44_PGN65305, 1000) // Every 1 minute
       setInterval(heartbeat, 60000) // Heart beat PGN
 	    break;
 	case 'AC12':
 	    debug('Emulate: Simrad AC12 Autopilot')
-      setTimeout(AC12_bootconfig, 5000) // Once at startup
       setInterval(PGN130822, 300000) // Every 5 minutes
-      // setInterval(AC12_PGN65340, 1000) // Every second
+      setInterval(AC12_PGN65340, 1000) // Every second
       setInterval(AC12_PGN65341_02, 5000) // Every 5 second
-      // setInterval(AC12_PGN65341_1s, 1000) // Every second
+      setInterval(AC12_PGN65341_1s, 1000) // Every second
       setInterval(AC12_PGN65341_5s, 5000) // Every 5 seconds
       setInterval(AC12_PGN65305, 1000)
       setInterval(AC12_PGN127245, 200); // Every 200ms
-      // setInterval(AC12_PGN130860, 1000) // Every second
+      setInterval(AC12_PGN130860, 1000) // Every second
       setInterval(heartbeat, 60000) // Heart beat PGN
       setInterval(AC12_PGN127237, 500) // Heading/track PGN
       setInterval(AC12_PGN127250, 500) // True heading
@@ -1075,24 +912,37 @@ function mainLoop () {
                 pgn130845 = [];
               }
               if (pgn130845.length > 14) { // We have 3 parts now
-                debug('PGN130845 request: %s', PGN130845);
-                // PGN130845 = PGN130845.replace(/,/g,'').substring(0,30);
+                // debug('PGN130845: %s', PGN130845);
                 PGN130845_1 = PGN130845.replace(/,/g,'').substring(0,8);
-                PGN130845_2 = PGN130845.replace(/,/g,'').substring(8,30);
-                PGN130845 = PGN130845.substring(0,12);
-                // debug('PGN130845_1: %s', PGN130845_1);
-                // debug('PGN130845_2: %s', PGN130845_2);
-                PGN130845_2 = commission_reply[PGN130845_2];
-                if (PGN130845_2 === undefined) {
-                  debug('PGN130845 reply  : not found');
+                PGN130845_key = PGN130845.replace(/,/g,'').substring(8,30);
+                PGN130845_reply = PGN130845.substring(0,12);
+                // Read or write?
+                if (PGN130845.match(/^0e,41,9f,(00|73),ff,ff,ff,..,..,00,00/)) {
+                  // Read
+                  PGN130845_value = commission_reply[PGN130845_key];
+                  if (PGN130845_value === undefined) {
+                    debug('130845: missing %s', PGN130845_key);
+                  } else {
+                    debug('130845: Request %s  Reply %s', PGN130845_key, PGN130845_value);
+                    PGN130845_reply = PGN130845_reply + PGN130845_value
+                  }
+                } else if (PGN130845.match(/^0e,41,9f,00,ff,ff,ff,..,..,00,0[12]/)) {
+                  // Write
+                  PGN130845_reply = PGN130845.substring(12,44)
+                  PGN130845_key = PGN130845_key.replace(/0001......../, '0000ffffffff');
+                  PGN130845_reply = PGN130845_reply.replace(/(ff,ff,ff,..,..),(..,..)/, '$1,00,02');
+                  debug('130845: Write   %s  Reply %s', PGN130845_key, PGN130845_reply);
+                  commission_reply[PGN130845_key] = PGN130845_reply
+                  PGN130845_reply = PGN130845;
                 } else {
-                  PGN130845 = PGN130845 + PGN130845_2;
-                  debug('Commission (130845): %s -> %s', PGN130845_1, PGN130845_2);
-                  PGN130845 = "%s,3,130845,%s,255," + PGN130845;
-                  PGN130845 = util.format(PGN130845, (new Date()).toISOString(), canbus.candevice.address)
-                  // debug('Sending PGN130845: %s', PGN130845)
-                  canbus.sendPGN(PGN130845)
+                  // Unclear
+                  debug('PGN130845 unclear type: %s', PGN130845)
+                  PGN130845_reply = PGN130845.substring(14,500)
                 }
+                PGN130845_reply = "%s,3,130845,%s,255," + PGN130845_reply;
+                PGN130845_reply = util.format(PGN130845_reply, (new Date()).toISOString(), canbus.candevice.address)
+                // debug('PGN130845 reply: %s', PGN130845_reply)
+                canbus.sendPGN(PGN130845_reply)
                 pgn130845 = [];
               }
             }
