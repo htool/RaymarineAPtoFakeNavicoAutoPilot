@@ -28,7 +28,8 @@ var ac12mode = 'headinghold';
 var lastac12mode = '';
 var ac12state = 'standby';
 var part = 0
-var wind_target_rad
+var wind_apparent_deg
+var wind_target_deg
 
 function hex2bin(hex){
     return ("00000000" + (parseInt(hex, 16)).toString(2)).substr(-8);
@@ -369,10 +370,18 @@ function AC12_PGN127250 () {
 }
 
 function AC12_PGN65341 () {
-  // B&G Wind target PGN
-  const message = "%s,6,65341,0,255,8,41,9f,ff,ff,03,ff,%s"
-  msg = util.format(message, (new Date()).toISOString(), canbus.candevice.address, wind_target_rad)
-  canbus.sendPGN(msg)
+  if (ac12mode == 'wind') {
+    if (ac12state == 'standby') {
+      wind_target_deg = wind_apparent_deg
+    }
+    wind_target_rad = Math.trunc(degsToRad(wind_target_deg) * 10000)
+    wind_target_hex = padd((wind_target_rad & 0xff).toString(16), 2) + "," + padd(((wind_target_rad >> 8) & 0xff).toString(16), 2)
+    // debug ("wind_target_hex: %s wind_deg: %s", wind_target_hex, wind_target_deg);
+    // B&G Wind target PGN
+    const message = "%s,6,65341,%s,255,8,41,9f,ff,ff,03,ff,%s"
+    msg = util.format(message, (new Date()).toISOString(), canbus.candevice.address, wind_target_hex)
+    canbus.sendPGN(msg)
+  }
 }
 
 function AC12_PGN127245 () {
@@ -494,7 +503,6 @@ async function AC12_PGN65341_5s () {
   const messages = [
     "%s,6,65341,%s,255,8,41,9f,ff,ff,0b,ff,00,00",
     "%s,6,65341,%s,255,8,41,9f,ff,ff,0c,ff,ff,ff",
-    "%s,6,65341,%s,255,8,41,9f,ff,ff,03,ff,ff,ff",
     "%s,6,65341,%s,255,8,41,9f,ff,ff,02,ff,ff,ff" ]
   for (var nr in messages) {
     msg = util.format(messages[nr], (new Date()).toISOString(), canbus.candevice.address)
@@ -638,8 +646,9 @@ switch (emulate) {
 	    debug('Emulate: Simrad AC12 Autopilot')
       setInterval(PGN130822, 300000) // Every 5 minutes
       setInterval(AC12_PGN65340, 1000) // Every second
+      setInterval(AC12_PGN65341, 1000) // Wind target angle
       setInterval(AC12_PGN65341_02, 5000) // Every 5 second
-      setInterval(AC12_PGN65341_1s, 1000) // Every second
+      // setInterval(AC12_PGN65341_1s, 1000) // Every second
       setInterval(AC12_PGN65341_5s, 5000) // Every 5 seconds
       setInterval(AC12_PGN65305, 1000)
       setInterval(AC12_PGN127245, 200); // Every 200ms
@@ -815,21 +824,11 @@ function mainLoop () {
                   pilot_state = 'wind';
                   ac12mode = 'wind';
                   ac12state = 'engaged';
+                  wind_target_deg = wind_apparent_deg
+                  debug('Setting target wind to: %s', wind_target_deg)
                   AC12_PGN65341_02();
                   debug('Raymarine mode: %s  AC12 mode: %s  state: %s', pilot_state, ac12mode, ac12state);
                 }
-              } else if (Seatalkmode.match(/16,3b,9f,f0,81,7f/)) {
-                // Get wind target from Seatalk1 packet
-                // debug ('Seatalk1 Pilot wind target info: %j', Seatalkmode);
-                wind_target_rad = Seatalkmode.substr(part,5);
-                var wind_target_rad_1 = wind_target_rad.substr(0,2);
-                var wind_target_rad_2 = wind_target_rad.substr(3,2);
-               
-                if (part > 100) { part = 0 }
-                wind_target_deg = radsToDeg(parseInt('0x' + wind_target_rad_2 + wind_target_rad_1))/10000;
-                // debug('pos: %s wind_target_rad: %s,%s  wind_target_deg: %s', part, wind_target_rad_1, wind_target_rad_2, wind_target_deg)
-                debug ('wind target: %j %s %s', Seatalkmode, wind_target_rad, wind_target_deg);
-                // AC12_PGN65341();
               } else if (Seatalkmode.match(/16,3b,9f,f0,81,84,..,..,..,4[08],/) || Seatalkmode.match(/16,3b,9f,f0,81,84,..,..,..,44,/) ) {
                 if (pilot_state != 'standby') {
                   debug('Following Seatalk1 pilot mode standby: %s', Seatalkmode);
@@ -878,6 +877,12 @@ function mainLoop () {
             }
             locked_heading = radsToDeg(parseInt('0x' + locked_heading_rad[1] + locked_heading_rad[0]))/10000;
             // debug('locked heading: %s', locked_heading)
+
+          } else if (msg.pgn.pgn == 130306) {
+          // Get apparent wind angle
+            wind_apparent_rad = buf2hex(msg.data).slice(3,5);
+            wind_apparent_deg = Math.round(radsToDeg(parseInt('0x' + wind_apparent_rad[1] + wind_apparent_rad[0]))/10000);
+            // debug ('Wind: %s', wind_apparent_deg);
 
           } else if (msg.pgn.pgn == 127245 && msg.pgn.src == 115) {
           // Get rudder angle info from Seatalk1 packet
