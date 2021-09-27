@@ -30,6 +30,7 @@ var ac12state = 'standby';
 var part = 0
 var wind_apparent_deg
 var wind_target_deg
+var cts_rad
 
 function hex2bin(hex){
     return ("00000000" + (parseInt(hex, 16)).toString(2)).substr(-8);
@@ -398,7 +399,7 @@ function AC12_PGN128275 (log_pgn_data) {
 
 function AC12_PGN127237 () {
   const heading_track_pgn = {
-      "navigation" : "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,%s,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s",
+      "navigation" : "%s,2,127237,%s,%s,15,ff,3f,ff,ff,7f,%s,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s",
       "headinghold": "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,%s,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s",
       "wind":        "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s",
       "standby":     "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s" // Magnetic
@@ -408,6 +409,9 @@ function AC12_PGN127237 () {
   if (ac12state == 'engaged') {
     switch (ac12mode) {
       case 'navigation':
+        var msg = util.format(heading_track_pgn[ac12mode], (new Date()).toISOString(), canbus.candevice.address,255, cts_rad, heading_rad)
+        canbus.sendPGN(msg);
+        break;
       case 'headinghold':
         var msg = util.format(heading_track_pgn[ac12mode], (new Date()).toISOString(), canbus.candevice.address,255, locked_heading_rad, heading_rad)
         canbus.sendPGN(msg);
@@ -552,8 +556,8 @@ async function AC12_PGN65305 () {
         break;
       case 'navigation': // unknown
         messages = [
-          // "%s,7,65305,%s,255,8,41,9f,00,02,02,00,00,00",
-          "%s,7,65305,%s,255,8,41,9f,00,0a,0a,00,80,00" ]
+          "%s,7,65305,%s,255,8,41,9f,00,02,10,00,00,00",
+          "%s,7,65305,%s,255,8,41,9f,00,0a,16,00,80,00" ]
         break;
       case 'nodrift': 
         messages = [
@@ -590,8 +594,8 @@ async function AC12_PGN65305 () {
         break;
       case 'navigation': // unknown
         messages = [
-          // "%s,7,65305,%s,255,8,41,9f,00,02,10,00,00,00",
-          "%s,7,65305,%s,255,8,41,9f,00,0a,10,00,00,00" ]
+          "%s,7,65305,%s,255,8,41,9f,00,02,02,00,00,00",
+          "%s,7,65305,%s,255,8,41,9f,00,0a,f0,00,80,00" ]
         break;
       case 'nonfollowup':  // unknown
         messages = [
@@ -771,7 +775,7 @@ function mainLoop () {
                     debug('Sending Seatalk key state pgn 126720 %j', pgn126720);
                     canbus.sendPGN(pgn126720);
                   } else if (state_button == 'navigation') {
-                    debug('B&G button Navigation pressed. Navigation in mode %s', ac12mode)
+                    debug('B&G button Navigation pressed. Navigation in state %s', ac12state)
                     if (ac12state == 'standby') {
                       debug('Going to Heading Hold first')
                       pgn126720 = util.format(raymarine_state_command, (new Date()).toISOString(), canbus.candevice.address, autopilot_dst, raymarine_state_code['headinghold']);
@@ -901,13 +905,21 @@ function mainLoop () {
             mag_variation = radsToDeg(parseInt('0x' + buf2hex(msg.data)[5] + buf2hex(msg.data)[4]))/10000;
             // debug('Got variation from 127258: %s', mag_variation)
           } else if (msg.pgn.pgn == 129284) { // Navigation bearing info
-            pgn129284 = pgn129284.concat(buf2hex(msg.data).slice(1)); // Skip multipart byte
+            // Header?
+            if (pgn129284.length == 0) {
+              pgn129284 = pgn129284.concat(buf2hex(msg.data));
+            } else {
+              pgn129284 = pgn129284.concat(buf2hex(msg.data).slice(1)); // Skip multipart byte
+            }
             PGN129284 = pgn129284.join(',');
             if (!PGN129284.match(/^[02468ace]0,22,/)) {
               pgn129284 = [];
             }
-            if (pgn129284.length > 8) { // We have 2 parts now
-              // debug('PGN129284: %s', PGN129284)
+            if (pgn129284.length > 32) { // We have 6 parts now
+              PGN129284 = PGN129284.substring(3)
+              cts_rad = PGN129284.substring(45,50)
+              // debug('PGN129284: %s %s', cts_rad, PGN129284)
+              pgn129284 = [];
             }
           } else if (msg.pgn.pgn == 130845) { // Commission Simnet reply
               pgn130845 = pgn130845.concat(buf2hex(msg.data).slice(1)); // Skip multipart byte
