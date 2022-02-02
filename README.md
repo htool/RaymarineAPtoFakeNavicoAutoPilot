@@ -20,12 +20,16 @@ Still to be done:
 ## Usage
 
 For now I start it in screen on the Raspberry Pi like this:
+```
 $ node ./emulate.js <device to emulate> <device address>
+```
 so I use
+```
 $ node ./emulate.js AC12 1
+```
 
 Sample output:
-<pre><code>
+```
 pi@boatnet:~/src/RaymarineAPtoFakeNavicoAutoPilot $ DEBUG=canboatjs:candevice,emulate,canbus node emulate.js AC12 1
   emulate Loading ./device/AC12.js +0ms
   emulate deviceAddress: "1" +36ms
@@ -55,4 +59,4 @@ pi@boatnet:~/src/RaymarineAPtoFakeNavicoAutoPilot $ DEBUG=canboatjs:candevice,em
   emulate ISO request from 6 to 1 Data PGN: 60928 +1ms
   canboatjs:candevice handleISORequest {"canId":417988870,"prio":6,"src":6,"dst":1,"pgn":59904,"timestamp":"2020-04-29T07:10:23.671Z","fields":{"PGN":60928}} +4ms
   canboatjs:candevice Sending PGN {"pgn":60928,"dst":6,"Unique Number":1751521,"Manufacturer Code":1857,"Device Function":150,"Device Class":40,"Device Instance Lower":0,"Device Instance Upper":0,"System Instance":0,"Industry Group":4,"Reserved1":1,"Reserved2":2,"src":"1"} +1ms
-</code></pre>
+```
