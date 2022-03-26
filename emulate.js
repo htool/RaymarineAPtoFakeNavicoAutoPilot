@@ -83,39 +83,6 @@ switch (emulate) {
 			});
 		}
   break;
-  case 'OP10keypad':
-    console.log('OP10 keypad emulator\nButtons: a=auto s=standby m=mode u=-10 i=-1 o=+1 p=+10')
-	  const readline = require('readline');
-		readline.emitKeypressEvents(process.stdin);
-		process.stdin.setRawMode(true);
-		process.stdin.on('keypress', (str, key) => {
-		  if (key.ctrl && key.name === 'c') {
-			  process.exit();
-			} else if (key.name === 'a') {
-			    button='auto'
-			} else if (key.name === 's') {
-			    button='standby'
-			} else if (key.name === 'm') {
-			    button='mode'
-			} else if (key.name === 'u') {
-			    button='-1'
-			} else if (key.name === 'i') {
-			    button='+1'
-			} else if (key.name === 'o') {
-			    button='-10'
-			} else if (key.name === 'p') {
-			    button='+10'
-      } else {
-        debug('Key not mapped: %s', key.name);
-      }
-      if (typeof button != 'undefined') {
-        msg = util.format(op10msg, (new Date()).toISOString(), canbus.candevice.address, hexByte(canbus.candevice.address), op10_key_code[button]);
-        // debug('Sending pgn: %s', msg);
-        canbus.sendPGN(msg)
-      }
-      delete button
-    });
-  break;
 }
 
 var commission_reply = {
@@ -199,20 +166,6 @@ var pgn129284 = [];
 var pgn130845 = [];
 var rudder_pgn_data = 'ff,f8,ff,ff,00,00,ff,ff';
 
-const op10msg = '%s,2,130850,%s,255,0c,41,9f,%s,ff,ff,%s,00,00,00,ff';
-
-const op10_key_code = {
-    "+1":      "02,ff,ff,02,0d,00,04",
-    "+10":     "02,ff,ff,02,0d,00,05",
-    "-1":      "02,ff,ff,02,0d,00,ff",
-    "-10":     "02,ff,ff,0a,06,00,00",
-    "auto":    "02,ff,ff,0a,09,00,00",
-    "mode":    "02,ff,ff,0a,0f,00,00",
-    "standby": "02,ff,ff,0a,1c,00,00",
-    "-1-10":   "",
-    "+1+10":   ""
-}
-
 // Raymarine setup
 const raymarine_state_command = "%s,3,126720,%s,%s,16,3b,9f,f0,81,86,21,%s,00,00,00,00,ff,ff,ff,ff,ff";
 const raymarine_state_code = {
@@ -221,6 +174,7 @@ const raymarine_state_code = {
     "wind":         "23,dc,00,00,00",  // Windvane mode
     "navigation":   "03,fc,3c,42,00"   // Track mode
 }
+
 
 const raymarine_key_command = "%s,3,126720,%s,%s,19,3b,9f,f0,81,86,21,%s,07,01,02,00,00,00,00,00,00,00,00,00,00,00,ff,ff,ff";
 const raymarine_key_code = {
@@ -361,11 +315,12 @@ function AC12_PGN130850 () {
 function AC12_PGN127250 () {
   // 2020-04-19-18:45:46.934,3,127250,7,255,8,0,3b,8f,ff,7f,0e,01,fd
   // 2020-04-19-18:46:19.480 2 115 255 127250 Vessel Heading:  SID = 0; Heading = 210.1 deg; Deviation = Unknown; Variation = Unknown; Reference = Magnetic
-  const message = "%s,3,127250,%s,255,8,00,%s,ff,7f,ff,7f,fd" // fc = true, fd = magnetic
-  // true_heading = Math.trunc(degsToRad(heading + mag_variation) * 10000)
+  const message = "%s,3,127250,%s,255,8,00,%s,ff,7f,ff,7f,fc" // fc = true, fd = magnetic
+  true_heading = Math.trunc(degsToRad(heading + mag_variation) * 10000)
   magnetic_heading = Math.trunc(degsToRad(heading) * 10000)
   // debug ("heading_true_rad: %s  variation: %s", true_heading, mag_variation);
-  heading_hex = padd((magnetic_heading & 0xff).toString(16), 2) + "," + padd(((magnetic_heading >> 8) & 0xff).toString(16), 2)
+  // heading_hex = padd((magnetic_heading & 0xff).toString(16), 2) + "," + padd(((magnetic_heading >> 8) & 0xff).toString(16), 2)
+  heading_hex = padd((true_heading & 0xff).toString(16), 2) + "," + padd(((true_heading >> 8) & 0xff).toString(16), 2)
   msg = util.format(message, (new Date()).toISOString(), canbus.candevice.address, heading_hex)
   canbus.sendPGN(msg)
 }
@@ -399,11 +354,14 @@ function AC12_PGN128275 (log_pgn_data) {
 
 function AC12_PGN127237 () {
   const heading_track_pgn = {
-      "navigation" : "%s,2,127237,%s,%s,15,ff,3f,ff,ff,7f,%s,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s",
-      "headinghold": "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,%s,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s",
-      "wind":        "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s",
-      "standby":     "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s" // Magnetic
-      // "standby":  "%s,2,127237,%s,%s,15,ff,3f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s" // True
+      // "navigation" : "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,%s,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s",    // Magnetic
+      "navigation" : "%s,2,127237,%s,%s,15,ff,3f,ff,ff,7f,%s,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s",    // True
+      // "headinghold": "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,%s,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s", // Magnetic
+      "headinghold": "%s,2,127237,%s,%s,15,ff,3f,ff,ff,7f,%s,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s",    // True
+      // "wind":        "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s", // Magnetic
+      "wind":        "%s,2,127237,%s,%s,15,ff,3f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s", // True
+      // "standby":  "%s,2,127237,%s,%s,15,ff,7f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s" // Magnetic
+      "standby"    : "%s,2,127237,%s,%s,15,ff,3f,ff,ff,7f,ff,ff,00,00,ff,ff,ff,ff,ff,7f,ff,ff,ff,ff,%s" // True
   }
 
   if (ac12state == 'engaged') {
@@ -655,7 +613,7 @@ switch (emulate) {
       // setInterval(AC12_PGN65341_1s, 1000) // Every second
       setInterval(AC12_PGN65341_5s, 5000) // Every 5 seconds
       setInterval(AC12_PGN65305, 1000)
-      setInterval(AC12_PGN127245, 200); // Every 200ms
+      // setInterval(AC12_PGN127245, 200); // Every 200ms
       setInterval(AC12_PGN130860, 1000) // Every second
       setInterval(heartbeat, 60000) // Heart beat PGN
       setInterval(AC12_PGN127237, 500) // Heading/track PGN
@@ -680,9 +638,6 @@ function mainLoop () {
         canbus.candevice.n2kMessage(msg.pgn);
       }
       switch (emulate) {
-        case 'op10keypad':
-          
-          break;
         case 'AC12':
           if (msg.pgn.pgn == 130850 || typeof key_button !== 'undefined' || typeof state_button !== 'undefined') { // Button or Simnet Event, requires reply
             pgn130850 = pgn130850.concat(buf2hex(msg.data).slice(1)); // Skip multipart byte
@@ -808,11 +763,12 @@ function mainLoop () {
             // 16,3b,9f,f0,81
             pilotmode126720 = pilotmode126720.concat(buf2hex(msg.data).slice(1)); // Skip multipart byte
             Seatalkmode = pilotmode126720.join(',');
-            if (!Seatalkmode.match(/^16,3b,9f,f0,81/)) {
+            if (!Seatalkmode.match(/^16,3b,9f,f0,81,84/)) {
               pilotmode126720 = [];
             }
             if (pilotmode126720.length > 24) { // We have 4 parts now
               // debug('Seatalk pilot mode: %s', Seatalkmode)
+              debug('Seatalk pilot mode: %s', Seatalkmode)
               if (Seatalkmode.match(/16,3b,9f,f0,81,84,..,..,..,42,/)) {
                 if (pilot_state != 'auto') {
                   debug('Following Seatalk1 pilot mode heading hold engaged: %s', Seatalkmode);
@@ -890,16 +846,14 @@ function mainLoop () {
 
           } else if (msg.pgn.pgn == 127245 && msg.pgn.src == 115) {
           // Get rudder angle info from Seatalk1 packet
-            rudder_pgn_data = buf2hex(msg.data);
-            rudder_pgn_data[1] = 'ff';
-            rudder_pgn_data[3] = rudder_pgn_data[5];
-            rudder_pgn_data[4] = rudder_pgn_data[4];
-            // rudder_pgn_data[5] = '0a';
-            // 2,127245,2,255,8,ff,ff,ff,7f,ff,7f,ff,ff
-            // rudder_pgn_data =  'ff,ff,90,f8,90,f8,ff,ff';
+            // 2021-11-22-23:26:00.156,2,127245,115,255,8,ff,f8,ff,ff,00,00,ff,ff
+            rudder_pgn_data = buf2hex(msg.data).join(',');
+            // debug('Rudder data: %s', rudder_pgn_data)
+            AC12_PGN127245(rudder_pgn_data);
           } else if (msg.pgn.pgn == 128275 && msg.pgn.src == 115) {
           // Get distance log info from Seatalk1 packet
-            AC12_PGN128275(buf2hex(msg.data));
+            // Isn't working well
+            // AC12_PGN128275(buf2hex(msg.data));
           } else if (msg.pgn.pgn == 127258)  {
           // Get variation info to turn into true heading
             mag_variation = radsToDeg(parseInt('0x' + buf2hex(msg.data)[5] + buf2hex(msg.data)[4]))/10000;
@@ -929,7 +883,8 @@ function mainLoop () {
                 pgn130845 = [];
               }
               if (pgn130845.length > 14) { // We have 3 parts now
-                // debug('PGN130845: %s', PGN130845);
+                debug('PGN130845[3]: %s', PGN130845.split(',')[3]);
+                if (PGN130845.split(',')[3] == hexByte(canbus.candevice.address)) {
                 PGN130845_1 = PGN130845.replace(/,/g,'').substring(0,8);
                 PGN130845_key = PGN130845.replace(/,/g,'').substring(8,30);
                 PGN130845_reply = PGN130845.substring(0,12);
@@ -961,7 +916,8 @@ function mainLoop () {
                 // debug('PGN130845 reply: %s', PGN130845_reply)
                 canbus.sendPGN(PGN130845_reply)
                 pgn130845 = [];
-              }
+              } 
+             }
             }
           break;
         default:
