@@ -372,6 +372,9 @@ function AC12_PGN127237 () {
         break;
       case 'headinghold':
         var msg = util.format(heading_track_pgn[ac12mode], (new Date()).toISOString(), canbus.candevice.address,255, locked_heading_rad, heading_rad)
+        debug('PGN127237: %s', msg)
+        debug('heading_rad: %s', heading_rad)
+        debug('locked_heading_rad: %s', locked_heading_rad)
         canbus.sendPGN(msg);
         break;
       case 'wind':
@@ -768,7 +771,6 @@ function mainLoop () {
             }
             if (pilotmode126720.length > 24) { // We have 4 parts now
               // debug('Seatalk pilot mode: %s', Seatalkmode)
-              debug('Seatalk pilot mode: %s', Seatalkmode)
               if (Seatalkmode.match(/16,3b,9f,f0,81,84,..,..,..,42,/)) {
                 if (pilot_state != 'auto') {
                   debug('Following Seatalk1 pilot mode heading hold engaged: %s', Seatalkmode);
@@ -822,6 +824,7 @@ function mainLoop () {
               heading_rad = heading_mag_rad
             }
             heading = radsToDeg(parseInt('0x' + heading_rad[1] + heading_rad[0]))/10000
+            heading_rad = heading_rad.join(',')
             // debug('heading: %s', heading)
 
           } else if (msg.pgn.pgn == 65360) {
@@ -829,13 +832,14 @@ function mainLoop () {
             // debug ('Seatalk1 Pilot locked heading info: %j %j', msg.pgn, msg.data);
             var locked_heading_true_rad = buf2hex(msg.data).slice(3,5);
             var locked_heading_mag_rad = buf2hex(msg.data).slice(5,7);
-            // debug ("heading_true_rad: %s heading_mag_rad: %s", heading_true_rad, heading_mag_rad);
+            debug ("heading_true_rad: %s heading_mag_rad: %s", heading_true_rad, heading_mag_rad);
             if (locked_heading_true_rad[0] != 'ff') {
               locked_heading_rad = locked_heading_true_rad
             } else {
               locked_heading_rad = locked_heading_mag_rad
             }
             locked_heading = radsToDeg(parseInt('0x' + locked_heading_rad[1] + locked_heading_rad[0]))/10000;
+            locked_heading_rad = locked_heading_rad.join(',')
             // debug('locked heading: %s', locked_heading)
 
           } else if (msg.pgn.pgn == 130306) {
