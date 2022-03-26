@@ -888,7 +888,6 @@ function mainLoop () {
               }
               if (pgn130845.length > 14) { // We have 3 parts now
                 debug('PGN130845[3]: %s', PGN130845.split(',')[3]);
-                if (PGN130845.split(',')[3] == hexByte(canbus.candevice.address)) {
                 PGN130845_1 = PGN130845.replace(/,/g,'').substring(0,8);
                 PGN130845_key = PGN130845.replace(/,/g,'').substring(8,30);
                 PGN130845_reply = PGN130845.substring(0,12);
@@ -921,7 +920,6 @@ function mainLoop () {
                 canbus.sendPGN(PGN130845_reply)
                 pgn130845 = [];
               } 
-             }
             }
           break;
         default:
