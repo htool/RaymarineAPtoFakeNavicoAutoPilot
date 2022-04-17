@@ -19,7 +19,7 @@ Still to be done:
 
 ## Usage
 
-For now I start it in screen on the Raspberry Pi like this:
+To test start it in screen on the Raspberry Pi like this:
 ```
 $ node ./emulate.js <device to emulate> <device address>
 ```
@@ -59,4 +59,32 @@ pi@boatnet:~/src/RaymarineAPtoFakeNavicoAutoPilot $ DEBUG=canboatjs:candevice,em
   emulate ISO request from 6 to 1 Data PGN: 60928 +1ms
   canboatjs:candevice handleISORequest {"canId":417988870,"prio":6,"src":6,"dst":1,"pgn":59904,"timestamp":"2020-04-29T07:10:23.671Z","fields":{"PGN":60928}} +4ms
   canboatjs:candevice Sending PGN {"pgn":60928,"dst":6,"Unique Number":1751521,"Manufacturer Code":1857,"Device Function":150,"Device Class":40,"Device Instance Lower":0,"Device Instance Upper":0,"System Instance":0,"Industry Group":4,"Reserved1":1,"Reserved2":2,"src":"1"} +1ms
+```
+
+
+### As pipedProvider in SignalK
+
+You can add it to SignalK as pipedProvier in the ~/.signalk/settings.json like:
+
+```
+    {
+      "id": "Emulate AP12",
+      "pipeElements": [
+        {
+          "type": "providers/execute",
+          "options": {
+            "command_old": "tail -f /dev/null",
+            "command_old2": "DEBUG=canboatjs:emulate node /home/pi/src/RaymarineAPtoFakeNavicoAutoPilot/emulate.js AC12 0",
+            "command": "node /home/pi/src/RaymarineAPtoFakeNavicoAutoPilot/emulate.js AC12 0",
+            "providerId": "Emulate AP12"
+          }
+        },
+        {
+          "type": "providers/liner"
+        },
+        {
+          "type": "providers/from_json"
+        }
+      ]
+    },
 ```
