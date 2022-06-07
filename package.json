@@ -1,0 +1,33 @@
+{
+  "name": "emualtesimradac12",
+  "version": "1.0.0",
+  "description": "Emulate Simrad AC12",
+  "main": "emulate.js",
+  "directories": {
+    "doc": "doc"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/htool/RaymarineAPtoFakeNavicoAutoPilot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/htool/RaymarineAPtoFakeNavicoAutoPilot/issues"
+  },
+  "homepage": "https://github.com/htool/RaymarineAPtoFakeNavicoAutoPilot#readme",
+  "dependencies": {
+    "@canboat/pgns": "^1.1.1",
+    "bit-buffer": "^0.2.4",
+    "date-fns": "^2.14.0",
+    "debug": "^4.1.1",
+    "int64-buffer": "^0.99.1007",
+    "lodash": "^4.17.15",
+    "mqtt": "^4.1.0",
+    "serialport": "^9.0.0",
+    "socketcan": "^2.9.1"
+  }
+}
